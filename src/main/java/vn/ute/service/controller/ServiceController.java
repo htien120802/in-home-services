@@ -9,6 +9,7 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.response.ServiceDto;
 import vn.ute.service.service.ServiceService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -16,6 +17,11 @@ import java.util.UUID;
 public class ServiceController {
     @Autowired
     private ServiceService serviceService;
+
+    @GetMapping("")
+    public ResponseEntity<ResponseDto<List<ServiceDto>>> getAllServices(){
+        return serviceService.getAllServices();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDto<ServiceDto>> getServiceById(@PathVariable("id") String id){

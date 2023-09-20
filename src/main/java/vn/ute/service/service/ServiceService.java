@@ -1,4 +1,6 @@
 package vn.ute.service.service;
+import org.modelmapper.TypeToken;
+import org.modelmapper.internal.bytebuddy.description.method.MethodDescription;
 import org.springframework.stereotype.Service;
 import vn.ute.service.dto.request.NewServiceRequest;
 import vn.ute.service.entity.CategoryEntity;
@@ -11,6 +13,8 @@ import vn.ute.service.dto.response.ServiceDto;
 import vn.ute.service.reposioty.CategoryRepository;
 import vn.ute.service.reposioty.ServiceRepository;
 
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,5 +57,11 @@ public class ServiceService {
         }else {
             return ResponseEntity.ok(new ResponseDto<>("failure","Service with this id is not exist!",null));
         }
+    }
+
+    public ResponseEntity<ResponseDto<List<ServiceDto>>> getAllServices() {
+        List<ServiceDto> serviceDtos = mapper.map(serviceRepository.findAll(),new TypeToken<List<ServiceDto>>() {}.getType());
+
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",serviceDtos));
     }
 }
