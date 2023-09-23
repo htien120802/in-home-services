@@ -1,9 +1,10 @@
-package vn.ute.service.dto.response;
+package vn.ute.service.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.ute.service.dto.CategoryDto;
+import vn.ute.service.dto.DescriptionDto;
 import vn.ute.service.dto.ImageDto;
 import vn.ute.service.dto.ReviewDto;
 

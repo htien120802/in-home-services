@@ -6,29 +6,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.ute.service.dto.request.NewServiceRequest;
 import vn.ute.service.dto.response.ResponseDto;
-import vn.ute.service.dto.response.ServiceDto;
+import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.service.ServiceService;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/service")
+@RequestMapping("")
 public class ServiceController {
     @Autowired
     private ServiceService serviceService;
 
-    @GetMapping("")
+    @GetMapping("/public/service")
     public ResponseEntity<ResponseDto<List<ServiceDto>>> getAllServices(){
         return serviceService.getAllServices();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/public/service/{id}")
     public ResponseEntity<ResponseDto<ServiceDto>> getServiceById(@PathVariable("id") String id){
         return serviceService.getServiceById(id);
     }
 
-    @PostMapping(value = "",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/provider/service",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto<ServiceDto>> createService(@RequestBody NewServiceRequest service){
         return serviceService.createService(service);
     }

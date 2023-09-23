@@ -1,6 +1,5 @@
 package vn.ute.service.service;
 import org.modelmapper.TypeToken;
-import org.modelmapper.internal.bytebuddy.description.method.MethodDescription;
 import org.springframework.stereotype.Service;
 import vn.ute.service.dto.request.NewServiceRequest;
 import vn.ute.service.entity.CategoryEntity;
@@ -9,11 +8,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import vn.ute.service.dto.response.ResponseDto;
-import vn.ute.service.dto.response.ServiceDto;
+import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.reposioty.CategoryRepository;
 import vn.ute.service.reposioty.ServiceRepository;
 
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

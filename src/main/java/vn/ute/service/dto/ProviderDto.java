@@ -1,5 +1,6 @@
-package vn.ute.service.dto.response;
+package vn.ute.service.dto;
 
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,6 +8,5 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DescriptionDto {
-    private String statement;
+public class ProviderDto {
 }
