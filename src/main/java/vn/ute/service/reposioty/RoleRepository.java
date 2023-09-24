@@ -6,4 +6,5 @@ import vn.ute.service.entity.RoleEntity;
 import java.util.UUID;
 
 public interface RoleRepository extends JpaRepository<RoleEntity, UUID> {
+    RoleEntity findByRoleName(String roleName);
 }

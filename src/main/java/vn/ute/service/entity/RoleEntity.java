@@ -25,7 +25,7 @@ public class RoleEntity {
     @Column(unique = true)
     private String roleName;
 
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles",fetch = FetchType.EAGER)
     private Set<AccountEntity> accounts = new HashSet<>();
 
 }

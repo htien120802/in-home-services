@@ -29,7 +29,7 @@ public class TokenEntity {
 
     public boolean expired;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
     public AccountEntity account;
 }

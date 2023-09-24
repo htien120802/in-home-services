@@ -1,11 +1,14 @@
 package vn.ute.service.service;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import vn.ute.service.dto.request.SignInRequest;
 import vn.ute.service.dto.request.SignUpRequest;
 import vn.ute.service.dto.response.AuthenticationResponse;
 import vn.ute.service.dto.response.ResponseDto;
@@ -14,10 +17,10 @@ import vn.ute.service.entity.CustomerEntity;
 import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.TokenEntity;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.AccountRepository;
-import vn.ute.service.reposioty.CustomerRepository;
-import vn.ute.service.reposioty.ProviderRepository;
-import vn.ute.service.reposioty.TokenRepository;
+import vn.ute.service.reposioty.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -32,6 +35,9 @@ public class AuthService {
 
     @Autowired
     private TokenRepository tokenRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -53,6 +59,8 @@ public class AuthService {
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         account = accountRepository.save(account);
 
+        account.getRoles().add(roleRepository.findByRoleName("ROLE_"+signUpRequest.getRoleName().toUpperCase()));
+
         if (signUpRequest.getRoleName().equals("customer")){
             CustomerEntity customer = mapper.map(signUpRequest,CustomerEntity.class);
             customer.setAccount(account);
@@ -66,6 +74,29 @@ public class AuthService {
         String jwtToken = jwtService.generateToken(account);
         String refreshToken = jwtService.generateRefreshToken(account);
 
+        saveToken(jwtToken,account);
+
+        return ResponseEntity.ok(new ResponseDto<>("success","Create account successfully", new AuthenticationResponse(jwtToken,refreshToken)));
+    }
+
+    public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest){
+        if (EmailValidator.getInstance().isValid(signInRequest.getUsername())){
+            if (accountRepository.findByEmail(signInRequest.getUsername()).isPresent())
+                signInRequest.setUsername(accountRepository.findByEmail(signInRequest.getUsername()).get().getUsername());
+        }
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
+
+        Optional<AccountEntity> account = accountRepository.findByUsername(signInRequest.getUsername());
+        if (!account.isPresent())
+            return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
+        String jwtToken = jwtService.generateToken(account.get());
+        String refreshToken = jwtService.generateRefreshToken(account.get());
+        revokeAllUserTokens(account.get());
+        saveToken(jwtToken,account.get());
+        return ResponseEntity.ok(new ResponseDto<>("success","Sign in successfully",new AuthenticationResponse(jwtToken,refreshToken)));
+    }
+
+    private void saveToken(String jwtToken, AccountEntity account){
         TokenEntity token = new TokenEntity();
         token.setAccount(account);
         token.setTokenType("BEARER");
@@ -73,6 +104,33 @@ public class AuthService {
         token.setExpired(false);
         token.setToken(jwtToken);
         tokenRepository.save(token);
-        return ResponseEntity.ok(new ResponseDto<>("success","Create account successfully", new AuthenticationResponse(jwtToken,refreshToken)));
+    }
+
+    private void revokeAllUserTokens(AccountEntity account) {
+        List<TokenEntity> validUserTokens = tokenRepository.findAllValidTokenByAccount(account.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+    public ResponseEntity<ResponseDto<?>> refreshToken(String authorization) {
+        String refreshToken = authorization.substring(7);
+        String username = jwtService.extractUsername(refreshToken);
+        if (username != null) {
+            Optional<AccountEntity> account = accountRepository.findByUsername(username);
+            if (!account.isPresent())
+                return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
+            if (jwtService.isTokenValid(refreshToken, account.get())) {
+                String accessToken = jwtService.generateToken(account.get());
+                revokeAllUserTokens(account.get());
+                saveToken(accessToken, account.get());
+                return ResponseEntity.ok(new ResponseDto<>("success","Refresh token successfully",new AuthenticationResponse(accessToken,refreshToken)));
+            }
+        }
+        return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
     }
 }

@@ -3,6 +3,7 @@ package vn.ute.service.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.ute.service.dto.request.NewServiceRequest;
 import vn.ute.service.dto.response.ResponseDto;
@@ -16,7 +17,6 @@ import java.util.List;
 public class ServiceController {
     @Autowired
     private ServiceService serviceService;
-
     @GetMapping("/public/service")
     public ResponseEntity<ResponseDto<List<ServiceDto>>> getAllServices(){
         return serviceService.getAllServices();
