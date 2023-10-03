@@ -24,8 +24,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class ApplicationConfig {
     private final AccountRepository repository;
-    @Value("${application.origin}")
-    private String origin;
+
 
     @Bean
     public UserDetailsService userDetailsService() {
