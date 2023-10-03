@@ -31,4 +31,5 @@ public class ServiceController {
     public ResponseEntity<ResponseDto<ServiceDto>> createService(@RequestBody NewServiceRequest service){
         return serviceService.createService(service);
     }
+
 }

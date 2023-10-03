@@ -30,8 +30,17 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseDto<?>> logout(@RequestHeader("Authorization") String authorization){
+        if (authorization.isEmpty())
+            return ResponseEntity.ok(new ResponseDto<>("fail","Token is empty",null));
+        return authService.logout(authorization);
+    }
+
     @PostMapping("/refresh-token")
     public  ResponseEntity<ResponseDto<?>> refreshToken(@RequestHeader("Authorization") String authorization){
+        if (authorization.isEmpty())
+            return ResponseEntity.ok(new ResponseDto<>("fail","Token is empty",null));
         return authService.refreshToken(authorization);
     }
 

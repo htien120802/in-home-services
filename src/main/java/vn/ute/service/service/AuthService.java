@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.ute.service.dto.request.SignInRequest;
@@ -132,5 +133,18 @@ public class AuthService {
             }
         }
         return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
+    }
+
+    public ResponseEntity<ResponseDto<?>> logout(String authorization) {
+        String jwt = authorization.substring(7);
+        TokenEntity storedToken = tokenRepository.findByToken(jwt)
+                .orElse(null);
+        if (storedToken != null) {
+            storedToken.setExpired(true);
+            storedToken.setRevoked(true);
+            tokenRepository.save(storedToken);
+            SecurityContextHolder.clearContext();
+        }
+        return ResponseEntity.ok(new ResponseDto<>("success","Logout successfully",null));
     }
 }
