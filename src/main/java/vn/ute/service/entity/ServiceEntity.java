@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
+import vn.ute.service.enumerate.ServiceStatus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,8 +25,12 @@ public class ServiceEntity {
 
     private String name;
 
+    private String thumbnail;
 
     private double price;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(15) default 'APPROVING'")
+    private ServiceStatus status;
 
     @ManyToOne
     @JoinColumn(name = "provider_id")

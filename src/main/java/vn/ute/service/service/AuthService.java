@@ -85,11 +85,10 @@ public class AuthService {
             if (accountRepository.findByEmail(signInRequest.getUsername()).isPresent())
                 signInRequest.setUsername(accountRepository.findByEmail(signInRequest.getUsername()).get().getUsername());
         }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
-
         Optional<AccountEntity> account = accountRepository.findByUsername(signInRequest.getUsername());
         if (!account.isPresent())
             return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
         String jwtToken = jwtService.generateToken(account.get());
         String refreshToken = jwtService.generateRefreshToken(account.get());
         revokeAllUserTokens(account.get());

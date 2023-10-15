@@ -22,6 +22,9 @@ public class CategoryEntity {
     private UUID id;
     @Column(unique = true)
     private String categoryName;
+
+    private String thumbnail;
+
     private String description;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
