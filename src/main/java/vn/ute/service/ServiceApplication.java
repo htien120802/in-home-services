@@ -38,12 +38,7 @@ public class ServiceApplication {
 
     @PostConstruct
     public void initial(){
-        AccountEntity account = accountRepository.findById(UUID.fromString("c0a80a0e-8af8-1556-818a-f8cac5810000")).orElse(null);
 
-        account.getRoles().clear();
-        account.getRoles().add(roleRepository.findById(UUID.fromString("c0a80566-8aab-139a-818a-ab839e640002")).get());
-
-        accountRepository.save(account);
     }
 
 }

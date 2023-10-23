@@ -25,24 +25,33 @@ public class ServiceController {
         return serviceService.getAllServices();
     }
 
+    @GetMapping("/provider/service")
+    public ResponseEntity<ResponseDto<?>> getServiceByProvider(@RequestHeader("Authorization") String authorization){
+        return serviceService.getServiceByProvider(authorization);
+    }
+
+    @GetMapping("/admin/service/approving")
+    public ResponseEntity<ResponseDto<?>> getServiceApproving(){
+        return serviceService.getServiceApproving();
+    }
+
+
     @GetMapping("/public/service/{id}")
     public ResponseEntity<ResponseDto<ServiceDto>> getServiceById(@PathVariable("id") String id){
         return serviceService.getServiceById(id);
     }
 
-    @PreAuthorize("hasRole('PROVIDER')")
     @PostMapping(value = "/provider/service",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE} )
     public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestBody RegisterServiceRequest service, @RequestPart("thumbnail") MultipartFile thumbnail){
         return serviceService.registerService(service, thumbnail);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/admin/service", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto<?>> approveRegisterRequest(@RequestBody ApproveRegisterServiceRequest approveRequest){
         return serviceService.approveRegisterRequest(approveRequest);
     }
 
-    @PreAuthorize("hasAnyRole('PROVIDER','ADMIN')")
+
     @DeleteMapping(value = "/provider/service/{id}")
     public ResponseEntity<ResponseDto<?>> deleteService(@PathVariable("id") UUID id, @RequestHeader("Authorization") String authorization){
         return serviceService.deleteService(id, authorization);

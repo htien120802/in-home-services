@@ -103,9 +103,7 @@ public class ServiceService {
     public ResponseEntity<ResponseDto<?>> deleteService(UUID id, String authorization) {
         Optional<ServiceEntity> service = serviceRepository.findById(id);
         if (service.isPresent()){
-
-            String jwt = authorization.substring(7);
-            String username = jwtService.extractUsername(jwt);
+            String username = jwtService.getUsernameFromAuthorization(authorization);
             AccountEntity account = accountRepository.findByUsername(username).orElse(null);
 
             if (account != null && account.getProvider() != null){
@@ -125,5 +123,17 @@ public class ServiceService {
             }
         }
         return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
+    }
+
+    public ResponseEntity<ResponseDto<?>> getServiceByProvider(String authorization) {
+        String username = jwtService.getUsernameFromAuthorization(authorization);
+        List<ServiceDto> services = mapper.map(serviceRepository.findAllByProvider_Account_Username(username),new TypeToken<List<ServiceDto>>() {}.getType());
+
+        return ResponseEntity.ok(new ResponseDto<>("success","Get services by provider successfully!",services));
+    }
+
+    public ResponseEntity<ResponseDto<?>> getServiceApproving() {
+        List<ServiceDto> services = mapper.map(serviceRepository.findAllByStatusIs(ServiceStatus.APPROVING),new TypeToken<List<ServiceDto>>() {}.getType());
+        return ResponseEntity.ok(new ResponseDto<>("success","Get services with approving status successfully!",services));
     }
 }
