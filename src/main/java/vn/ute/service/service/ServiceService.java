@@ -133,6 +133,7 @@ public class ServiceService {
     }
 
     public ResponseEntity<ResponseDto<?>> getServiceApproving(String status) {
+        status = status.toUpperCase();
         List<ServiceDto> services = mapper.map(serviceRepository.findAllByStatusIs(ServiceStatus.valueOf(status)),new TypeToken<List<ServiceDto>>() {}.getType());
         return ResponseEntity.ok(new ResponseDto<>("success","Get services with approving status successfully!",services));
     }

@@ -38,7 +38,12 @@ public class ServiceApplication {
 
     @PostConstruct
     public void initial(){
-
+//        AccountEntity account = new AccountEntity();
+//        account.setUsername("admin");
+//        account.setPassword("admin");
+//        RoleEntity role = roleRepository.findByRoleName("ROLE_ADMIN");
+//        account.getRoles().add(role);
+//        accountRepository.save(account);
     }
 
 }
