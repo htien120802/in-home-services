@@ -132,8 +132,8 @@ public class ServiceService {
         return ResponseEntity.ok(new ResponseDto<>("success","Get services by provider successfully!",services));
     }
 
-    public ResponseEntity<ResponseDto<?>> getServiceApproving() {
-        List<ServiceDto> services = mapper.map(serviceRepository.findAllByStatusIs(ServiceStatus.APPROVING),new TypeToken<List<ServiceDto>>() {}.getType());
+    public ResponseEntity<ResponseDto<?>> getServiceApproving(String status) {
+        List<ServiceDto> services = mapper.map(serviceRepository.findAllByStatusIs(ServiceStatus.valueOf(status)),new TypeToken<List<ServiceDto>>() {}.getType());
         return ResponseEntity.ok(new ResponseDto<>("success","Get services with approving status successfully!",services));
     }
 }

@@ -30,9 +30,9 @@ public class ServiceController {
         return serviceService.getServiceByProvider(authorization);
     }
 
-    @GetMapping("/admin/service/approving")
-    public ResponseEntity<ResponseDto<?>> getServiceApproving(){
-        return serviceService.getServiceApproving();
+    @GetMapping("/admin/service/{status}")
+    public ResponseEntity<ResponseDto<?>> getServiceApproving(@PathVariable("status") String status){
+        return serviceService.getServiceApproving(status);
     }
 
 
