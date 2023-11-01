@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: SSH into server
-      run: sshpass -p ${{ secrets.ROOT_PASS }} ssh -tt root@103.146.23.19
+      run: ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@103.146.23.19
     - name: Pull image and re-run
       run: |
         docker compose stop
