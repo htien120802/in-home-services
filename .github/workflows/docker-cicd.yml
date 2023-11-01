@@ -16,11 +16,12 @@ jobs:
     - name: Push Docker Image
       run: docker push huutien120802/app-server
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: SSH into server
-      run: sshpass -p ${{ secrets.ROOT_PASS }} ssh root@103.146.23.19
+      run: sshpass -p ${{ secrets.ROOT_PASS }} ssh -tt root@103.146.23.19
     - name: Pull image and re-run
       run: |
         docker compose stop
