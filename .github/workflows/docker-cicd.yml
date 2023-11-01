@@ -21,9 +21,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: SSH into server
+      env:
+        PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+        HOSTNAME: ${{secrets.SSH_HOST}}
+        USER_NAME: ${{secrets.USER_NAME}}
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh -i ~/.ssh/id_rsa root@103.146.23.19 "docker compose stop && docker compose pull && docker compose up -d"
-  
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} " docker compose stop && docker compose pull && docker compose up -d"
