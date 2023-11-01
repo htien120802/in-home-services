@@ -34,7 +34,9 @@ public class ProviderEntity {
     @PhoneNumber
     private String phone;
 
-    private String specialization;
+    private String avatar;
+
+//    private String specialization;
 
     private double rating;
 
@@ -48,8 +50,8 @@ public class ProviderEntity {
 
     @OneToMany(mappedBy = "provider")
     private Set<AddressEntity> addresses = new HashSet<>();
-
-    @OneToOne
-    @JoinColumn(name = "image_id")
-    private ImageEntity avatar;
+//
+//    @OneToOne
+//    @JoinColumn(name = "image_id")
+//    private ImageEntity avatar;
 }

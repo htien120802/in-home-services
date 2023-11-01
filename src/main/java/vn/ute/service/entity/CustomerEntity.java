@@ -36,6 +36,8 @@ public class CustomerEntity {
     @PhoneNumber
     private String phone;
 
+    private String avatar;
+
     // One user can create multiple reviews
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private Set<ReviewEntity> reviews;
@@ -51,9 +53,9 @@ public class CustomerEntity {
     @OneToMany(mappedBy = "customer")
     private Set<AddressEntity> addresses = new HashSet<>();
 
-    @OneToOne
-    @JoinColumn(name = "image_id")
-    private ImageEntity avatar;
+//    @OneToOne
+//    @JoinColumn(name = "image_id")
+//    private ImageEntity avatar;
 
 
 }

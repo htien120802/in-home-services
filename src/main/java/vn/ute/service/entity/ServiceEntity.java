@@ -49,6 +49,6 @@ public class ServiceEntity {
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
     private Set<ScheduleEntity> schedules = new HashSet<>();
 
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-    private Set<ImageEntity> images = new HashSet<>();
+//    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
+//    private Set<ImageEntity> images = new HashSet<>();
 }

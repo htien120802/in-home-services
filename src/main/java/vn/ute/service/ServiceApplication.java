@@ -38,6 +38,8 @@ public class ServiceApplication {
 
     @PostConstruct
     public void initial(){
+
+
 //        AccountEntity account = new AccountEntity();
 //        account.setUsername("admin");
 //        account.setPassword("admin");

@@ -25,7 +25,8 @@ public class CategoryEntity {
 
     private String thumbnail;
 
-    private String description;
+    @Column(unique = true)
+    private String slug;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private Set<ServiceEntity> services;
