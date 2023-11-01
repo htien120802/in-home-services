@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>vn.ute</groupId>
-    <artifactId>serviceEntity</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>serviceEntity</name>
-    <description>serviceEntity</description>
+    <artifactId>in-home-service</artifactId>
+    <version>1.0</version>
+    <name>in-home-service</name>
+    <description>in-home-service</description>
     <properties>
         <java.version>17</java.version>
     </properties>

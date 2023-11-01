@@ -1,36 +1,17 @@
-#### Stage 1: Build the application
-FROM openjdk:17.0.1-jdk-slim as build
-
-# Set the current working directory inside the image
+# Stage 1: Build the Spring Boot application
+FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
 
-# Copy maven executable to the image
-COPY mvnw .
-COPY .mvn .mvn
+# Copy the project files and build the application
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy the pom.xml file
-COPY pom.xml .
+# Stage 2: Create a minimal image to run the application
+FROM adoptopenjdk:17-jre-hotspot
+WORKDIR /app
 
-# Build all the dependencies in preparation to go offline.
-# This is a separate step so the dependencies will be cached unless
-# the pom.xml file has changed.
-RUN ./mvnw dependency:go-offline -B
+# Copy the JAR file from the build stage into the final image
+COPY --from=build /app/target/in-home-service-1.0.jar /app/in-home-service.jar
 
-# Copy the project source
-COPY src src
-
-# Package the application
-RUN ./mvnw package -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
-
-#### Stage 2: A minimal docker image with command to run the app
-FROM openjdk:17.0.1-jdk-slim
-
-ARG DEPENDENCY=/app/target/dependency
-
-# Copy project dependencies from the build stage
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-
-ENTRYPOINT ["java","-cp","app:app/lib/*","vn.ute.service.ServiceApplication"]
+# Specify the command to run your application
+CMD ["java", "-jar", "in-home-service.jar"]
