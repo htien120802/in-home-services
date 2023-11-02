@@ -28,4 +28,4 @@ jobs:
         PASSWORD: ${{secrets.PASSWORD}}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        sshpass -p ${{ secrets.PASSWORD }} ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} "docker compose stop && docker compose up --pull=always -d"
+        sshpass -p ${{ secrets.PASSWORD }} ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} "docker compose stop && docker compose up --pull=always -d"
