@@ -3,13 +3,10 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-
+    
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Login Docker hub
@@ -18,3 +15,15 @@ jobs:
       run: docker build -t huutien120802/app-server .
     - name: Push Docker Image
       run: docker push huutien120802/app-server
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Pull && Re-reun services
+      uses: appleboy/ssh-action@master
+      with:
+        username: ${{secrets.USER_NAME}}
+        host:  ${{secrets.SSH_HOST}}
+        password: ${{secrets.PASSWORD}}
+        script: "docker compose stop && docker compose up --pull=always -d"

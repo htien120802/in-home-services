@@ -7,7 +7,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Stage 2: Create a minimal image to run the application
-FROM adoptopenjdk:17-jre-hotspot
+FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app
 
 # Copy the JAR file from the build stage into the final image
