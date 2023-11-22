@@ -38,14 +38,10 @@ public class ServiceApplication {
 
     @PostConstruct
     public void initial(){
-
-
-//        AccountEntity account = new AccountEntity();
-//        account.setUsername("admin");
-//        account.setPassword("admin");
-//        RoleEntity role = roleRepository.findByRoleName("ROLE_ADMIN");
-//        account.getRoles().add(role);
-//        accountRepository.save(account);
+//
+//
+//        AccountEntity account = accountRepository.findByCustomer_EmailOrProvider_Email("dhtien120802@gmail.com","dhtien120802@gmail.com").orElse(null);
+//        System.out.println(account.getCustomer().getEmail());
     }
 
 }

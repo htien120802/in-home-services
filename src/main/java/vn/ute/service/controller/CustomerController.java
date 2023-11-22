@@ -1,5 +1,6 @@
 package vn.ute.service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +18,22 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping("/customer/profile")
-    public ResponseEntity<ResponseDto<CustomerDto>> getProfile(@RequestHeader("Authorization") String authorization){
-        return customerService.getProfile(authorization);
+    public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request){
+        return customerService.getProfile(request);
     }
 
-    @PutMapping(value = "/customer/profile", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody CustomerProfileRequest customerProfile, @RequestHeader("Authorization") String authorization){
-        return customerService.updateProfile(customerProfile,authorization);
+    @PutMapping(value = "/customer/profile")
+    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody CustomerProfileRequest customerProfile, HttpServletRequest request){
+        return customerService.updateProfile(customerProfile,request);
     }
 
-    @PostMapping(value = "/customer/address", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<?>> addAddress(@RequestBody AddressDto addressDto, @RequestHeader("Authorization") String authorization){
-        return customerService.addAddress(addressDto,authorization);
+    @PostMapping(value = "/customer/address")
+    public ResponseEntity<ResponseDto<?>> addAddress(@RequestBody AddressDto addressDto, HttpServletRequest request){
+        return customerService.addAddress(addressDto,request);
     }
 
-    @PutMapping(value = "/customer/address", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<?>> updateAddress(@RequestBody AddressDto addressDto, @RequestHeader("Authorization") String authorization){
-        return customerService.updateAddress(addressDto,authorization);
+    @PutMapping(value = "/customer/address")
+    public ResponseEntity<ResponseDto<?>> updateAddress(@RequestBody AddressDto addressDto, HttpServletRequest request){
+        return customerService.updateAddress(addressDto,request);
     }
 }

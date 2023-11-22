@@ -1,7 +1,9 @@
 package vn.ute.service.reposioty;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import vn.ute.service.entity.AccountEntity;
 
 import java.util.List;
@@ -14,9 +16,6 @@ public interface AccountRepository extends JpaRepository<AccountEntity, UUID> {
     boolean existsByUsername(String username);
 
     Optional<AccountEntity> findByUsername(String username);
-    @Query(value = """
-    select a from AccountEntity a where a.customer.email = :email or a.provider.email = :email
-    """)
-    Optional<AccountEntity> findByEmail(String email);
+    Optional<AccountEntity> findByCustomer_EmailOrProvider_Email(String email1, String email2);
 
 }

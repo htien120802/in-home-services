@@ -1,5 +1,6 @@
 package vn.ute.service.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,11 +83,12 @@ public class AuthService {
 
     public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest){
         if (EmailValidator.getInstance().isValid(signInRequest.getUsername())){
-            if (accountRepository.findByEmail(signInRequest.getUsername()).isPresent())
-                signInRequest.setUsername(accountRepository.findByEmail(signInRequest.getUsername()).get().getUsername());
+            Optional<AccountEntity> temp = accountRepository.findByCustomer_EmailOrProvider_Email(signInRequest.getUsername(),signInRequest.getUsername());
+            if (temp.isPresent())
+                signInRequest.setUsername(temp.get().getUsername());
         }
         Optional<AccountEntity> account = accountRepository.findByUsername(signInRequest.getUsername());
-        if (!account.isPresent())
+        if (account.isEmpty())
             return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
         String jwtToken = jwtService.generateToken(account.get());
@@ -117,12 +119,12 @@ public class AuthService {
         tokenRepository.saveAll(validUserTokens);
     }
 
-    public ResponseEntity<ResponseDto<?>> refreshToken(String authorization) {
-        String refreshToken = authorization.substring(7);
+    public ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request) {
+        String refreshToken = jwtService.getTokenFromRequest(request);
         String username = jwtService.extractUsername(refreshToken);
         if (username != null) {
             Optional<AccountEntity> account = accountRepository.findByUsername(username);
-            if (!account.isPresent())
+            if (account.isEmpty())
                 return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
             if (jwtService.isTokenValid(refreshToken, account.get())) {
                 String accessToken = jwtService.generateToken(account.get());
@@ -134,8 +136,10 @@ public class AuthService {
         return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
     }
 
-    public ResponseEntity<ResponseDto<?>> logout(String authorization) {
-        String jwt = authorization.substring(7);
+    public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request) {
+        if (request.getHeader("Authorization").isEmpty())
+            return ResponseEntity.ok(new ResponseDto<>("fail","Token not found",null));
+        String jwt = jwtService.getTokenFromRequest(request);
         TokenEntity storedToken = tokenRepository.findByToken(jwt)
                 .orElse(null);
         if (storedToken != null) {

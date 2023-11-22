@@ -1,4 +1,5 @@
 package vn.ute.service.service;
+import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -100,10 +101,10 @@ public class ServiceService {
         }
     }
 
-    public ResponseEntity<ResponseDto<?>> deleteService(UUID id, String authorization) {
+    public ResponseEntity<ResponseDto<?>> deleteService(UUID id, HttpServletRequest request) {
         Optional<ServiceEntity> service = serviceRepository.findById(id);
         if (service.isPresent()){
-            String username = jwtService.getUsernameFromAuthorization(authorization);
+            String username = jwtService.getUsernameFromRequest(request);
             AccountEntity account = accountRepository.findByUsername(username).orElse(null);
 
             if (account != null && account.getProvider() != null){
@@ -125,8 +126,8 @@ public class ServiceService {
         return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
     }
 
-    public ResponseEntity<ResponseDto<?>> getServiceByProvider(String authorization) {
-        String username = jwtService.getUsernameFromAuthorization(authorization);
+    public ResponseEntity<ResponseDto<?>> getServiceByProvider(HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
         List<ServiceDto> services = mapper.map(serviceRepository.findAllByProvider_Account_Username(username),new TypeToken<List<ServiceDto>>() {}.getType());
 
         return ResponseEntity.ok(new ResponseDto<>("success","Get services by provider successfully!",services));

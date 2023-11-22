@@ -1,5 +1,6 @@
 package vn.ute.service.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,8 @@ public class CustomerService {
 
     @Autowired
     private ModelMapper mapper;
-    public ResponseEntity<ResponseDto<?>> updateProfile(CustomerProfileRequest customerProfile, String authorization) {
-        String username = jwtService.getUsernameFromAuthorization(authorization);
+    public ResponseEntity<ResponseDto<?>> updateProfile(CustomerProfileRequest customerProfile, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
         Optional<CustomerEntity> customer = customerRepository.findByAccount_Username(username);
         if (customer.isPresent()){
             CustomerEntity temp = customer.get();
@@ -44,8 +45,8 @@ public class CustomerService {
         }
     }
 
-    public ResponseEntity<ResponseDto<?>> addAddress(AddressDto addressDto, String authorization) {
-        String username = jwtService.getUsernameFromAuthorization(authorization);
+    public ResponseEntity<ResponseDto<?>> addAddress(AddressDto addressDto, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
         AddressEntity addressEntity = mapper.map(addressDto,AddressEntity.class);
 
         Optional<CustomerEntity> customerEntity = customerRepository.findByAccount_Username(username);
@@ -62,14 +63,14 @@ public class CustomerService {
         }
     }
 
-    public ResponseEntity<ResponseDto<CustomerDto>> getProfile(String authorization) {
-        String username = jwtService.getUsernameFromAuthorization(authorization);
+    public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
         Optional<CustomerEntity> customerEntity = customerRepository.findByAccount_Username(username);
         return customerEntity.map(entity -> ResponseEntity.ok(new ResponseDto<>("success", "Get profile successfully", mapper.map(entity, CustomerDto.class)))).orElseGet(() -> ResponseEntity.ok(new ResponseDto<>("fail", "Can not find customer", null)));
     }
 
-    public ResponseEntity<ResponseDto<?>> updateAddress(AddressDto addressDto, String authorization) {
-        String username = jwtService.getUsernameFromAuthorization(authorization);
+    public ResponseEntity<ResponseDto<?>> updateAddress(AddressDto addressDto, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
         boolean belongToCustomer = addressRepository.existsByIdAndAndCustomer_Account_Username(addressDto.getId(),username);
         if (belongToCustomer){
             Optional<AddressEntity> addressEntity = addressRepository.findById(addressDto.getId());

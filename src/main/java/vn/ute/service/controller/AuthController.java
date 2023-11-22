@@ -1,5 +1,6 @@
 package vn.ute.service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,17 +32,13 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ResponseDto<?>> logout(@RequestHeader("Authorization") String authorization){
-        if (authorization.isEmpty())
-            return ResponseEntity.ok(new ResponseDto<>("fail","Token is empty",null));
-        return authService.logout(authorization);
+    public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request){
+        return authService.logout(request);
     }
 
     @PostMapping("/refresh-token")
-    public  ResponseEntity<ResponseDto<?>> refreshToken(@RequestHeader("Authorization") String authorization){
-        if (authorization.isEmpty())
-            return ResponseEntity.ok(new ResponseDto<>("fail","Token is empty",null));
-        return authService.refreshToken(authorization);
+    public  ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request){
+     return authService.refreshToken(request);
     }
 
 }

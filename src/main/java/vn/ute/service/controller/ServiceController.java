@@ -1,5 +1,6 @@
 package vn.ute.service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,8 @@ public class ServiceController {
     }
 
     @GetMapping("/provider/service")
-    public ResponseEntity<ResponseDto<?>> getServiceByProvider(@RequestHeader("Authorization") String authorization){
-        return serviceService.getServiceByProvider(authorization);
+    public ResponseEntity<ResponseDto<?>> getServiceByProvider(HttpServletRequest request){
+        return serviceService.getServiceByProvider(request);
     }
 
     @GetMapping("/admin/service/{status}")
@@ -53,8 +54,8 @@ public class ServiceController {
 
 
     @DeleteMapping(value = "/provider/service/{id}")
-    public ResponseEntity<ResponseDto<?>> deleteService(@PathVariable("id") UUID id, @RequestHeader("Authorization") String authorization){
-        return serviceService.deleteService(id, authorization);
+    public ResponseEntity<ResponseDto<?>> deleteService(@PathVariable("id") UUID id, HttpServletRequest request){
+        return serviceService.deleteService(id, request);
     }
 
 
