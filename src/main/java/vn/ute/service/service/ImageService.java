@@ -19,7 +19,7 @@ public class ImageService {
     public String uploadImage(MultipartFile file) {
         try {
             //Generatde name
-            String name = UUID.randomUUID().toString().replaceAll("-","");
+            //String name = UUID.randomUUID().toString().replaceAll("-","");
             //Convert MultipartFile to Map for Cloudinary upload
             Map<?, ?> params = ObjectUtils.asMap(
                     "folder", "storage", // Optional: Set a specific folder

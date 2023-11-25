@@ -51,7 +51,8 @@ public class WebSecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-ui.html",
-            "/public/**"
+            "/public/**",
+            "/payment-callback"
     };
 
     @Bean

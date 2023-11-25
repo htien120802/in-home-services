@@ -59,9 +59,8 @@ public class AuthService {
 
         AccountEntity account = mapper.map(signUpRequest,AccountEntity.class);
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        account = accountRepository.save(account);
-
         account.getRoles().add(roleRepository.findByRoleName("ROLE_"+signUpRequest.getRoleName().toUpperCase()));
+        account = accountRepository.save(account);
 
         if (signUpRequest.getRoleName().equals("customer")){
             CustomerEntity customer = mapper.map(signUpRequest,CustomerEntity.class);

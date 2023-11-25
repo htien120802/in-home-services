@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.ute.service.dto.AddressDto;
 import vn.ute.service.dto.CustomerDto;
 import vn.ute.service.dto.request.CustomerProfileRequest;
+import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.service.CustomerService;
 
@@ -35,5 +36,9 @@ public class CustomerController {
     @PutMapping(value = "/customer/address")
     public ResponseEntity<ResponseDto<?>> updateAddress(@RequestBody AddressDto addressDto, HttpServletRequest request){
         return customerService.updateAddress(addressDto,request);
+    }
+    @PutMapping(value ="/customer/password")
+    public ResponseEntity<ResponseDto<?>> updatePassword(@RequestBody UpdatePasswordRequest updatePasswordRequest, HttpServletRequest request){
+        return customerService.updatePassword(updatePasswordRequest, request);
     }
 }

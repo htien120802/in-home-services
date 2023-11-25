@@ -1,13 +1,14 @@
 package vn.ute.service.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.ute.service.dto.WorkDto;
 import vn.ute.service.dto.request.ApproveRegisterServiceRequest;
 import vn.ute.service.dto.request.RegisterServiceRequest;
-import vn.ute.service.entity.AccountEntity;
-import vn.ute.service.entity.CategoryEntity;
-import vn.ute.service.entity.ServiceEntity;
+import vn.ute.service.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +16,7 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.AccountRepository;
-import vn.ute.service.reposioty.CategoryRepository;
-import vn.ute.service.reposioty.ServiceRepository;
+import vn.ute.service.reposioty.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +28,13 @@ public class ServiceService {
     private ServiceRepository serviceRepository;
 
     @Autowired
+    private WorkRepository workRepository;
+
+    @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ProviderRepository providerRepository;
 
     @Autowired
     private AccountRepository accountRepository;
@@ -45,25 +50,41 @@ public class ServiceService {
 
 
 
-    public ResponseEntity<ResponseDto<ServiceDto>> registerService(RegisterServiceRequest serviceRequest, MultipartFile thumbnail) {
-        ResponseDto<ServiceDto> responseDto = new ResponseDto<>();
-        try {
-            Optional<CategoryEntity> category = categoryRepository.findById(serviceRequest.getCategory());
-            ServiceEntity serviceEntity = mapper.map(serviceRequest, ServiceEntity.class);
-            serviceEntity.setCategory(category.get());
+    public ResponseEntity<ResponseDto<ServiceDto>> registerService(MultipartFile thumbnail, String service, HttpServletRequest request) throws JsonProcessingException {
+        RegisterServiceRequest serviceRequest = new ObjectMapper().readValue(service, RegisterServiceRequest.class);
 
-            String url = imageService.uploadImage(thumbnail);
-            serviceEntity.setThumbnail(url);
-            ServiceDto serviceDto = mapper.map(serviceRepository.save(serviceEntity),ServiceDto.class);
-            responseDto.setData(serviceDto);
-            responseDto.setStatus("success");
-            responseDto.setMessage("Register service successfully!");
-        } catch (Exception e){
-            responseDto.setStatus("fail");
-            responseDto.setMessage("Register service is failure!");
-        } finally {
-            return ResponseEntity.ok(responseDto);
+        String username = jwtService.getUsernameFromRequest(request);
+
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+
+        if (provider == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
         }
+
+        CategoryEntity category = categoryRepository.findById(serviceRequest.getCategory()).orElse(null);
+        if (category == null)
+            return ResponseEntity.ok(new ResponseDto<>("fail","Category not found!",null));
+
+        ServiceEntity serviceEntity = mapper.map(serviceRequest, ServiceEntity.class);
+        serviceEntity.setProvider(provider);
+        serviceEntity.setCategory(category);
+
+        String url = imageService.uploadImage(thumbnail);
+        serviceEntity.setThumbnail(url);
+
+        for (WorkEntity work : serviceEntity.getWorks()){
+            work.setService(serviceEntity);
+        }
+
+        serviceEntity = serviceRepository.save(serviceEntity);
+
+//        for (WorkDto work : serviceRequest.getWorks()){
+//            WorkEntity workEntity = mapper.map(work, WorkEntity.class);
+//            workEntity.setService(serviceEntity);
+//            workRepository.save(workEntity);
+//        }
+        ServiceDto serviceDto = mapper.map(serviceRepository.findById(serviceEntity.getId()),ServiceDto.class);
+        return ResponseEntity.ok(new ResponseDto<>("success","Register service successfully!",serviceDto));
     }
 
     public ResponseEntity<ResponseDto<ServiceDto>> getServiceById(String id) {

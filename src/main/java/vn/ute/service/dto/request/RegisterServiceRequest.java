@@ -3,7 +3,11 @@ package vn.ute.service.dto.request;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+import vn.ute.service.dto.WorkDto;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 @NoArgsConstructor
 @Getter
@@ -12,9 +16,9 @@ public class RegisterServiceRequest {
 
     private String name;
 
-    private String description;
-
-    private double price;
+    private List<WorkDto> works;
 
     private UUID category;
+
+    private MultipartFile thumbnail;
 }

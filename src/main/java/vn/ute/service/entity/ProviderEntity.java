@@ -40,6 +40,9 @@ public class ProviderEntity {
 
     private double rating;
 
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
+    private Set<BookingEntity> bookings;
+
     // One provider can offer multiple services
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     private Set<ServiceEntity> services;

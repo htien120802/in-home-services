@@ -1,5 +1,6 @@
 package vn.ute.service.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.service.ServiceService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,12 +44,12 @@ public class ServiceController {
         return serviceService.getServiceById(id);
     }
 
-    @PostMapping(value = "/provider/service",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE} )
-    public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestBody RegisterServiceRequest service, @RequestPart("thumbnail") MultipartFile thumbnail){
-        return serviceService.registerService(service, thumbnail);
+    @PostMapping(value = "/provider/service", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces =MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestPart MultipartFile thumbnail, @RequestPart String service, HttpServletRequest request) throws JsonProcessingException {
+        return serviceService.registerService(thumbnail, service, request);
     }
 
-    @PutMapping(value = "/admin/service", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/admin/service")
     public ResponseEntity<ResponseDto<?>> approveRegisterRequest(@RequestBody ApproveRegisterServiceRequest approveRequest){
         return serviceService.approveRegisterRequest(approveRequest);
     }

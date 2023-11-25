@@ -3,29 +3,35 @@ package vn.ute.service.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Description")
 @Getter
 @Setter
+@Table(name = "work")
 @NoArgsConstructor
-public class DescriptionEntity {
+public class WorkEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
-    private String statement;
+    private String description;
+
+    private Integer price;
 
     @ManyToOne
     @JoinColumn(name = "service_id")
     private ServiceEntity service;
 
-    public DescriptionEntity(String statement) {
-        this.statement = statement;
+    @ManyToMany(mappedBy = "works",fetch = FetchType.EAGER)
+    private Set<BookingEntity> bookings = new HashSet<>();
+
+    public WorkEntity(String description) {
+        this.description = description;
     }
 }

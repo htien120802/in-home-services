@@ -27,9 +27,8 @@ public class ServiceEntity {
 
     private String thumbnail;
 
-    private double price;
+//    @Column(columnDefinition = "enum('APPROVING', 'APPROVED', 'UNAPPROVED', 'DISABLE', 'DELETE') default 'APPROVING'")
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(15) default 'APPROVING'")
     private ServiceStatus status;
 
     @ManyToOne
@@ -41,7 +40,7 @@ public class ServiceEntity {
     private CategoryEntity category;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-    private Set<DescriptionEntity> descriptions = new HashSet<>();
+    private Set<WorkEntity> works = new HashSet<>();
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
     private Set<ReviewEntity> reviews = new HashSet<>();
@@ -51,4 +50,11 @@ public class ServiceEntity {
 
 //    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
 //    private Set<ImageEntity> images = new HashSet<>();
+
+    @PrePersist
+    private void prePersist(){
+        if (this.status == null){
+            this.status = ServiceStatus.APPROVING;
+        }
+    }
 }

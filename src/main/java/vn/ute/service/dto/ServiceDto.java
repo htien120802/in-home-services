@@ -3,10 +3,6 @@ package vn.ute.service.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.ute.service.dto.CategoryDto;
-import vn.ute.service.dto.DescriptionDto;
-import vn.ute.service.dto.ImageDto;
-import vn.ute.service.dto.ReviewDto;
 
 import java.util.Set;
 import java.util.UUID;
@@ -18,9 +14,7 @@ public class ServiceDto {
 
     private String name;
 
-    private Set<DescriptionDto> descriptions;
-
-    private double price;
+    private Set<WorkDto> works;
 
     private CategoryDto category;
 
