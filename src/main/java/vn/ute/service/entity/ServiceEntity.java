@@ -23,11 +23,13 @@ public class ServiceEntity {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    @Column(nullable = false)
     private String name;
 
     private String thumbnail;
 
 //    @Column(columnDefinition = "enum('APPROVING', 'APPROVED', 'UNAPPROVED', 'DISABLE', 'DELETE') default 'APPROVING'")
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ServiceStatus status;
 

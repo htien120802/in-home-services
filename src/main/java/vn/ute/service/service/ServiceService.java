@@ -70,6 +70,9 @@ public class ServiceService {
         serviceEntity.setCategory(category);
 
         String url = imageService.uploadImage(thumbnail);
+        if(url == null)
+            return ResponseEntity.ok(new ResponseDto<>("fail","Fail to upload image!",null));
+
         serviceEntity.setThumbnail(url);
 
         for (WorkEntity work : serviceEntity.getWorks()){

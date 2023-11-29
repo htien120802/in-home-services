@@ -11,14 +11,18 @@ import vn.ute.service.dto.WorkDto;
 import vn.ute.service.dto.request.CreateBookingRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.*;
+import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.PaymentMethod;
+import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.reposioty.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -54,6 +58,9 @@ public class BookingService {
         }
 
         ServiceEntity objCompare = new ArrayList<>(works).get(0).getService();
+        if (!objCompare.getStatus().equals(ServiceStatus.APPROVED)){
+            return ResponseEntity.ok(new ResponseDto<>("fail","This service no longer provide!",null));
+        }
         boolean validWorks = works.stream().allMatch(work -> work.getService().equals(objCompare));
         if (!validWorks){
             return ResponseEntity.ok(new ResponseDto<>("fail","List of works is invalid!",null));
@@ -84,5 +91,39 @@ public class BookingService {
             return ResponseEntity.ok(new ResponseDto<>("success","Booking successfully!",url));
         }
         return ResponseEntity.ok(new ResponseDto<>("fail","Payment method is invalid!",null));
+    }
+
+    public ResponseEntity<?> getAllBookingOfCustomer(HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+        }
+        List<BookingEntity> bookings = bookingRepository.findAllByCustomer(customer);
+        List<BookingDto> bookingDtos = new ArrayList<>();
+        for (BookingEntity booking : bookings){
+            PaymentEntity payment = paymentRepository.findByBooking(booking).orElse(null);
+            BookingDto bookingDto = mapper.map(booking, BookingDto.class);
+            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
+            bookingDtos.add(bookingDto);
+        }
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+    }
+
+    public ResponseEntity<?> getAllBookingOfCustomerByStatus(String status, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+        }
+        List<BookingEntity> bookings = bookingRepository.findAllByCustomerAndStatus(customer, BookingStatus.valueOf(status.toUpperCase()));
+        List<BookingDto> bookingDtos = new ArrayList<>();
+        for (BookingEntity booking : bookings){
+            PaymentEntity payment = paymentRepository.findByBooking(booking).orElse(null);
+            BookingDto bookingDto = mapper.map(booking, BookingDto.class);
+            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
+            bookingDtos.add(bookingDto);
+        }
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
 }

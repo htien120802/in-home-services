@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import vn.ute.service.dto.AddressDto;
 import vn.ute.service.dto.CustomerDto;
 import vn.ute.service.dto.request.CustomerProfileRequest;
@@ -20,7 +21,6 @@ import vn.ute.service.reposioty.AddressRepository;
 import vn.ute.service.reposioty.CustomerRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class CustomerService {
@@ -35,6 +35,9 @@ public class CustomerService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private ImageService imageService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -115,5 +118,23 @@ public class CustomerService {
         } else {
             return ResponseEntity.ok(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
         }
+    }
+
+    public ResponseEntity<ResponseDto<?>> updateAvatar(MultipartFile avatar, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+
+        if (customer == null)
+            return ResponseEntity.ok(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
+
+        String url = imageService.uploadImage(avatar);
+        if (url == null)
+            return ResponseEntity.ok(new ResponseDto<>("fail", "Fail to upload image!", null));
+
+        customer.setAvatar(url);
+        customer = customerRepository.save(customer);
+
+        return ResponseEntity.ok(new ResponseDto<>("success","Update avatar successfully!",mapper.map(customer,CustomerDto.class)));
+
     }
 }

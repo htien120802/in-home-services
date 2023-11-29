@@ -20,8 +20,10 @@ public class WorkEntity {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Integer price;
 
     @ManyToOne
@@ -31,7 +33,4 @@ public class WorkEntity {
     @ManyToMany(mappedBy = "works",fetch = FetchType.EAGER)
     private Set<BookingEntity> bookings = new HashSet<>();
 
-    public WorkEntity(String description) {
-        this.description = description;
-    }
 }

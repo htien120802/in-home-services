@@ -30,8 +30,11 @@ public class ReviewEntity {
     @JoinColumn(name = "customer_id") // Name of the foreign key column in the Review table
     private CustomerEntity customer; // This field represents the relationship with User
 
+    @Column(nullable = false)
     private int rating;
+    @Column(nullable = false)
     private String comment;
+    @Column(nullable = false)
     private Date date;
 }
 

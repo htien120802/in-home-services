@@ -19,6 +19,4 @@ public class RegisterServiceRequest {
     private List<WorkDto> works;
 
     private UUID category;
-
-    private MultipartFile thumbnail;
 }
