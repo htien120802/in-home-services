@@ -1,33 +1,57 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+/home-service-server/HELP.md
+/home-service-server/target/
+/home-service-server/!.mvn/wrapper/maven-wrapper.jar
+/home-service-server/!**/src/main/**/target/
+/home-service-server/!**/src/test/**/target/
 
 ### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+/home-service-server/.apt_generated
+/home-service-server/.classpath
+/home-service-server/.factorypath
+/home-service-server/.project
+/home-service-server/.settings
+/home-service-server/.springBeans
+/home-service-server/.sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+/home-service-server/.idea
+/home-service-server/*.iws
+/home-service-server/*.iml
+/home-service-server/*.ipr
 
 ### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+/home-service-server//nbproject/private/
+/home-service-server//nbbuild/
+/home-service-server//dist/
+/home-service-server//nbdist/
+/home-service-server//.nb-gradle/
+/home-service-server/build/
+/home-service-server/!**/src/main/**/build/
+/home-service-server/!**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
+/home-service-server/.vscode/
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/home-service-client/node_modules
+/home-service-client/.pnp
+/home-service-client/.pnp.js
+
+# testing
+/home-service-client/coverage
+
+# production
+/home-service-client/build
+
+# misc
+/home-service-client/.DS_Store
+/home-service-client/.env.local
+/home-service-client/.env.development.local
+/home-service-client/.env.test.local
+/home-service-client/.env.production.local
+
+/home-service-client/npm-debug.log*
+/home-service-client/yarn-debug.log*
+/home-service-client/yarn-error.log*

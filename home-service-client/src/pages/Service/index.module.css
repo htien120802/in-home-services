@@ -1,0 +1,39 @@
+h2 {
+  color: black;
+}
+
+p {
+  color: grey;
+}
+
+li {
+  color: grey;
+}
+
+.service-images img {
+  max-width: 100%;
+  height: auto;
+}
+
+.service-reviews {
+  margin-top: 20px;
+}
+
+.service-reviews h3 {
+  font-size: 18px;
+  color: black;
+  margin-bottom: 10px;
+}
+
+.service-reviews ul {
+  list-style: square;
+}
+
+.service-reviews li {
+  font-size: 14px;
+  color: grey;
+}
+
+p > span {
+  color: orange;
+}
