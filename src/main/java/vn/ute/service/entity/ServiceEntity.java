@@ -28,6 +28,8 @@ public class ServiceEntity {
 
     private String thumbnail;
 
+    private Double avgRating;
+
 //    @Column(columnDefinition = "enum('APPROVING', 'APPROVED', 'UNAPPROVED', 'DISABLE', 'DELETE') default 'APPROVING'")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -36,6 +38,9 @@ public class ServiceEntity {
     @ManyToOne
     @JoinColumn(name = "provider_id")
     private ProviderEntity provider;
+
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
+    private Set<BookingEntity> bookings;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -58,5 +63,10 @@ public class ServiceEntity {
         if (this.status == null){
             this.status = ServiceStatus.APPROVING;
         }
+        this.avgRating = 0.0;
+    }
+
+    public void calcAvgRating(){
+        this.avgRating = this.getReviews().stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
     }
 }

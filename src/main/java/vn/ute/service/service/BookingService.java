@@ -74,6 +74,7 @@ public class BookingService {
         booking.setWorks(works);
         booking.setTime(bookingRequest.getTime());
         booking.setDate(bookingRequest.getDate());
+        booking.setService(objCompare);
         booking = bookingRepository.save(booking);
 
         PaymentEntity payment = new PaymentEntity();

@@ -16,6 +16,7 @@ public class BookingDto {
     private UUID id;
     private CustomerDto customer;
     private ProviderDto provider;
+    private ServiceDto service;
     private Set<WorkDto> works;
     private Integer totalPrice;
     private Time time;

@@ -20,5 +20,5 @@ public class ServiceDto {
 
     private Set<ImageDto> images;
 
-    private Set<ReviewDto> reviews;
+//    private Set<ReviewDto> reviews;
 }

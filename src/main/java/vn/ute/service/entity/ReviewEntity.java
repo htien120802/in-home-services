@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 @Entity
@@ -36,5 +36,17 @@ public class ReviewEntity {
     private String comment;
     @Column(nullable = false)
     private Date date;
+
+    @PrePersist
+    private void prePersist(){
+        this.date = new Date(System.currentTimeMillis());
+    }
+
+//    @PostPersist
+//    @PostUpdate
+//    private void postPersist(){
+//        Double avg = this.service.getReviews().stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+//        this.service.setAvgRating(avg);
+//    }
 }
 
