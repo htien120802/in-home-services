@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `service_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `service_db`;
 -- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
 --
 -- Host: localhost    Database: service_db
@@ -223,39 +225,6 @@ LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
 INSERT INTO `customer` VALUES (_binary '¬ ‹ú­‹ú¿\ß\0',NULL,'fgherarducci0@virginia.edu','Fonz','Gherarducci','+84 28 3154 7108',_binary '¬ ‹ú­‹ú¿™\0\0'),(_binary '¬ ‹ú­‹úÀ½\0',NULL,'ekristoffersen1@buzzfeed.com','Erskine','Kristoffersen','+84 28 3592 1811',_binary '¬ ‹ú­‹úÀµ\0'),(_binary '¬ ‹ú­‹úÁS\0',NULL,'gpacey2@cpanel.net','Graham','Pacey','+84 28 3588 6289',_binary '¬ ‹ú­‹úÁN\0'),(_binary '¬ ‹ú­‹ú\Â2\0\n',NULL,'czanazzi3@angelfire.com','Cross','Zanazzi','+84 28 3791 4204',_binary '¬ ‹ú­‹ú\Â(\0	'),(_binary '¬ ‹ú­‹ú\Â\Ş\0\r',NULL,'dpilpovic4@narod.ru','Darlleen','Pilpovic','+84 28 3853 1196',_binary '¬ ‹ú­‹ú\Â\Ö\0'),(_binary '¬ ‹ú­‹ú\Ã\Î\0',NULL,'sallebone5@sohu.com','Steffane','Allebone','+84 28 3176 8930',_binary '¬ ‹ú­‹ú\Ã\Å\0'),(_binary '¬ ‹ú­‹ú\Ä\Û\0',NULL,'snorris6@dagondesign.com','Sam','Norris','+84 28 3673 8077',_binary '¬ ‹ú­‹ú\Ä\Ğ\0'),(_binary '¬ ‹ú­‹úÅ£\0',NULL,'sbarthropp7@addthis.com','Stacia','Barthropp','+84 28 3741 2878',_binary '¬ ‹ú­‹úÅ—\0'),(_binary '¬ ‹ú­‹ú\Æ\Ö\0',NULL,'ljurries8@etsy.com','Lanny','Jurries','+84 28 3838 8287',_binary '¬ ‹ú­‹ú\Æ\Ë\0'),(_binary '¬ ‹ú­‹ú\Çû\0',NULL,'fchomicz9@typepad.com','Florencia','Chomicz','+84 28 3713 9464',_binary '¬ ‹ú­‹ú\Ç\ï\0'),(_binary '¬ ‹ú­‹ú\Èş\0',NULL,'dvaudina@blogtalkradio.com','Deane','Vaudin','+84 28 3141 9951',_binary '¬ ‹ú­‹ú\Èö\0'),(_binary '¬ ‹ú­‹ú\É\É\0\"',NULL,'ddelveb@altervista.org','Dalli','Delve','+84 28 3119 3385',_binary '¬ ‹ú­‹ú\ÉÁ\0!'),(_binary '¬ ‹ú­‹ú\Êx\0%',NULL,'mkittemanc@utexas.edu','Maurine','Kitteman','+84 28 3470 9212',_binary '¬ ‹ú­‹ú\Êq\0$'),(_binary '¬ ‹ú­‹ú\ËD\0(',NULL,'cvenusd@sphinn.com','Christina','Venus','+84 28 3569 3433',_binary '¬ ‹ú­‹ú\Ë;\0\''),(_binary '¬ ‹ú­‹ú\ÌQ\0+',NULL,'kchalcrafte@omniture.com','Kipper','Chalcraft','+84 28 3711 3286',_binary '¬ ‹ú­‹ú\ÌH\0*'),(_binary '¬ ‹ú­‹ú\Í1\0.',NULL,'mjahnerf@youku.com','Mel','Jahner','+84 28 3361 8165',_binary '¬ ‹ú­‹ú\Í)\0-'),(_binary '¬ ‹ú­‹ú\Î\r\01',NULL,'vwankg@utexas.edu','Vic','Wank','+84 28 3371 2612',_binary '¬ ‹ú­‹ú\Î\00'),(_binary '¬ ‹ú­‹ú\Ï\n\04',NULL,'brenehanh@usa.gov','Benedicta','Renehan','+84 28 3166 2156',_binary '¬ ‹ú­‹ú\Ï\03'),(_binary '¬ ‹ú­‹ú\Ïù\07',NULL,'kdunniomi@mail.ru','Kipp','Dunniom','+84 28 3176 3771',_binary '¬ ‹ú­‹ú\Ïğ\06'),(_binary '¬ ‹ú­‹ú\Ñ\0:',NULL,'rcathrallj@archive.org','Rayshell','Cathrall','+84 28 3609 4799',_binary '¬ ‹ú­‹ú\Ñ	\09'),(_binary '¬ ‹şc‹ş\ã\è7\0','https://res.cloudinary.com/dwwrlxcsi/image/upload/v1701268427/storage/x1ifzs1xtqe8fowetqqn.jpg','dhtien120802@gmail.com','Tien','Dang',NULL,_binary '¬ ‹şc‹ş\ã\è\0\0');
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `flyway_schema_history`
---
-
-DROP TABLE IF EXISTS `flyway_schema_history`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `flyway_schema_history` (
-  `installed_rank` int NOT NULL,
-  `version` varchar(50) DEFAULT NULL,
-  `description` varchar(200) NOT NULL,
-  `type` varchar(20) NOT NULL,
-  `script` varchar(1000) NOT NULL,
-  `checksum` int DEFAULT NULL,
-  `installed_by` varchar(100) NOT NULL,
-  `installed_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `execution_time` int NOT NULL,
-  `success` tinyint(1) NOT NULL,
-  PRIMARY KEY (`installed_rank`),
-  KEY `flyway_schema_history_s_idx` (`success`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `flyway_schema_history`
---
-
-LOCK TABLES `flyway_schema_history` WRITE;
-/*!40000 ALTER TABLE `flyway_schema_history` DISABLE KEYS */;
-INSERT INTO `flyway_schema_history` VALUES (1,'2','init','SQL','V2__init.sql',-780402074,'root','2023-12-01 02:30:22',68,0);
-/*!40000 ALTER TABLE `flyway_schema_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -506,4 +475,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-01  9:37:54
+-- Dump completed on 2023-12-01  8:39:18

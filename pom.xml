@@ -130,28 +130,6 @@
             <version>3.17</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>9.22.3</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-mysql -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-            <version>9.22.3</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-maven-plugin -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-maven-plugin</artifactId>
-            <version>9.22.3</version>
-        </dependency>
-
-
-
     </dependencies>
 
     <build>
