@@ -2,6 +2,7 @@ package vn.ute.service.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import vn.ute.service.dto.CoordinatesDto;
 
@@ -13,17 +14,18 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 @Service
-public class BingMapService {
+public class BingMapsService {
     double SEMI_MAJOR_AXIS_MT = 6378137;
     double SEMI_MINOR_AXIS_MT = 6356752.314245;
     double FLATTENING = 1 / 298.257223563;
     double ERROR_TOLERANCE = 1e-12;
-
     double EARTH_RADIUS = 6371;
+    @Value("${bingsmap.api-key}")
+    String bingMapsApiKey;
 
     public CoordinatesDto getLocation(String address) throws IOException {
         address = URLEncoder.encode(address, "UTF-8").replaceAll("\\+", "%20");
-        String urlString = String.format("http://dev.virtualearth.net/REST/v1/Locations?q=%s&key=%s", address, "Al11pttXV3iBnZOoBJIqNxY_S0rhuPAvm_2wedLyXcl4eIEOKFcR0jYfmA5OZ1Vu");
+        String urlString = String.format("http://dev.virtualearth.net/REST/v1/Locations?q=%s&key=%s", address, bingMapsApiKey);
         // Create URL object
         URL url = new URL(urlString);
 
@@ -62,8 +64,6 @@ public class BingMapService {
                     .path("coordinates");
 
             return new CoordinatesDto(pointNode.get(0).asDouble(), pointNode.get(1).asDouble());
-
-
         } else {
             return null;
         }
@@ -115,27 +115,6 @@ public class BingMapService {
 
         double distanceMt = SEMI_MINOR_AXIS_MT * A * (sigma - deltaSigma);
         return distanceMt / 1000;
-    }
-
-    private double calculateHaversineDistance(CoordinatesDto location1, CoordinatesDto location2) {
-        // Convert degrees to radians
-        double lat1 = Math.toRadians(location1.getLat());
-        double lon1 = Math.toRadians(location1.getLng());
-        double lat2 = Math.toRadians(location2.getLat());
-        double lon2 = Math.toRadians(location2.getLng());
-
-        // Calculate differences
-        double dLat = lat2 - lat1;
-        double dLon = lon2 - lon1;
-
-        // Haversine formula
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1) * Math.cos(lat2) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        // Distance in kilometers
-        return EARTH_RADIUS * c;
     }
 
 }

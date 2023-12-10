@@ -2,6 +2,7 @@ package vn.ute.service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class BookingController {
 
     @Operation(summary = "Customer cancel booking")
     @PutMapping("/customer/booking/{bookingId}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable UUID bookingId, HttpServletRequest request){
-        return bookingService.cancelBooking(bookingId, request);
+    public ResponseEntity<?> cancelBookingByCustomer(@PathVariable UUID bookingId, HttpServletRequest request){
+        return bookingService.cancelBookingByCustomer(bookingId, request);
     }
 }

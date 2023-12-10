@@ -17,7 +17,7 @@ public class BookingDto {
     private CustomerDto customer;
     private ProviderDto provider;
     private ServiceDto service;
-    private Set<WorkDto> works;
+    private Set<BookingItemDto> bookingItems;
     private Integer totalPrice;
     private Time time;
     private Date date;

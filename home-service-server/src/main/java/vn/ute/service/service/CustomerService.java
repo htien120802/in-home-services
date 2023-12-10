@@ -41,7 +41,7 @@ public class CustomerService {
     private AccountRepository accountRepository;
 
     @Autowired
-    private BingMapService bingMapService;
+    private BingMapsService bingMapsService;
 
     @Autowired
     private ImageService imageService;
@@ -73,7 +73,7 @@ public class CustomerService {
         Optional<CustomerEntity> customerEntity = customerRepository.findByAccount_Username(username);
         if (customerEntity.isPresent()){
             addressEntity.setCustomer(customerEntity.get());
-            CoordinatesDto coordinatesDto = bingMapService.getLocation(addressEntity.toString());
+            CoordinatesDto coordinatesDto = bingMapsService.getLocation(addressEntity.toString());
             CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
             coordinates.setAddress(addressEntity);
             addressEntity.setCoordinates(coordinates);
@@ -103,7 +103,7 @@ public class CustomerService {
             if (addressEntity.isPresent()) {
                 AddressEntity address = addressEntity.get();
                 mapper.map(addressDto, address);
-                CoordinatesDto coordinatesDto = bingMapService.getLocation(address.toString());
+                CoordinatesDto coordinatesDto = bingMapsService.getLocation(address.toString());
                 mapper.map(coordinatesDto,address.getCoordinates());
 
                 return ResponseEntity.ok(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));

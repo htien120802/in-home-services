@@ -9,7 +9,7 @@ import vn.ute.service.dto.request.SignInRequest;
 import vn.ute.service.dto.request.SignUpRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.service.AuthService;
-import vn.ute.service.service.BingMapService;
+import vn.ute.service.service.BingMapsService;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,7 +19,7 @@ public class AuthController {
     private AuthService authService;
 
     @Autowired
-    private BingMapService bingMapService;
+    private BingMapsService bingMapsService;
 
     @PostMapping("/signin")
     public ResponseEntity<ResponseDto<?>> signin(@RequestBody SignInRequest signInRequest){

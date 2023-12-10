@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.config.VNPayConfig;
+import vn.ute.service.entity.BookingEntity;
+import vn.ute.service.entity.CustomerEntity;
 import vn.ute.service.entity.PaymentEntity;
 import vn.ute.service.enumerate.PaymentStatus;
 import vn.ute.service.reposioty.BookingRepository;
@@ -128,5 +130,65 @@ public class PaymentService {
                 }
             }
         }
+    }
+
+    public Map generateRefundUrl(CustomerEntity customer, BookingEntity booking, HttpServletRequest request){
+        String url = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+        String vnp_RequestId = booking.getId().toString();
+        String vnp_Version = "2.1.0";
+        String vnp_Command = "refund";
+        String vnp_TransactionType = "02";
+        String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
+        double vnp_Amount = booking.getTotalPrice();
+        String vnp_IpAddr = VNPayConfig.getIpAddress(request);
+
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_RequestId", vnp_RequestId);
+        vnp_Params.put("vnp_Version", vnp_Version);
+        vnp_Params.put("vnp_Command", vnp_Command);
+        vnp_Params.put("vnp_TmnCode", VNPayConfig.vnp_TmnCode);
+        vnp_Params.put("vnp_TransactionType", vnp_TransactionType);
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        vnp_Params.put("vnp_Amount", String.valueOf(vnp_Amount));
+        vnp_Params.put("vnp_OrderInfo", "Hoàn trả đơn hàng:" + vnp_TxnRef);
+
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String date = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_TransactionDate", date);
+        vnp_Params.put("vnp_CreateDate", date);
+
+        vnp_Params.put("vnp_CreateBy", customer.getFirstName() + customer.getLastName());
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+        List fieldNames = new ArrayList(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        Iterator itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = (String) itr.next();
+            String fieldValue = (String) vnp_Params.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                //Build hash data
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                //Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
+                }
+            }
+        }
+        String queryUrl = query.toString();
+        String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        String refundUrl = url + "?" + queryUrl;
+
+        return  vnp_Params;
     }
 }

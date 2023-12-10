@@ -42,6 +42,9 @@ public class BookingEntity {
     @JoinColumn(name = "payment_id")
     private PaymentEntity payment;
 
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    private Set<BookingItemEntity> bookingItems = new HashSet<>();
+
 //    @ManyToOne
 //    @JoinColumn(name = "providerId")
 //    private Provider provider;
@@ -50,11 +53,11 @@ public class BookingEntity {
 //    @JoinColumn(name = "service_id")
 //    private ServiceEntity service;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "booking_work",
-            joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "work_id"))
-    private Set<WorkEntity> works = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(name = "booking_work",
+//            joinColumns = @JoinColumn(name = "booking_id"),
+//            inverseJoinColumns = @JoinColumn(name = "work_id"))
+//    private Set<WorkEntity> works = new HashSet<>();
 
     private Integer totalPrice;
 
@@ -71,11 +74,18 @@ public class BookingEntity {
         if (this.status == null){
             this.status = BookingStatus.BOOKED;
         }
-        this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
+        calcTotalPrice();
     }
     @PreUpdate
     private void preUpdate(){
-        this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
+        calcTotalPrice();
+    }
+
+    public void calcTotalPrice(){
+        this.totalPrice = 0;
+        for (BookingItemEntity item : this.bookingItems){
+            this.totalPrice = this.totalPrice + item.getWork().getPricePerUnit() * item.getQuantity();
+        }
     }
 
 //    @PostPersist
