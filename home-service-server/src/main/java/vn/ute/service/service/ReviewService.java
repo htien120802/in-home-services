@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.ReviewDto;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.BookingEntity;
@@ -39,6 +40,7 @@ public class ReviewService {
 
     @Autowired
     private ModelMapper mapper;
+    @Transactional
     public ResponseEntity<?> createReview(UUID serviceId, ReviewDto review, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);

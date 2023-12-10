@@ -3,13 +3,13 @@ package vn.ute.service.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.ute.service.dto.request.SignInRequest;
 import vn.ute.service.dto.request.SignUpRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.service.AuthService;
+import vn.ute.service.service.BingMapService;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,6 +17,9 @@ import vn.ute.service.service.AuthService;
 public class AuthController {
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private BingMapService bingMapService;
 
     @PostMapping("/signin")
     public ResponseEntity<ResponseDto<?>> signin(@RequestBody SignInRequest signInRequest){
@@ -40,5 +43,10 @@ public class AuthController {
     public  ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request){
      return authService.refreshToken(request);
     }
+
+//    @GetMapping
+//    public double calcDistance(@RequestParam String origin, @RequestParam String destination){
+//        return googleMapService.calculateDistance(origin, destination);
+//    }
 
 }

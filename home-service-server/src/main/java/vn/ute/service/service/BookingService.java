@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.BookingDto;
 import vn.ute.service.dto.PaymentDto;
 import vn.ute.service.dto.WorkDto;
@@ -18,11 +19,7 @@ import vn.ute.service.jwt.JwtService;
 import vn.ute.service.reposioty.*;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class BookingService {
@@ -40,7 +37,7 @@ public class BookingService {
     private BookingRepository bookingRepository;
     @Autowired
     private PaymentRepository paymentRepository;
-
+    @Transactional
     public ResponseEntity<?> createBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
@@ -75,17 +72,19 @@ public class BookingService {
         booking.setTime(bookingRequest.getTime());
         booking.setDate(bookingRequest.getDate());
         booking.setService(objCompare);
-        booking = bookingRepository.save(booking);
+
 
         PaymentEntity payment = new PaymentEntity();
         payment.setBooking(booking);
         payment.setMethod(PaymentMethod.valueOf(bookingRequest.getPaymentMethoad().toUpperCase()));
         payment.setAmount(booking.getTotalPrice());
-        payment = paymentRepository.save(payment);
+
+        booking.setPayment(payment);
+        booking = bookingRepository.save(booking);
+
 
         if (payment.getMethod().equals(PaymentMethod.CASH)){
             BookingDto bookingDto = mapper.map(booking, BookingDto.class);
-            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
             return ResponseEntity.ok(new ResponseDto<>("success","Booking successfully!",bookingDto));
         }else if (payment.getMethod().equals(PaymentMethod.VNPAY)){
             String url = paymentService.createPaymentUrl(payment, request);
@@ -126,5 +125,21 @@ public class BookingService {
             bookingDtos.add(bookingDto);
         }
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+    }
+    @Transactional
+    public ResponseEntity<?> cancelBooking(UUID bookingId, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+        }
+        BookingEntity booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking != null && booking.getStatus().equals(BookingStatus.BOOKED)){
+            booking.setStatus(BookingStatus.CANCEL_BY_CUSTOMER);
+            bookingRepository.save(booking);
+            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!",null));
+        } else {
+            return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
+        }
     }
 }

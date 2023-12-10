@@ -14,6 +14,8 @@ import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.service.CustomerService;
 
+import java.io.IOException;
+
 @RestController
 public class CustomerController {
 
@@ -31,12 +33,12 @@ public class CustomerController {
     }
     @Operation(summary = "Add new address for customer")
     @PostMapping(value = "/customer/address")
-    public ResponseEntity<ResponseDto<?>> addAddress(@RequestBody AddressDto addressDto, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<?>> addAddress(@RequestBody AddressDto addressDto, HttpServletRequest request) throws IOException {
         return customerService.addAddress(addressDto,request);
     }
     @Operation(summary = "Update address of customer")
     @PutMapping(value = "/customer/address")
-    public ResponseEntity<ResponseDto<?>> updateAddress(@RequestBody AddressDto addressDto, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<?>> updateAddress(@RequestBody AddressDto addressDto, HttpServletRequest request) throws IOException {
         return customerService.updateAddress(addressDto,request);
     }
     @Operation(summary = "Update password of customer")

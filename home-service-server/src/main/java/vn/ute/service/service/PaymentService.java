@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.config.VNPayConfig;
 import vn.ute.service.entity.PaymentEntity;
 import vn.ute.service.enumerate.PaymentStatus;
@@ -97,7 +98,7 @@ public class PaymentService {
 
         return paymentUrl;
     }
-
+    @Transactional
     public void paymentCallBack(Map<String, String> queryParams, HttpServletResponse response) throws IOException {
         String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
         String paymentId = queryParams.get("paymentId");

@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.request.SignInRequest;
 import vn.ute.service.dto.request.SignUpRequest;
 import vn.ute.service.dto.response.AuthenticationResponse;
@@ -50,7 +51,7 @@ public class AuthService {
 
     @Autowired
     private ModelMapper mapper;
-
+    @Transactional
     public ResponseEntity<ResponseDto<?>> createAccount(SignUpRequest signUpRequest) {
         if (accountRepository.existsByUsername(signUpRequest.getUsername()))
             return ResponseEntity.ok(new ResponseDto<>("fail","Username is already exist",null));
@@ -60,15 +61,17 @@ public class AuthService {
         AccountEntity account = mapper.map(signUpRequest,AccountEntity.class);
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         account.getRoles().add(roleRepository.findByRoleName("ROLE_"+signUpRequest.getRoleName().toUpperCase()));
-        account = accountRepository.save(account);
+//        account = accountRepository.save(account);
 
         if (signUpRequest.getRoleName().equals("customer")){
             CustomerEntity customer = mapper.map(signUpRequest,CustomerEntity.class);
             customer.setAccount(account);
+            account.setCustomer(customer);
             customerRepository.save(customer);
         }else {
             ProviderEntity provider = mapper.map(signUpRequest,ProviderEntity.class);
             provider.setAccount(account);
+            account.setProvider(provider);
             providerRepository.save(provider);
         }
 
@@ -79,7 +82,7 @@ public class AuthService {
 
         return ResponseEntity.ok(new ResponseDto<>("success","Create account successfully", new AuthenticationResponse(jwtToken,refreshToken)));
     }
-
+    @Transactional
     public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest){
         if (EmailValidator.getInstance().isValid(signInRequest.getUsername())){
             Optional<AccountEntity> temp = accountRepository.findByCustomer_EmailOrProvider_Email(signInRequest.getUsername(),signInRequest.getUsername());
@@ -117,7 +120,7 @@ public class AuthService {
         });
         tokenRepository.saveAll(validUserTokens);
     }
-
+    @Transactional
     public ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request) {
         String refreshToken = jwtService.getTokenFromRequest(request);
         String username = jwtService.extractUsername(refreshToken);
@@ -134,7 +137,7 @@ public class AuthService {
         }
         return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
     }
-
+    @Transactional
     public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request) {
         if (request.getHeader("Authorization").isEmpty())
             return ResponseEntity.ok(new ResponseDto<>("fail","Token not found",null));

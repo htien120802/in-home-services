@@ -38,6 +38,10 @@ public class BookingEntity {
     @JoinColumn(name = "service_id")
     private ServiceEntity service;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id")
+    private PaymentEntity payment;
+
 //    @ManyToOne
 //    @JoinColumn(name = "providerId")
 //    private Provider provider;
@@ -67,16 +71,16 @@ public class BookingEntity {
         if (this.status == null){
             this.status = BookingStatus.BOOKED;
         }
-//        this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
-    }
-//    @PreUpdate
-//    private void preUpdate(){
-//        this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
-//    }
-
-    @PostPersist
-    @PostUpdate
-    private void postPersist(){
         this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
     }
+    @PreUpdate
+    private void preUpdate(){
+        this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
+    }
+
+//    @PostPersist
+//    @PostUpdate
+//    private void postPersist(){
+//        this.totalPrice = this.works.stream().mapToInt(WorkEntity::getPrice).sum();
+//    }
 }

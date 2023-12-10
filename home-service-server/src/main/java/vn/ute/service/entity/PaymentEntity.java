@@ -23,15 +23,11 @@ public class PaymentEntity {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "userId")
-//    private User user;
 
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "booking_id")
     private BookingEntity booking;
 
-//    @Column(columnDefinition = "enum ('CASH','VNPAY')")
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
 
