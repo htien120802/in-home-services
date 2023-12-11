@@ -16,7 +16,7 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.*;
+import vn.ute.service.repository.*;
 
 import java.util.List;
 import java.util.Optional;

@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import vn.ute.service.reposioty.*;
+import vn.ute.service.repository.*;
 import vn.ute.service.service.BingMapsService;
 
 @SpringBootApplication

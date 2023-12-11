@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.ute.service.dto.AddressDto;
 import vn.ute.service.dto.CoordinatesDto;
 import vn.ute.service.dto.CustomerDto;
-import vn.ute.service.dto.request.CustomerProfileRequest;
+import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.AccountEntity;
@@ -19,9 +19,9 @@ import vn.ute.service.entity.AddressEntity;
 import vn.ute.service.entity.CoordinatesEntity;
 import vn.ute.service.entity.CustomerEntity;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.AccountRepository;
-import vn.ute.service.reposioty.AddressRepository;
-import vn.ute.service.reposioty.CustomerRepository;
+import vn.ute.service.repository.AccountRepository;
+import vn.ute.service.repository.AddressRepository;
+import vn.ute.service.repository.CustomerRepository;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -52,7 +52,7 @@ public class CustomerService {
     @Autowired
     private ModelMapper mapper;
     @Transactional
-    public ResponseEntity<ResponseDto<?>> updateProfile(CustomerProfileRequest customerProfile, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         Optional<CustomerEntity> customer = customerRepository.findByAccount_Username(username);
         if (customer.isPresent()){
@@ -96,20 +96,13 @@ public class CustomerService {
     @Transactional
     public ResponseEntity<ResponseDto<?>> updateAddress(AddressDto addressDto, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
-        boolean belongToCustomer = addressRepository.existsByIdAndAndCustomer_Account_Username(addressDto.getId(),username);
-        if (belongToCustomer){
-            Optional<AddressEntity> addressEntity = addressRepository.findById(addressDto.getId());
-
-            if (addressEntity.isPresent()) {
-                AddressEntity address = addressEntity.get();
-                mapper.map(addressDto, address);
-                CoordinatesDto coordinatesDto = bingMapsService.getLocation(address.toString());
-                mapper.map(coordinatesDto,address.getCoordinates());
-
-                return ResponseEntity.ok(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));
-            }else {
-                return ResponseEntity.ok(new ResponseDto<>("fail", "Can not find address",null));
-            }
+        Optional<AddressEntity> addressEntity = addressRepository.findByIdAndCustomer_Account_Username(addressDto.getId(),username);
+        if (addressEntity.isPresent()){
+            AddressEntity address = addressEntity.get();
+            mapper.map(addressDto, address);
+            CoordinatesDto coordinatesDto = bingMapsService.getLocation(address.toString());
+            mapper.map(coordinatesDto,address.getCoordinates());
+            return ResponseEntity.ok(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));
         } else {
             return ResponseEntity.ok(new ResponseDto<>("fail","You are not allowed",null));
         }

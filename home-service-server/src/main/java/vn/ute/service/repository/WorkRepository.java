@@ -1,4 +1,4 @@
-package vn.ute.service.reposioty;
+package vn.ute.service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import vn.ute.service.entity.WorkEntity;

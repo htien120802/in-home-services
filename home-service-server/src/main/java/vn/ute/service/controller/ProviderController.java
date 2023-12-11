@@ -12,43 +12,42 @@ import vn.ute.service.dto.CustomerDto;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
-import vn.ute.service.service.CustomerService;
+import vn.ute.service.service.ProviderService;
 
 import java.io.IOException;
 
 @RestController
-public class CustomerController {
-
+public class ProviderController {
     @Autowired
-    private CustomerService customerService;
-    @Operation(summary = "Get profile of customer")
-    @GetMapping("/customer/profile")
+    private ProviderService providerService;
+    @Operation(summary = "Get profile of provider")
+    @GetMapping("/provider/profile")
     public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request){
-        return customerService.getProfile(request);
+        return providerService.getProfile(request);
     }
-    @Operation(summary = "Update profile of customer")
-    @PutMapping(value = "/customer/profile")
+    @Operation(summary = "Update profile of provider")
+    @PutMapping(value = "/provider/profile")
     public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest customerProfile, HttpServletRequest request){
-        return customerService.updateProfile(customerProfile,request);
+        return providerService.updateProfile(customerProfile,request);
     }
-    @Operation(summary = "Add new address for customer")
-    @PostMapping(value = "/customer/address")
+    @Operation(summary = "Add new address for provider")
+    @PostMapping(value = "/provider/address")
     public ResponseEntity<ResponseDto<?>> addAddress(@RequestBody AddressDto addressDto, HttpServletRequest request) throws IOException {
-        return customerService.addAddress(addressDto,request);
+        return providerService.addAddress(addressDto,request);
     }
-    @Operation(summary = "Update address of customer")
-    @PutMapping(value = "/customer/address")
+    @Operation(summary = "Update address of provider")
+    @PutMapping(value = "/provider/address")
     public ResponseEntity<ResponseDto<?>> updateAddress(@RequestBody AddressDto addressDto, HttpServletRequest request) throws IOException {
-        return customerService.updateAddress(addressDto,request);
+        return providerService.updateAddress(addressDto,request);
     }
-    @Operation(summary = "Update password of customer")
-    @PutMapping(value ="/customer/password")
+    @Operation(summary = "Update password of provider")
+    @PutMapping(value ="/provider/password")
     public ResponseEntity<ResponseDto<?>> updatePassword(@RequestBody UpdatePasswordRequest updatePasswordRequest, HttpServletRequest request){
-        return customerService.updatePassword(updatePasswordRequest, request);
+        return providerService.updatePassword(updatePasswordRequest, request);
     }
-    @Operation(summary = "Update password of customer")
-    @PutMapping(value = "/customer/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Update password of provider")
+    @PutMapping(value = "/provider/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto<?>> updateAvatar(@RequestPart MultipartFile avatar, HttpServletRequest request){
-        return customerService.updateAvatar(avatar, request);
+        return providerService.updateAvatar(avatar, request);
     }
 }

@@ -1,7 +1,6 @@
 package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,9 @@ import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.PaymentMethod;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.*;
+import vn.ute.service.repository.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -135,7 +135,7 @@ public class BookingService {
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
     @Transactional
-    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, HttpServletRequest request) {
+    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
@@ -146,11 +146,11 @@ public class BookingService {
             booking.setStatus(BookingStatus.CANCEL_BY_CUSTOMER);
             bookingRepository.save(booking);
 
-//            Map params = null;
-//            if (booking.getPayment().getMethod().equals(PaymentMethod.VNPAY)){
-//                params = paymentService.generateRefundUrl(customer, booking, request);
-//            }
-            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", null));
+            String message = null;
+            if (booking.getPayment().getMethod().equals(PaymentMethod.VNPAY)){
+                message = "Your money will be refunded soon!";
+            }
+            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", message));
         } else {
             return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
         }

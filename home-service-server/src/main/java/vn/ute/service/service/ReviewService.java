@@ -14,10 +14,10 @@ import vn.ute.service.entity.ReviewEntity;
 import vn.ute.service.entity.ServiceEntity;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.BookingRepository;
-import vn.ute.service.reposioty.CustomerRepository;
-import vn.ute.service.reposioty.ReviewRepository;
-import vn.ute.service.reposioty.ServiceRepository;
+import vn.ute.service.repository.BookingRepository;
+import vn.ute.service.repository.CustomerRepository;
+import vn.ute.service.repository.ReviewRepository;
+import vn.ute.service.repository.ServiceRepository;
 
 import java.util.UUID;
 

@@ -20,7 +20,7 @@ import vn.ute.service.entity.CustomerEntity;
 import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.TokenEntity;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.*;
+import vn.ute.service.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +58,10 @@ public class AuthService {
         if (accountRepository.existsByCustomer_Email(signUpRequest.getEmail()) || accountRepository.existsByProvider_Email(signUpRequest.getEmail()))
             return ResponseEntity.ok(new ResponseDto<>("fail","This email has been used",null));
 
+        if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword()))
+            return ResponseEntity.ok(new ResponseDto<>("fail","Password and confirm password don't match!",null));
+
+
         AccountEntity account = mapper.map(signUpRequest,AccountEntity.class);
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         account.getRoles().add(roleRepository.findByRoleName("ROLE_"+signUpRequest.getRoleName().toUpperCase()));
@@ -91,7 +95,11 @@ public class AuthService {
         }
         Optional<AccountEntity> account = accountRepository.findByUsername(signInRequest.getUsername());
         if (account.isEmpty())
-            return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
+            return ResponseEntity.ok(new ResponseDto<>("fail","Login name is incorrect!",null));
+
+        if (!passwordEncoder.matches(signInRequest.getPassword(), account.get().getPassword()))
+            return ResponseEntity.ok(new ResponseDto<>("fail","Password is incorrect!",null));
+
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
         String jwtToken = jwtService.generateToken(account.get());
         String refreshToken = jwtService.generateRefreshToken(account.get());
