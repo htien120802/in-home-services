@@ -36,4 +36,13 @@ public class AddressEntity {
     @ManyToOne
     @JoinColumn(name = "provider_id")
     private ProviderEntity provider;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "coordinates_id")
+    private CoordinatesEntity coordinates;
+
+    @Override
+    public String toString() {
+        return number + ", " + street + ", " + ward + ", " + district + ", " + city + ", Việt Nam";
+    }
 }

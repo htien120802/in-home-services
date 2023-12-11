@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.ReviewDto;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.BookingEntity;
@@ -13,10 +14,10 @@ import vn.ute.service.entity.ReviewEntity;
 import vn.ute.service.entity.ServiceEntity;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.BookingRepository;
-import vn.ute.service.reposioty.CustomerRepository;
-import vn.ute.service.reposioty.ReviewRepository;
-import vn.ute.service.reposioty.ServiceRepository;
+import vn.ute.service.repository.BookingRepository;
+import vn.ute.service.repository.CustomerRepository;
+import vn.ute.service.repository.ReviewRepository;
+import vn.ute.service.repository.ServiceRepository;
 
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ public class ReviewService {
 
     @Autowired
     private ModelMapper mapper;
+    @Transactional
     public ResponseEntity<?> createReview(UUID serviceId, ReviewDto review, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);

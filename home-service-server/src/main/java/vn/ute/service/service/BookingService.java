@@ -5,9 +5,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.BookingDto;
+import vn.ute.service.dto.BookingItemDto;
 import vn.ute.service.dto.PaymentDto;
-import vn.ute.service.dto.WorkDto;
 import vn.ute.service.dto.request.CreateBookingRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.*;
@@ -15,14 +16,11 @@ import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.PaymentMethod;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.*;
+import vn.ute.service.repository.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class BookingService {
@@ -40,7 +38,7 @@ public class BookingService {
     private BookingRepository bookingRepository;
     @Autowired
     private PaymentRepository paymentRepository;
-
+    @Transactional
     public ResponseEntity<?> createBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
@@ -48,20 +46,23 @@ public class BookingService {
             return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
         }
 
-        Set<WorkEntity> works = new HashSet<>();
-        for (WorkDto w : bookingRequest.getWorks()){
-            WorkEntity work = workRepository.findById(w.getId()).orElse(null);
+        Set<BookingItemEntity> bookingItems = new HashSet<>();
+        for (BookingItemDto w : bookingRequest.getBookingItems()){
+            WorkEntity work = workRepository.findById(w.getWork().getId()).orElse(null);
             if (work == null){
                 return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
             }
-            works.add(work);
+            BookingItemEntity bookingItem = new BookingItemEntity();
+            bookingItem.setWork(work);
+            bookingItem.setQuantity(w.getQuantity());
+            bookingItems.add(bookingItem);
         }
 
-        ServiceEntity objCompare = new ArrayList<>(works).get(0).getService();
+        ServiceEntity objCompare = new ArrayList<>(bookingItems).get(0).getWork().getService();
         if (!objCompare.getStatus().equals(ServiceStatus.APPROVED)){
             return ResponseEntity.ok(new ResponseDto<>("fail","This service no longer provide!",null));
         }
-        boolean validWorks = works.stream().allMatch(work -> work.getService().equals(objCompare));
+        boolean validWorks = bookingItems.stream().allMatch(bookingItem -> bookingItem.getWork().getService().equals(objCompare));
         if (!validWorks){
             return ResponseEntity.ok(new ResponseDto<>("fail","List of works is invalid!",null));
         }
@@ -71,21 +72,27 @@ public class BookingService {
         BookingEntity booking = new BookingEntity();
         booking.setCustomer(customer);
         booking.setProvider(provider);
-        booking.setWorks(works);
         booking.setTime(bookingRequest.getTime());
         booking.setDate(bookingRequest.getDate());
         booking.setService(objCompare);
-        booking = bookingRepository.save(booking);
+
+        for (BookingItemEntity item : bookingItems){
+            item.setBooking(booking);
+        }
+        booking.setBookingItems(bookingItems);
+        booking.calcTotalPrice();
+
 
         PaymentEntity payment = new PaymentEntity();
         payment.setBooking(booking);
         payment.setMethod(PaymentMethod.valueOf(bookingRequest.getPaymentMethoad().toUpperCase()));
         payment.setAmount(booking.getTotalPrice());
-        payment = paymentRepository.save(payment);
+        booking.setPayment(payment);
+        booking = bookingRepository.save(booking);
+
 
         if (payment.getMethod().equals(PaymentMethod.CASH)){
             BookingDto bookingDto = mapper.map(booking, BookingDto.class);
-            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
             return ResponseEntity.ok(new ResponseDto<>("success","Booking successfully!",bookingDto));
         }else if (payment.getMethod().equals(PaymentMethod.VNPAY)){
             String url = paymentService.createPaymentUrl(payment, request);
@@ -126,5 +133,26 @@ public class BookingService {
             bookingDtos.add(bookingDto);
         }
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+    }
+    @Transactional
+    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, HttpServletRequest request) throws IOException {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+        }
+        BookingEntity booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking != null && booking.getStatus().equals(BookingStatus.BOOKED)){
+            booking.setStatus(BookingStatus.CANCEL_BY_CUSTOMER);
+            bookingRepository.save(booking);
+
+            String message = null;
+            if (booking.getPayment().getMethod().equals(PaymentMethod.VNPAY)){
+                message = "Your money will be refunded soon!";
+            }
+            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", message));
+        } else {
+            return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
+        }
     }
 }

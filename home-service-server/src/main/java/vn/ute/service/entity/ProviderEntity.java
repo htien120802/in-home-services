@@ -1,14 +1,13 @@
 package vn.ute.service.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
-import vn.ute.service.validation.custom.PhoneNumber;
 
-import javax.validation.constraints.Email;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -28,10 +27,10 @@ public class ProviderEntity {
 
     private String lastName;
 
-    @Email(message = "Email is not valid!")
+    @Email
     private String email;
 
-    @PhoneNumber
+
     private String phone;
 
     private String avatar;
@@ -47,7 +46,7 @@ public class ProviderEntity {
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     private Set<ServiceEntity> services;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private AccountEntity account;
 

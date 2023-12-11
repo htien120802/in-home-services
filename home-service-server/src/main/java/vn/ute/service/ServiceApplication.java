@@ -1,12 +1,16 @@
 package vn.ute.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import vn.ute.service.reposioty.*;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import vn.ute.service.repository.*;
+import vn.ute.service.service.BingMapsService;
 
 @SpringBootApplication
+@EnableTransactionManagement
 public class ServiceApplication {
     @Autowired
     ServiceRepository serviceRepository;
@@ -35,13 +39,58 @@ public class ServiceApplication {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private BingMapsService bingMapsService;
+
+    @Autowired
+    private ModelMapper mapper;
+
     public static void main(String[] args) {
         SpringApplication.run(ServiceApplication.class, args);
     }
 
 //    @PostConstruct
+//    public void TestGooglmap() throws IOException {
+//        String add1 = "859 Nhất Chi Mai, Phường 13, Tân Bình, Thành phố Hồ Chí Minh, Việt Nam";
+//        String add2 = "86 Lý Thường Kiệt, Phường 6, Tân Bình, Thành phố Hồ Chí Minh, Việt Nam";
+//        CoordinatesDto location1 = googleMapService.getLocation(add1);
+//        CoordinatesDto location2 = googleMapService.getLocation(add2);
+//        System.out.println(googleMapService.calculateDistance(location1,location2));
+//    }
+
+//    @PostConstruct
+//    public void createCategory(){
+//        String[] categories = {"Clean", "Install, repair and maintain", "Human", "Pet", "Others"};
+//        for ( String c : categories){
+//            CategoryEntity category = new CategoryEntity();
+//            category.setCategoryName(c);
+//            categoryRepository.save(category);
+//        }
+//    }
+
+//    @PostConstruct
+//    public void createRole(){
+//        String[] roles = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_PROVIDER"};
+//        for (String r : roles){
+//            RoleEntity role = new RoleEntity();
+//            role.setRoleName(r);
+//            roleRepository.save(role);
+//        }
+//    }
+
+//    @PostConstruct
+//    public void creatAccountAdmin(){
+//        AccountEntity account = new AccountEntity();
+//        account.setUsername("admin");
+//        account.setPassword(passwordEncoder.encode("admin"));
+//        RoleEntity role = roleRepository.findByRoleName("ROLE_ADMIN");
+//        account.getRoles().add(role);
+//        accountRepository.save(account);
+//    }
+
+//    @PostConstruct
 //    public void generateCustomer() throws IOException {
-//        FileInputStream file = new FileInputStream("./src/main/resources/customer-1.xlsx");
+//        FileInputStream file = new FileInputStream("./home-service-server/src/main/resources/customer-1.xlsx");
 //        Workbook workbook = new XSSFWorkbook(file);
 //        Sheet sheet = workbook.getSheetAt(0);
 //
@@ -73,15 +122,16 @@ public class ServiceApplication {
 //                account.setUsername(username);
 //                account.setPassword(passwordEncoder.encode(password));
 //                account.getRoles().add(roleRepository.findByRoleName("ROLE_CUSTOMER"));
-//                account = accountRepository.save(account);
+////                account = accountRepository.save(account);
 //
 //
 //                CustomerEntity customer = new CustomerEntity();
 //                customer.setEmail(email);
-//                customer.setPhone(phone);
+//                customer.setPhone("0" + phone);
 //                customer.setFirstName(firstName);
 //                customer.setLastName(lastName);
 //                customer.setAccount(account);
+//                account.setCustomer(customer);
 //                customer = customerRepository.save(customer);
 //
 //                AddressEntity addressEntity = new AddressEntity();
@@ -91,6 +141,11 @@ public class ServiceApplication {
 //                addressEntity.setDistrict(district);
 //                addressEntity.setCity(city);
 //                addressEntity.setCustomer(customer);
+//
+//                CoordinatesDto coordinatesDto = bingMapService.getLocation(addressEntity.toString());
+//                CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
+//                coordinates.setAddress(addressEntity);
+//                addressEntity.setCoordinates(coordinates);
 //                addressEntity = addressRepository.save(addressEntity);
 //            }
 //
@@ -102,7 +157,7 @@ public class ServiceApplication {
 
 //    @PostConstruct
 //    public void generateProvider() throws IOException {
-//        FileInputStream file = new FileInputStream("./src/main/resources/provider-1.xlsx");
+//        FileInputStream file = new FileInputStream("./home-service-server/src/main/resources/provider-1.xlsx");
 //        Workbook workbook = new XSSFWorkbook(file);
 //        Sheet sheet = workbook.getSheetAt(0);
 //
@@ -134,15 +189,16 @@ public class ServiceApplication {
 //                account.setUsername(username);
 //                account.setPassword(passwordEncoder.encode(password));
 //                account.getRoles().add(roleRepository.findByRoleName("ROLE_PROVIDER"));
-//                account = accountRepository.save(account);
+////                account = accountRepository.save(account);
 //
 //
 //                ProviderEntity provider = new ProviderEntity();
 //                provider.setEmail(email);
-//                provider.setPhone(phone);
+//                provider.setPhone("0" + phone);
 //                provider.setFirstName(firstName);
 //                provider.setLastName(lastName);
 //                provider.setAccount(account);
+//                account.setProvider(provider);
 //                provider = providerRepository.save(provider);
 //
 //                AddressEntity addressEntity = new AddressEntity();
@@ -152,6 +208,12 @@ public class ServiceApplication {
 //                addressEntity.setDistrict(district);
 //                addressEntity.setCity(city);
 //                addressEntity.setProvider(provider);
+//
+//                CoordinatesDto coordinatesDto = bingMapService.getLocation(addressEntity.toString());
+//                CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
+//                coordinates.setAddress(addressEntity);
+//                addressEntity.setCoordinates(coordinates);
+//
 //                addressEntity = addressRepository.save(addressEntity);
 //            }
 //

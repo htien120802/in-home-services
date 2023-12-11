@@ -1,12 +1,8 @@
-package vn.ute.service.reposioty;
+package vn.ute.service.repository;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import vn.ute.service.entity.AccountEntity;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -11,29 +11,22 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Table(name = "booking_item")
 @Getter
 @Setter
-@Table(name = "work")
 @NoArgsConstructor
-public class WorkEntity {
+public class BookingItemEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
-    private String unit;
-
-    @Column(nullable = false)
-    private Integer pricePerUnit;
+    @OneToOne
+    @JoinColumn(name = "work_id")
+    private WorkEntity work;
 
     @ManyToOne
-    @JoinColumn(name = "service_id")
-    private ServiceEntity service;
+    @JoinColumn(name = "booking_id")
+    private BookingEntity booking;
 
-    @OneToOne(mappedBy = "work")
-    private BookingItemEntity bookingItem;
-
+    private int quantity;
 }

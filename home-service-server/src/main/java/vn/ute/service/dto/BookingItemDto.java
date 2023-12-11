@@ -6,12 +6,11 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
-public class WorkDto {
+public class BookingItemDto {
     private UUID id;
-    private String description;
-    private String unit;
-    private Integer pricePerUnit;
+    private WorkDto work;
+    private int quantity;
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CustomerProfileRequest {
+public class ProfileRequest {
     private String firstName;
     private String lastName;
     private String phone;

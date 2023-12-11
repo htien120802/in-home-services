@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import vn.ute.service.dto.WorkDto;
 import vn.ute.service.dto.request.ApproveRegisterServiceRequest;
 import vn.ute.service.dto.request.RegisterServiceRequest;
 import vn.ute.service.entity.*;
@@ -16,7 +16,7 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.reposioty.*;
+import vn.ute.service.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class ServiceService {
     private ModelMapper mapper;
 
 
-
+    @Transactional
     public ResponseEntity<ResponseDto<ServiceDto>> registerService(MultipartFile thumbnail, String service, HttpServletRequest request) throws JsonProcessingException {
         RegisterServiceRequest serviceRequest = new ObjectMapper().readValue(service, RegisterServiceRequest.class);
 
@@ -105,7 +105,7 @@ public class ServiceService {
 
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",serviceDtos));
     }
-
+    @Transactional
     public ResponseEntity<ResponseDto<?>> approveRegisterRequest(ApproveRegisterServiceRequest approveRequest) {
         ServiceEntity service = serviceRepository.findById(approveRequest.getServiceId()).orElse(null);
 
@@ -124,30 +124,22 @@ public class ServiceService {
             return ResponseEntity.ok(new ResponseDto<>("fail","Service was canceled or approved!",null));
         }
     }
-
+    @Transactional
     public ResponseEntity<ResponseDto<?>> deleteService(UUID id, HttpServletRequest request) {
-        Optional<ServiceEntity> service = serviceRepository.findById(id);
-        if (service.isPresent()){
-            String username = jwtService.getUsernameFromRequest(request);
-            AccountEntity account = accountRepository.findByUsername(username).orElse(null);
-
-            if (account != null && account.getProvider() != null){
-                if (!serviceRepository.existsByIdAndProvider_Account_Username(id,username)){
-                    return ResponseEntity.ok(new ResponseDto<>("fail","You're allowed to delete this!",null));
-                }
-            }
-
-            ServiceEntity s =service.get();
-            if (s.getStatus().equals(ServiceStatus.DELETE)){
-                return ResponseEntity.ok(new ResponseDto<>("fail","This service has been delete",null));
-            }
-            else {
-                s.setStatus(ServiceStatus.DELETE);
-                serviceRepository.save(s);
-                return ResponseEntity.ok(new ResponseDto<>("success","Delete successfully!",null));
-            }
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+        if (provider == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
         }
-        return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
+
+        ServiceEntity service = serviceRepository.findByIdAndProvider(id,provider).orElse(null);
+        if (service == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","You're not allowed to delete!",null));
+        }
+        serviceRepository.deleteById(id);
+//        service.setStatus(ServiceStatus.DELETE);
+//        serviceRepository.save(service);
+        return ResponseEntity.ok(new ResponseDto<>("success","Delete service successfully!",null));
     }
 
     public ResponseEntity<ResponseDto<?>> getServiceByProvider(HttpServletRequest request) {

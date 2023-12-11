@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.ute.service.dto.request.ApproveRegisterServiceRequest;
@@ -15,7 +14,6 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.service.ServiceService;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,8 +44,8 @@ public class ServiceController {
         return serviceService.getServiceById(id);
     }
     @Operation(summary = "Register to provide service")
-    @PostMapping(value = "/provider/service", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces =MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestPart MultipartFile thumbnail, @RequestPart String service, HttpServletRequest request) throws JsonProcessingException {
+    @PostMapping(value = "/provider/service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestPart MultipartFile thumbnail, @RequestPart("service") String service, HttpServletRequest request) throws JsonProcessingException {
         return serviceService.registerService(thumbnail, service, request);
     }
     @Operation(summary = "Approve or unapprove register service")
