@@ -25,6 +25,10 @@ public class JwtService {
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
 
+    public long getRefreshExpiration() {
+        return refreshExpiration;
+    }
+
     public String getUsernameFromRequest(HttpServletRequest request){
         String jwt = getTokenFromRequest(request);
         return extractUsername(jwt);

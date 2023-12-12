@@ -1,6 +1,8 @@
 package vn.ute.service.service;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -76,15 +78,15 @@ public class AuthService {
             providerRepository.save(provider);
         }
 
-        String jwtToken = jwtService.generateToken(account);
-        String refreshToken = jwtService.generateRefreshToken(account);
+//        String jwtToken = jwtService.generateToken(account);
+//        String refreshToken = jwtService.generateRefreshToken(account);
+//
+//        saveToken(jwtToken,account);
 
-        saveToken(jwtToken,account);
-
-        return ResponseEntity.ok(new ResponseDto<>("success","Create account successfully", new AuthenticationResponse(jwtToken,refreshToken)));
+        return ResponseEntity.ok(new ResponseDto<>("success","Create account successfully", null));
     }
     @Transactional
-    public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest){
+    public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest, HttpServletResponse response){
         if (EmailValidator.getInstance().isValid(signInRequest.getUsername())){
             Optional<AccountEntity> temp = accountRepository.findByCustomer_EmailOrProvider_Email(signInRequest.getUsername(),signInRequest.getUsername());
             temp.ifPresent(accountEntity -> signInRequest.setUsername(accountEntity.getUsername()));
@@ -98,7 +100,15 @@ public class AuthService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
         String jwtToken = jwtService.generateToken(account.get());
+
         String refreshToken = jwtService.generateRefreshToken(account.get());
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setMaxAge((int) jwtService.getRefreshExpiration());
+        cookie.setSecure(false);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
         revokeAllUserTokens(account.get());
         saveToken(jwtToken,account.get());
         return ResponseEntity.ok(new ResponseDto<>("success","Sign in successfully",new AuthenticationResponse(jwtToken,refreshToken)));
@@ -126,7 +136,10 @@ public class AuthService {
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request) {
-        String refreshToken = jwtService.getTokenFromRequest(request);
+        String refreshToken = getRefreshTokenInCookies(request);
+        if (refreshToken == null)
+            return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token not found",null));
+
         String username = jwtService.extractUsername(refreshToken);
         if (username != null) {
             Optional<AccountEntity> account = accountRepository.findByUsername(username);
@@ -155,5 +168,13 @@ public class AuthService {
             SecurityContextHolder.clearContext();
         }
         return ResponseEntity.ok(new ResponseDto<>("success","Logout successfully",null));
+    }
+
+    private String getRefreshTokenInCookies(HttpServletRequest req) {
+        for (Cookie c : req.getCookies()) {
+            if (c.getName().equals("refreshToken"))
+                return c.getValue();
+        }
+        return null;
     }
 }
