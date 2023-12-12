@@ -19,27 +19,33 @@ import vn.ute.service.repository.CustomerRepository;
 import vn.ute.service.repository.ReviewRepository;
 import vn.ute.service.repository.ServiceRepository;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
-    @Autowired
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    private ServiceRepository serviceRepository;
+    private final ServiceRepository serviceRepository;
 
-    @Autowired
-    private BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
+
+    public ReviewService(ReviewRepository reviewRepository, CustomerRepository customerRepository, ServiceRepository serviceRepository, BookingRepository bookingRepository, JwtService jwtService, ModelMapper mapper) {
+        this.reviewRepository = reviewRepository;
+        this.customerRepository = customerRepository;
+        this.serviceRepository = serviceRepository;
+        this.bookingRepository = bookingRepository;
+        this.jwtService = jwtService;
+        this.mapper = mapper;
+    }
+
     @Transactional
     public ResponseEntity<?> createReview(UUID serviceId, ReviewDto review, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
@@ -90,5 +96,11 @@ public class ReviewService {
         }
 
         return ResponseEntity.ok(new ResponseDto<>("success","Get your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
+    }
+
+    public ResponseEntity<?> getAllReview(UUID serviceId) {
+        List<ReviewEntity> reviews = reviewRepository.findAllByService_Id(serviceId);
+        List<ReviewDto> reviewDtos = reviews.stream().map(reviewEntity -> mapper.map(reviewEntity, ReviewDto.class)).toList();
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all reviews of this successfully!",mapper.map(reviewDtos, ReviewDto.class)));
     }
 }

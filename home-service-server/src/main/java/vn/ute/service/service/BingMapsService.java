@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class BingMapsService {
@@ -19,12 +20,12 @@ public class BingMapsService {
     double SEMI_MINOR_AXIS_MT = 6356752.314245;
     double FLATTENING = 1 / 298.257223563;
     double ERROR_TOLERANCE = 1e-12;
-    double EARTH_RADIUS = 6371;
+
     @Value("${bingsmap.api-key}")
     String bingMapsApiKey;
 
     public CoordinatesDto getLocation(String address) throws IOException {
-        address = URLEncoder.encode(address, "UTF-8").replaceAll("\\+", "%20");
+        address = URLEncoder.encode(address, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         String urlString = String.format("http://dev.virtualearth.net/REST/v1/Locations?q=%s&key=%s", address, bingMapsApiKey);
         // Create URL object
         URL url = new URL(urlString);

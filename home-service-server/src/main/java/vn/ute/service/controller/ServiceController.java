@@ -20,8 +20,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("")
 public class ServiceController {
-    @Autowired
-    private ServiceService serviceService;
+    private final ServiceService serviceService;
+
+    public ServiceController(ServiceService serviceService) {
+        this.serviceService = serviceService;
+    }
+
     @Operation(summary = "Get all services")
     @GetMapping("/public/service")
     public ResponseEntity<ResponseDto<List<ServiceDto>>> getAllServices(){
@@ -61,4 +65,15 @@ public class ServiceController {
     }
 
 
+    @Operation(summary = "Enable or Disable service")
+    @PutMapping("/provider/service/{id}/{action}")
+    public ResponseEntity<?> providerEnableOrDisableService(@PathVariable UUID id, @PathVariable String action, HttpServletRequest request){
+        return serviceService.providerEnableOrDisableService(id, action, request);
+    }
+
+    @Operation(summary = "Update service of provider")
+    @PutMapping("/provider/service")
+    public ResponseEntity<?> updateServiceOfProvider(@RequestBody ServiceDto serviceDto, HttpServletRequest request){
+        return serviceService.updateServiceOfProvider(serviceDto,request);
+    }
 }

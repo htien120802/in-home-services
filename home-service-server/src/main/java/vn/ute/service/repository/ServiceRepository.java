@@ -22,5 +22,4 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, UUID> {
 
     Optional<ServiceEntity> findByIdAndProvider(UUID serviceId, ProviderEntity provider);
 
-    boolean existsByIdAndProvider_Account_Username(UUID serviceId, String providerUsername);
 }

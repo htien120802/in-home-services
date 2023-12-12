@@ -18,8 +18,12 @@ import java.io.IOException;
 
 @RestController
 public class ProviderController {
-    @Autowired
-    private ProviderService providerService;
+    private final ProviderService providerService;
+
+    public ProviderController(ProviderService providerService) {
+        this.providerService = providerService;
+    }
+
     @Operation(summary = "Get profile of provider")
     @GetMapping("/provider/profile")
     public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request){

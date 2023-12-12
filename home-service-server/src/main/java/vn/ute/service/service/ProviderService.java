@@ -2,7 +2,6 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,10 @@ import vn.ute.service.dto.ProviderDto;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
-import vn.ute.service.entity.*;
+import vn.ute.service.entity.AccountEntity;
+import vn.ute.service.entity.AddressEntity;
+import vn.ute.service.entity.CoordinatesEntity;
+import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.AccountRepository;
 import vn.ute.service.repository.AddressRepository;
@@ -26,29 +28,33 @@ import java.util.Optional;
 
 @Service
 public class ProviderService {
-    @Autowired
-    private ProviderRepository providerRepository;
+    private final ProviderRepository providerRepository;
 
-    @Autowired
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
 
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private BingMapsService bingMapsService;
+    private final BingMapsService bingMapsService;
+
+    public ProviderService(ProviderRepository providerRepository, AddressRepository addressRepository, AccountRepository accountRepository, JwtService jwtService, PasswordEncoder passwordEncoder, ImageService imageService, ModelMapper mapper, BingMapsService bingMapsService) {
+        this.providerRepository = providerRepository;
+        this.addressRepository = addressRepository;
+        this.accountRepository = accountRepository;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
+        this.imageService = imageService;
+        this.mapper = mapper;
+        this.bingMapsService = bingMapsService;
+    }
+
     @Transactional
     public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);

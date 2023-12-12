@@ -2,7 +2,6 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,30 +13,37 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.PaymentMethod;
+import vn.ute.service.enumerate.PaymentStatus;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.Date;
 import java.util.*;
 
 @Service
 public class BookingService {
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private ModelMapper mapper;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private PaymentService paymentService;
-    @Autowired
-    private WorkRepository workRepository;
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private PaymentRepository paymentRepository;
+    private final JwtService jwtService;
+    private final ModelMapper mapper;
+    private final CustomerRepository customerRepository;
+    private final ProviderRepository providerRepository;
+    private final PaymentService paymentService;
+    private final WorkRepository workRepository;
+    private final BookingRepository bookingRepository;
+    private final PaymentRepository paymentRepository;
+
+    public BookingService(JwtService jwtService, ModelMapper mapper, CustomerRepository customerRepository, ProviderRepository providerRepository, PaymentService paymentService, WorkRepository workRepository, BookingRepository bookingRepository, PaymentRepository paymentRepository) {
+        this.jwtService = jwtService;
+        this.mapper = mapper;
+        this.customerRepository = customerRepository;
+        this.providerRepository = providerRepository;
+        this.paymentService = paymentService;
+        this.workRepository = workRepository;
+        this.bookingRepository = bookingRepository;
+        this.paymentRepository = paymentRepository;
+    }
+
     @Transactional
     public ResponseEntity<?> createBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
         String username = jwtService.getUsernameFromRequest(request);
@@ -135,15 +141,16 @@ public class BookingService {
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
     @Transactional
-    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, HttpServletRequest request) throws IOException {
+    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, String reason, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
             return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
         }
-        BookingEntity booking = bookingRepository.findById(bookingId).orElse(null);
+        BookingEntity booking = bookingRepository.findByIdAndCustomer(bookingId, customer).orElse(null);
         if (booking != null && booking.getStatus().equals(BookingStatus.BOOKED)){
             booking.setStatus(BookingStatus.CANCEL_BY_CUSTOMER);
+            booking.setReasonCancel(reason);
             bookingRepository.save(booking);
 
             String message = null;
@@ -153,6 +160,57 @@ public class BookingService {
             return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", message));
         } else {
             return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
+        }
+
+    }
+
+    @Transactional
+    public ResponseEntity<?> cancelBookingByProvider(UUID bookingId, String reason, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+        if (provider == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+        }
+        BookingEntity booking = bookingRepository.findByIdAndProvider(bookingId, provider).orElse(null);
+        if (booking != null && booking.getStatus().equals(BookingStatus.BOOKED)){
+            booking.setStatus(BookingStatus.CANCEL_BY_PROVIDER);
+            booking.setReasonCancel(reason);
+            bookingRepository.save(booking);
+
+            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", null));
+        } else {
+            return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
+        }
+    }
+    @Transactional
+    public ResponseEntity<?> autoUpdateBookingStatus(UUID bookingId, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+        if (provider == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+        }
+        BookingEntity booking = bookingRepository.findByIdAndProvider(bookingId, provider).orElse(null);
+        if (booking != null){
+            if (booking.getStatus().equals(BookingStatus.BOOKED))
+                booking.setStatus(BookingStatus.ACCEPTED);
+            else if (booking.getStatus().equals(BookingStatus.ACCEPTED))
+                booking.setStatus(BookingStatus.COMING);
+            else if (booking.getStatus().equals(BookingStatus.COMING))
+                booking.setStatus(BookingStatus.DOING);
+            else if (booking.getStatus().equals(BookingStatus.DOING)) {
+                booking.setStatus(BookingStatus.DONE);
+                if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){
+                    booking.getPayment().setPaymentStatus(PaymentStatus.PAID);
+                    booking.getPayment().setPaymentDate(new Date(System.currentTimeMillis()));
+                }
+
+            } else {
+                return ResponseEntity.ok(new ResponseDto<>("fail","Fail to update booking status!",null));
+            }
+            bookingRepository.save(booking);
+            return ResponseEntity.ok(new ResponseDto<>("success","Update booking status successfully!",null));
+        } else {
+            return ResponseEntity.ok(new ResponseDto<>("fail","You're not allowed to update booking status!",null));
         }
     }
 }
