@@ -3,6 +3,7 @@ package vn.ute.service.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import vn.ute.service.entity.BookingEntity;
 import vn.ute.service.entity.CustomerEntity;
+import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.ServiceEntity;
 import vn.ute.service.enumerate.BookingStatus;
 
@@ -14,6 +15,10 @@ public interface BookingRepository extends JpaRepository<BookingEntity, UUID> {
     List<BookingEntity> findAllByCustomer(CustomerEntity customer);
     List<BookingEntity> findAllByCustomerAndStatus(CustomerEntity customer, BookingStatus status);
     Optional<BookingEntity> findByCustomerAndService(CustomerEntity customer, ServiceEntity service);
+
+    Optional<BookingEntity> findByIdAndCustomer(UUID id, CustomerEntity customer);
+
+    Optional<BookingEntity> findByIdAndProvider(UUID id, ProviderEntity provider);
 
     Optional<BookingEntity> findByCustomerAndServiceAndStatus(CustomerEntity customer, ServiceEntity service, BookingStatus status);
 }

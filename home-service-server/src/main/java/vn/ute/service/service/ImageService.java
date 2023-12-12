@@ -13,8 +13,11 @@ import java.util.UUID;
 @Service
 public class ImageService {
 
-    @Autowired
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
+
+    public ImageService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
 
     public String uploadImage(MultipartFile file) {
         try {

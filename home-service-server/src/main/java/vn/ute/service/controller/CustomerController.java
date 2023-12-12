@@ -19,8 +19,12 @@ import java.io.IOException;
 @RestController
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
+
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
+    }
+
     @Operation(summary = "Get profile of customer")
     @GetMapping("/customer/profile")
     public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request){

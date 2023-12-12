@@ -2,7 +2,6 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,29 +27,33 @@ import java.util.Optional;
 
 @Service
 public class CustomerService {
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    @Autowired
-    private BingMapsService bingMapsService;
+    private final BingMapsService bingMapsService;
 
-    @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
+
+    public CustomerService(JwtService jwtService, CustomerRepository customerRepository, AddressRepository addressRepository, AccountRepository accountRepository, BingMapsService bingMapsService, ImageService imageService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+        this.jwtService = jwtService;
+        this.customerRepository = customerRepository;
+        this.addressRepository = addressRepository;
+        this.accountRepository = accountRepository;
+        this.bingMapsService = bingMapsService;
+        this.imageService = imageService;
+        this.passwordEncoder = passwordEncoder;
+        this.mapper = mapper;
+    }
+
     @Transactional
     public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);

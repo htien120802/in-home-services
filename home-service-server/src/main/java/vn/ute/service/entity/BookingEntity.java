@@ -69,6 +69,7 @@ public class BookingEntity {
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
+    private String reasonCancel;
     @PrePersist
     private void prePersist(){
         if (this.status == null){

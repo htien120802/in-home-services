@@ -15,8 +15,12 @@ import vn.ute.service.service.ImageService;
 @RestController
 @RequestMapping("/image")
 public class ImageController {
-    @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
+
+    public ImageController(ImageService imageService) {
+        this.imageService = imageService;
+    }
+
     @PreAuthorize("hasAnyRole('PROVIDER','ADMIN')")
     @PostMapping(value = "/upload", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImage(@RequestPart("file") MultipartFile file) {

@@ -3,7 +3,6 @@ package vn.ute.service.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,30 +26,28 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final CustomerRepository customerRepository;
+    private final ProviderRepository providerRepository;
+    private final TokenRepository tokenRepository;
+    private final RoleRepository roleRepository;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    public AuthService(AccountRepository accountRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, TokenRepository tokenRepository, RoleRepository roleRepository, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+        this.accountRepository = accountRepository;
+        this.customerRepository = customerRepository;
+        this.providerRepository = providerRepository;
+        this.tokenRepository = tokenRepository;
+        this.roleRepository = roleRepository;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+        this.mapper = mapper;
+    }
 
-    @Autowired
-    private ProviderRepository providerRepository;
-
-    @Autowired
-    private TokenRepository tokenRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private ModelMapper mapper;
     @Transactional
     public ResponseEntity<ResponseDto<?>> createAccount(SignUpRequest signUpRequest) {
         if (accountRepository.existsByUsername(signUpRequest.getUsername()))
@@ -90,8 +87,7 @@ public class AuthService {
     public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest){
         if (EmailValidator.getInstance().isValid(signInRequest.getUsername())){
             Optional<AccountEntity> temp = accountRepository.findByCustomer_EmailOrProvider_Email(signInRequest.getUsername(),signInRequest.getUsername());
-            if (temp.isPresent())
-                signInRequest.setUsername(temp.get().getUsername());
+            temp.ifPresent(accountEntity -> signInRequest.setUsername(accountEntity.getUsername()));
         }
         Optional<AccountEntity> account = accountRepository.findByUsername(signInRequest.getUsername());
         if (account.isEmpty())

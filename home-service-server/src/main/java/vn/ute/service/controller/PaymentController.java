@@ -12,8 +12,12 @@ import java.util.Map;
 
 @RestController
 public class PaymentController {
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
     @GetMapping("/payment-callback")
     public void paymentCallback(@RequestParam Map<String, String> queryParams, HttpServletResponse response) throws IOException, IOException {
         paymentService.paymentCallBack(queryParams, response);
