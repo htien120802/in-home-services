@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.ute.service.dto.request.CreateBookingRequest;
 import vn.ute.service.service.BookingService;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class BookingController {
 
     @Operation(summary = "Customer cancel booking")
     @PutMapping("/customer/booking/{bookingId}/cancel")
-    public ResponseEntity<?> cancelBookingByCustomer(@PathVariable UUID bookingId, @RequestParam String reason, HttpServletRequest request) {
+    public ResponseEntity<?> cancelBookingByCustomer(@PathVariable UUID bookingId, @RequestParam String reason, HttpServletRequest request) throws IOException {
         return bookingService.cancelBookingByCustomer(bookingId, reason, request);
     }
 

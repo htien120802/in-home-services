@@ -155,7 +155,7 @@ public class AuthService {
         return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
     }
     @Transactional
-    public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("Authorization").isEmpty())
             return ResponseEntity.ok(new ResponseDto<>("fail","Token not found",null));
         String jwt = jwtService.getTokenFromRequest(request);
@@ -167,6 +167,12 @@ public class AuthService {
             tokenRepository.save(storedToken);
             SecurityContextHolder.clearContext();
         }
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setMaxAge(0);
+        cookie.setSecure(false);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
         return ResponseEntity.ok(new ResponseDto<>("success","Logout successfully",null));
     }
 

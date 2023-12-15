@@ -33,7 +33,7 @@ public class WorkEntity {
     @JoinColumn(name = "service_id")
     private ServiceEntity service;
 
-    @OneToOne(mappedBy = "work")
-    private BookingItemEntity bookingItem;
+    @OneToMany(mappedBy = "work", cascade = CascadeType.ALL)
+    private Set<BookingItemEntity> bookingItems = new HashSet<>();
 
 }

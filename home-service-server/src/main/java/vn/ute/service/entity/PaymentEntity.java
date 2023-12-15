@@ -33,7 +33,9 @@ public class PaymentEntity {
 
     private Integer amount;
 
-    private Date paymentDate;
+    private String paymentDate;
+
+    private String transactionNo;
 
 //    @Column(columnDefinition = "enum ('PAID','UNPAID') default 'UNPAID'")
     @Enumerated(EnumType.STRING)
