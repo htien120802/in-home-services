@@ -35,6 +35,7 @@ public class ReviewEntity {
     @Column(nullable = false)
     private String comment;
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     @PrePersist

@@ -20,7 +20,7 @@ public class BookingItemEntity {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "work_id")
     private WorkEntity work;
 
