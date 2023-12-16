@@ -37,6 +37,11 @@
       "no-underscore-dangle": 0,
       "jsx-a11y/label-has-associated-control": 0,
       "react/jsx-props-no-spreading": 0,
-      "import/order": 0
+      "import/order": 0,
+      "max-len": 0,
+      "react/no-unescaped-entities": 0,
+      "jsx-a11y/anchor-is-valid": 0,
+      "react/jsx-no-script-url": 0,
+      "no-script-url": 0
     }
 }

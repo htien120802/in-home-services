@@ -6,7 +6,9 @@ export default {
   async login(payload) {
     const path = `${endpoint}/signin`;
 
-    const response = await axiosClient.post(path, payload);
+    const response = await axiosClient.post(path, payload, {
+      withCredentials: true,
+    });
 
     return response.data;
   },
@@ -14,7 +16,9 @@ export default {
   async register(payload) {
     const path = `${endpoint}/signup`;
 
-    const response = await axiosClient.post(path, payload);
+    const response = await axiosClient.post(path, payload, {
+      withCredentials: true,
+    });
 
     return response.data;
   },
@@ -22,7 +26,9 @@ export default {
   async refreshToken() {
     const path = `${endpoint}/refresh-token`;
 
-    const response = await axiosClient.post(path);
+    const response = await axiosClient.post(path, {
+      withCredentials: true,
+    });
 
     return response.data;
   },
@@ -30,7 +36,9 @@ export default {
   async logout() {
     const path = `${endpoint}/logout`;
 
-    const response = await axiosClient.post(path);
+    const response = await axiosClient.post(path, {
+      withCredentials: true,
+    });
 
     return response.data;
   },

@@ -31,7 +31,6 @@ function* login({ payload }) {
 
     localStorage.setItem('accessToken', response.data.accessToken);
     document.cookie = `refreshToken=${response.data.refreshToken}; path=/; secure; HttpOnly`;
-    localStorage.setItem('accessTokenExpirationTime', 24 * 60 * 60 * 1000);
 
     yield put(actionLoginSuccess(response.data));
 

@@ -1,49 +1,193 @@
+import { toast } from 'react-toastify';
 import { put, takeLeading, call } from 'redux-saga/effects';
 
 import serviceAPI from 'apis/service/serviceAPI';
 
 import {
-  apiErrorHandler,
-} from 'utils/index';
-
-import {
-  GET_ALL_SERVICES,
-  GET_SERVICE_DETAILS,
+  GET_ALL_PROVIDER_SERVICES,
+  UPDATE_PROVIDER_SERVICE,
+  REGISTER_PROVIDER_SERVICE,
+  ENABLE_OR_DISABLE_PROVIDER_SERVICE,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
+  GET_ALL_PUBLIC_SERVICES,
+  GET_SERVICE_BY_ID,
+  GET_PROVIDER_SERVICES_BY_STATUS,
+  DELETE_PROVIDER_SERVICE,
 } from './actionTypes';
 
 import {
-  actionGetAllServicesSuccess,
-  actionGetAllServicesFailed,
-
-  actionGetServiceDetailsSuccess,
-  actionGetServiceDetailsFailed,
+  actionGetAllProviderServicesSuccess,
+  actionGetAllProviderServicesFailed,
+  actionUpdateProviderServiceSuccess,
+  actionUpdateProviderServiceFailed,
+  actionRegisterProviderServiceSuccess,
+  actionRegisterProviderServiceFailed,
+  actionEnableOrDisableProviderServiceSuccess,
+  actionEnableOrDisableProviderServiceFailed,
+  actionApproveOrUnapproveRegisterServiceSuccess,
+  actionApproveOrUnapproveRegisterServiceFailed,
+  actionGetAllPublicServicesSuccess,
+  actionGetAllPublicServicesFailed,
+  actionGetServiceByIdSuccess,
+  actionGetServiceByIdFailed,
+  actionGetProviderServicesByStatusSuccess,
+  actionGetProviderServicesByStatusFailed,
+  actionDeleteProviderServiceSuccess,
+  actionDeleteProviderServiceFailed,
 } from './actions';
 
-function* getAllServices() {
+function* getAllProviderServices() {
   try {
-    const response = yield serviceAPI.getAllServices();
+    const response = yield call(serviceAPI.getAllProviderServices);
 
-    yield put(actionGetAllServicesSuccess(response));
+    yield put(actionGetAllProviderServicesSuccess(response.data.services));
   } catch (error) {
-    apiErrorHandler(error);
-
-    yield put(actionGetAllServicesFailed());
+    yield put(actionGetAllProviderServicesFailed());
   }
 }
 
-function* getServiceDetails(action) {
+function* updateProviderService({ payload }) {
   try {
-    const response = yield call(serviceAPI.getServiceDetails, { id: action.payload.id });
+    const { serviceData } = payload;
 
-    yield put(actionGetServiceDetailsSuccess(response.data));
+    const response = yield call(serviceAPI.updateProviderService, serviceData);
+
+    yield put(actionUpdateProviderServiceSuccess(response.data.service));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
   } catch (error) {
-    apiErrorHandler(error);
+    toast.error(error.message);
 
-    yield put(actionGetServiceDetailsFailed());
+    yield put(actionUpdateProviderServiceFailed());
   }
 }
 
-export default function* CamerasSaga() {
-  yield takeLeading(GET_ALL_SERVICES, getAllServices);
-  yield takeLeading(GET_SERVICE_DETAILS, getServiceDetails);
+function* registerProviderService({ payload }) {
+  try {
+    const { serviceData } = payload;
+
+    const response = yield call(serviceAPI.registerProviderService, serviceData);
+
+    yield put(actionRegisterProviderServiceSuccess(response.data.service));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+
+    yield put(actionRegisterProviderServiceFailed());
+  }
+}
+
+function* enableOrDisableProviderService({ payload }) {
+  try {
+    const { serviceId, actionType } = payload;
+
+    const response = yield call(serviceAPI.enableOrDisableProviderService, serviceId, actionType);
+
+    yield put(actionEnableOrDisableProviderServiceSuccess(response.data.service));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+
+    yield put(actionEnableOrDisableProviderServiceFailed());
+  }
+}
+
+function* approveOrUnapproveRegisterService({ payload }) {
+  try {
+    const { serviceData } = payload;
+
+    const response = yield call(serviceAPI.approveOrUnapproveRegisterService, serviceData);
+
+    yield put(actionApproveOrUnapproveRegisterServiceSuccess(response.data.service));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+
+    yield put(actionApproveOrUnapproveRegisterServiceFailed());
+  }
+}
+
+function* getAllPublicServices() {
+  try {
+    const response = yield call(serviceAPI.getAllPublicServices);
+
+    yield put(actionGetAllPublicServicesSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetAllPublicServicesFailed());
+  }
+}
+
+function* getServiceById({ payload }) {
+  try {
+    const { id } = payload;
+
+    const response = yield call(serviceAPI.getServiceById, id);
+
+    yield put(actionGetServiceByIdSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetServiceByIdFailed());
+  }
+}
+
+function* getProviderServicesByStatus({ payload }) {
+  try {
+    const { status } = payload;
+
+    const response = yield call(serviceAPI.getProviderServicesByStatus, status);
+
+    yield put(actionGetProviderServicesByStatusSuccess(response.data.services));
+  } catch (error) {
+    yield put(actionGetProviderServicesByStatusFailed());
+  }
+}
+
+function* deleteProviderService({ payload }) {
+  try {
+    const { serviceId } = payload;
+
+    const response = yield call(serviceAPI.deleteProviderService, serviceId);
+
+    yield put(actionDeleteProviderServiceSuccess(serviceId));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+
+    yield put(actionDeleteProviderServiceFailed());
+  }
+}
+
+export default function* serviceSaga() {
+  yield takeLeading(GET_ALL_PROVIDER_SERVICES, getAllProviderServices);
+  yield takeLeading(UPDATE_PROVIDER_SERVICE, updateProviderService);
+  yield takeLeading(REGISTER_PROVIDER_SERVICE, registerProviderService);
+  yield takeLeading(ENABLE_OR_DISABLE_PROVIDER_SERVICE, enableOrDisableProviderService);
+  yield takeLeading(APPROVE_OR_UNAPPROVE_REGISTER_SERVICE, approveOrUnapproveRegisterService);
+  yield takeLeading(GET_ALL_PUBLIC_SERVICES, getAllPublicServices);
+  yield takeLeading(GET_SERVICE_BY_ID, getServiceById);
+  yield takeLeading(GET_PROVIDER_SERVICES_BY_STATUS, getProviderServicesByStatus);
+  yield takeLeading(DELETE_PROVIDER_SERVICE, deleteProviderService);
 }

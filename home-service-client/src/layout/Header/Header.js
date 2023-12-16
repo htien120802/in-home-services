@@ -50,8 +50,7 @@ function Header() {
           <li><Link to={LOCATION.HOME} onClick={closeNav}>01. Home</Link></li>
           <li><Link to={LOCATION.ABOUT} onClick={closeNav}>02. About</Link></li>
           <li><Link to={LOCATION.SERVICES} onClick={closeNav}>03. Services</Link></li>
-          <li><Link to={LOCATION.REVIEWS} onClick={closeNav}>04. Reviews</Link></li>
-          <li><Link to={LOCATION.CONTACT} onClick={closeNav}>05. Contact Us</Link></li>
+          <li><Link to={LOCATION.CONTACT} onClick={closeNav}>04. Contact Us</Link></li>
         </ul>
       </div>
 
@@ -69,7 +68,7 @@ function Header() {
                   </button>
 
                   <div className="logo_circle">
-                    <a href="index.html"><img className="img-responsive" src="/assets/img/logo.png" alt="#" /></a>
+                    <Link to="/"><img className="img-responsive" src="/assets/img/logo.png" alt="#" /></Link>
                   </div>
                 </div>
               </div>
@@ -85,9 +84,9 @@ function Header() {
 
                         {isDropdownOpen && (
                         <div className="dropdown-content">
-                          <a href="/">Profile</a>
+                          <a href="/profile">Profile</a>
                           <a href="/">Settings</a>
-                          <button type="button" onClick={handleLogout}>Logout</button>
+                          <button className="dropdown-content-logout" type="button" onClick={handleLogout}>Logout</button>
                         </div>
                         )}
                       </div>
