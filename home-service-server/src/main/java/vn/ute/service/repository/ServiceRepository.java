@@ -2,6 +2,7 @@ package vn.ute.service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.ServiceEntity;
 import vn.ute.service.enumerate.ServiceStatus;
@@ -17,6 +18,10 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, UUID> {
     List<ServiceEntity> findAllByStatusIsApproved();
 
     List<ServiceEntity> findAllByStatusIs(ServiceStatus status);
+    @Query(value = """
+    select count(s) from ServiceEntity s where s.status = 'APPROVED' and s.category.slug = :category_slug
+    """)
+    int countAllByCategory_Slug(@Param("category_slug") String category_slug);
 
     List<ServiceEntity> findAllByProvider_Account_Username(String username);
 
