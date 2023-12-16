@@ -2,17 +2,22 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.config.VNPayConfig;
+import vn.ute.service.entity.BookingEntity;
 import vn.ute.service.entity.PaymentEntity;
 import vn.ute.service.enumerate.PaymentStatus;
 import vn.ute.service.repository.BookingRepository;
 import vn.ute.service.repository.PaymentRepository;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
+import java.io.InputStreamReader;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -38,7 +43,7 @@ public class PaymentService {
         String vnp_Command = "pay";
         String orderType = "other";
         long amount = payment.getAmount()*100;
-        String bankCode = "NCB";
+        String bankCode = "";
 
         String vnp_TxnRef = String.valueOf(payment.getBooking().getId());
         String vnp_IpAddr = VNPayConfig.getIpAddress(request);
@@ -110,7 +115,8 @@ public class PaymentService {
                 // Thực hiện các xử lý cần thiết, ví dụ: cập nhật CSDL
                 if (payment != null){
                     payment.setPaymentStatus(PaymentStatus.PAID);
-                    payment.setPaymentDate(new Date(System.currentTimeMillis()));
+                    payment.setPaymentDate(queryParams.get("vnp_PayDate"));
+                    payment.setTransactionNo(queryParams.get("vnp_TransactionNo"));
                     paymentRepository.save(payment);
                     response.sendRedirect(urlSuccess);
                 }
@@ -131,4 +137,82 @@ public class PaymentService {
         }
     }
 
+    public void refund(BookingEntity booking, HttpServletRequest request) throws IOException {
+        String vnp_ResponseId = VNPayConfig.getRandomNumber(8);
+        String vnp_Version = "2.1.0";
+        String vnp_Command = "refund";
+        String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
+        String vnp_ResponseCode = "00";
+
+        String vnp_TransactionType = "02" ;
+        String vnp_TxnRef = String.valueOf(booking.getId());
+        // response từ query trả về từ vnpay ko cần *100, nó đã sẵn nhân 100 rồi
+        int amount = booking.getTotalPrice() ;//Integer.parseInt(req.getParameter("amount"))*100;//150000 * 100;10000000
+        String vnp_Amount = String.valueOf(amount);
+        String vnp_OrderInfo = "Hoan tien GD " + vnp_TxnRef + ":";
+        String vnp_TransactionNo = booking.getPayment().getTransactionNo();
+        String vnp_TransactionDate = booking.getPayment().getPaymentDate() ;//req.getParameter("trans_date"); //
+        String vnp_CreateBy = booking.getCustomer().getFirstName();//req.getParameter("user");NGUYEN VAN A// ko quan trong
+
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnp_CreateDate = formatter.format(cld.getTime());
+
+        String vnp_IpAddr = VNPayConfig.getIpAddress(request);
+
+        JSONObject vnp_Params = new JSONObject ();
+
+
+        vnp_Params.append("vnp_ResponseId", vnp_ResponseId);
+        vnp_Params.append("vnp_Version", vnp_Version);
+        vnp_Params.append("vnp_Command", vnp_Command);
+        vnp_Params.append("vnp_TmnCode", vnp_TmnCode);
+        vnp_Params.append("vnp_TransactionType", vnp_TransactionType);
+        vnp_Params.append("vnp_TxnRef", vnp_TxnRef);
+        vnp_Params.append("vnp_ResponseCode",vnp_ResponseCode);
+        vnp_Params.append("vnp_Amount", vnp_Amount);
+        vnp_Params.append("vnp_OrderInfo", vnp_OrderInfo);
+
+        if(vnp_TransactionNo != null && !vnp_TransactionNo.isEmpty())
+        {
+            vnp_Params.append("vnp_TransactionNo", "{get value of vnp_TransactionNo}");
+        }
+
+        vnp_Params.append("vnp_TransactionDate", vnp_TransactionDate);
+        vnp_Params.append("vnp_CreateBy", vnp_CreateBy);
+        vnp_Params.append("vnp_CreateDate", vnp_CreateDate);
+        vnp_Params.append("vnp_IpAddr", vnp_IpAddr);
+
+        String hash_Data = vnp_ResponseId + "|" + vnp_Version + "|" + vnp_Command + "|" + vnp_TmnCode + "|" +
+                vnp_TransactionType + "|" + vnp_TxnRef + "|" + vnp_Amount + "|" + vnp_TransactionNo + "|"
+                + vnp_TransactionDate + "|" + vnp_CreateBy + "|" + vnp_CreateDate + "|" + vnp_IpAddr + "|" + vnp_OrderInfo;
+
+        String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hash_Data.toString());
+
+        vnp_Params.append("vnp_SecureHash", vnp_SecureHash);
+
+        URL url = new URL (VNPayConfig.vnp_ApiUrl);
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.writeBytes(vnp_Params.toString());
+        wr.flush();
+        wr.close();
+        int responseCode = con.getResponseCode();
+        System.out.println("nSending 'POST' request to URL : " + url);
+        System.out.println("Post Data : " + vnp_Params);
+        System.out.println("Response Code : " + responseCode);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String output;
+        StringBuffer response = new StringBuffer();
+        while ((output = in.readLine()) != null) {
+            response.append(output);
+        }
+        in.close();
+        System.out.println(response.toString());
+
+    }
 }

@@ -18,6 +18,7 @@ import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.util.*;
@@ -141,7 +142,7 @@ public class BookingService {
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
     @Transactional
-    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, String reason, HttpServletRequest request) {
+    public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, String reason, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
@@ -156,6 +157,7 @@ public class BookingService {
             String message = null;
             if (booking.getPayment().getMethod().equals(PaymentMethod.VNPAY)){
                 message = "Your money will be refunded soon!";
+//                paymentService.refund(booking,request);
             }
             return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", message));
         } else {
@@ -201,7 +203,7 @@ public class BookingService {
                 booking.setStatus(BookingStatus.DONE);
                 if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){
                     booking.getPayment().setPaymentStatus(PaymentStatus.PAID);
-                    booking.getPayment().setPaymentDate(new Date(System.currentTimeMillis()));
+                    booking.getPayment().setPaymentDate(String.valueOf(new Date(System.currentTimeMillis())));
                 }
 
             } else {

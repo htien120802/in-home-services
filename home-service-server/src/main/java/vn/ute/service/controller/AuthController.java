@@ -1,6 +1,7 @@
 package vn.ute.service.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +22,8 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<ResponseDto<?>> signin(@RequestBody SignInRequest signInRequest){
-        return authService.signIn(signInRequest);
+    public ResponseEntity<ResponseDto<?>> signin(@RequestBody SignInRequest signInRequest, HttpServletResponse response){
+        return authService.signIn(signInRequest, response);
     }
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto<?>> signupAccount(@RequestBody SignUpRequest signUpRequest){
@@ -34,8 +35,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request){
-        return authService.logout(request);
+    public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request, HttpServletResponse response){
+        return authService.logout(request, response);
     }
 
     @PostMapping("/refresh-token")
