@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,15 @@ public class ServiceController {
 
     @Operation(summary = "Get all services")
     @GetMapping("/public/service")
-    public ResponseEntity<ResponseDto<List<ServiceDto>>> getAllServices(){
-        return serviceService.getAllServices();
+    public ResponseEntity<?> getAllServices(@RequestParam(defaultValue = "0") int pageNumber,
+                                            @RequestParam(defaultValue = "9") int size,
+                                            @RequestParam(defaultValue = "avgRating") String sortBy,
+                                            @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection,
+                                            @RequestParam(required = false) String name,
+                                            @RequestParam(required = false) String categorySlug,
+                                            @RequestParam(required = false) String rating,
+                                            HttpServletRequest request){
+        return serviceService.getAllServices(pageNumber,size,sortBy,sortDirection,name,categorySlug,rating,request);
     }
     @Operation(summary = "Get all services of provider")
     @GetMapping("/provider/service")

@@ -29,6 +29,12 @@ public class JwtService {
         return refreshExpiration;
     }
 
+    public boolean checkHaveToken(HttpServletRequest request){
+        if (request.getHeader("Authorization") == null)
+            return false;
+        return true;
+    }
+
     public String getUsernameFromRequest(HttpServletRequest request){
         String jwt = getTokenFromRequest(request);
         return extractUsername(jwt);

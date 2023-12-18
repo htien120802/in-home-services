@@ -81,9 +81,9 @@ public class ProviderService {
             CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
             coordinates.setAddress(addressEntity);
             addressEntity.setCoordinates(coordinates);
-            addressEntity = addressRepository.save(addressEntity);
+            addressRepository.save(addressEntity);
 
-            providerEntity.get().getAddresses().add(addressEntity);
+//            providerEntity.get().getAddresses().add(addressEntity);
 //            customerRepository.save(customerEntity.get());
             ProviderDto providerDto = mapper.map(providerEntity.get(), ProviderDto.class);
             return ResponseEntity.ok(new ResponseDto<>("success","Add address successfully",providerDto));

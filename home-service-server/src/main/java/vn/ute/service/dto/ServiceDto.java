@@ -20,5 +20,9 @@ public class ServiceDto {
 
     private Set<ImageDto> images;
 
+    private Double avgRating;
+
+    private Double distance;
+
 //    private Set<ReviewDto> reviews;
 }

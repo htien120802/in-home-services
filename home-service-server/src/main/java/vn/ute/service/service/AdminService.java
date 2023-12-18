@@ -14,6 +14,7 @@ import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.AccountEntity;
 import vn.ute.service.entity.CustomerEntity;
 import vn.ute.service.repository.AccountRepository;
+import vn.ute.service.repository.AddressRepository;
 import vn.ute.service.repository.CustomerCriteriaRepository;
 import vn.ute.service.repository.CustomerRepository;
 
@@ -24,14 +25,16 @@ public class AdminService {
     private final CustomerCriteriaRepository customerCriteriaRepository;
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
+    private final AddressRepository addressRepository;
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
-    public AdminService(CustomerCriteriaRepository customerCriteriaRepository, CustomerRepository customerRepository, AccountRepository accountRepository, ImageService imageService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+    public AdminService(CustomerCriteriaRepository customerCriteriaRepository, CustomerRepository customerRepository, AccountRepository accountRepository, AddressRepository addressRepository, ImageService imageService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
         this.customerCriteriaRepository = customerCriteriaRepository;
         this.customerRepository = customerRepository;
         this.accountRepository = accountRepository;
+        this.addressRepository = addressRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
@@ -74,5 +77,13 @@ public class AdminService {
 
         customerRepository.deleteById(customerId);
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete customer successfully!", null));
+    }
+
+    public ResponseEntity deleteAddress(UUID addressId) {
+        if (!addressRepository.existsById(addressId))
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Not found address with this id!", null));
+
+        addressRepository.deleteById(addressId);
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete address successfully!", null));
     }
 }

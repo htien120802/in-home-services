@@ -38,4 +38,10 @@ public class AdminController {
     public ResponseEntity deleteCustomer(@PathVariable UUID customerId){
         return adminService.deleteCustomer(customerId);
     }
+
+    @Operation(summary = "Delete a address")
+    @DeleteMapping("/address/{addressId}")
+    public ResponseEntity deleteAddress(@PathVariable UUID addressId){
+        return adminService.deleteAddress(addressId);
+    }
 }

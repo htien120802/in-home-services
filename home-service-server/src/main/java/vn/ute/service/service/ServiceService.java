@@ -5,35 +5,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import vn.ute.service.dto.CoordinatesDto;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.dto.WorkDto;
 import vn.ute.service.dto.request.ApproveRegisterServiceRequest;
 import vn.ute.service.dto.request.RegisterServiceRequest;
 import vn.ute.service.dto.response.ResponseDto;
-import vn.ute.service.entity.CategoryEntity;
-import vn.ute.service.entity.ProviderEntity;
-import vn.ute.service.entity.ServiceEntity;
-import vn.ute.service.entity.WorkEntity;
+import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ServiceService {
     private final ServiceRepository serviceRepository;
+    private final ServiceCriteriaRepository serviceCriteriaRepository;
 
     private final CategoryRepository categoryRepository;
+    private final CustomerRepository customerRepository;
 
     private final ProviderRepository providerRepository;
 
     private final WorkRepository workRepository;
+
+    private final BingMapsService bingMapsService;
 
     private final ImageService imageService;
 
@@ -41,11 +43,14 @@ public class ServiceService {
 
     private final ModelMapper mapper;
 
-    public ServiceService(ServiceRepository serviceRepository, CategoryRepository categoryRepository, ProviderRepository providerRepository, WorkRepository workRepository, ImageService imageService, JwtService jwtService, ModelMapper mapper) {
+    public ServiceService(ServiceRepository serviceRepository, ServiceCriteriaRepository serviceCriteriaRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, WorkRepository workRepository, BingMapsService bingMapsService, ImageService imageService, JwtService jwtService, ModelMapper mapper) {
         this.serviceRepository = serviceRepository;
+        this.serviceCriteriaRepository = serviceCriteriaRepository;
         this.categoryRepository = categoryRepository;
+        this.customerRepository = customerRepository;
         this.providerRepository = providerRepository;
         this.workRepository = workRepository;
+        this.bingMapsService = bingMapsService;
         this.imageService = imageService;
         this.jwtService = jwtService;
         this.mapper = mapper;
@@ -230,5 +235,46 @@ public class ServiceService {
 
         return ResponseEntity.ok(new ResponseDto<>("success","Update service successfully",mapper.map(service,ServiceDto.class)));
 
+    }
+
+    public ResponseEntity<?> getAllServices(int pageNumber, int size, String sortBy, Sort.Direction sortDirection, String name, String categorySlug, String rating, HttpServletRequest request) {
+        if(jwtService.checkHaveToken(request)){
+            String username = jwtService.getUsernameFromRequest(request);
+            CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+            if (customer != null && customer.getAddresses().size() != 0) {
+                AddressEntity addressEntity = new ArrayList<>(customer.getAddresses()).get(0);
+                List<ServiceDto> serviceDtos = new ArrayList<>();
+                for (ServiceEntity service : serviceCriteriaRepository.findAllWithFilters(name, categorySlug, rating)) {
+                    ServiceDto map = mapper.map(service, ServiceDto.class);
+                    AddressEntity address = new ArrayList<>(service.getProvider().getAddresses()).get(0);
+                    map.setDistance(bingMapsService.calculateDistance(mapper.map(addressEntity.getCoordinates(), CoordinatesDto.class),mapper.map(address.getCoordinates(), CoordinatesDto.class)));
+                    serviceDtos.add(map);
+                }
+                if (sortBy.equals("distance")){
+                    if (sortDirection.isAscending())
+                        serviceDtos.sort(Comparator.comparingDouble(ServiceDto::getDistance).thenComparing(Comparator.comparingDouble(ServiceDto::getAvgRating).reversed()));
+                    else {
+                        serviceDtos.sort(Comparator.comparingDouble(ServiceDto::getDistance).reversed().thenComparing(Comparator.comparingDouble(ServiceDto::getAvgRating).reversed()));
+                    }
+                }
+                if (sortBy.equals("avgRating")){
+                    if (sortDirection.isAscending())
+                        serviceDtos.sort(Comparator.comparingDouble(ServiceDto::getAvgRating).thenComparingDouble(ServiceDto::getDistance));
+                    else {
+                        serviceDtos.sort(Comparator.comparingDouble(ServiceDto::getAvgRating).reversed().thenComparingDouble(ServiceDto::getDistance));
+                    }
+                }
+
+                Sort sort = Sort.by(sortDirection, sortBy);
+                Pageable pageable = PageRequest.of(pageNumber,size, sort);
+                Page<ServiceDto> page = new PageImpl<>(serviceDtos,pageable,serviceDtos.size());
+                return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",page));
+            }
+        }
+        if (sortBy.equals("distance"))
+            sortBy = "avgRating";
+        Page<ServiceEntity> serviceEntityPage = serviceCriteriaRepository.findAllWithFilters(pageNumber,size,sortDirection,sortBy,name,categorySlug,rating);
+        Page<ServiceDto> serviceDtoPage = serviceEntityPage.map(service -> mapper.map(service,ServiceDto.class));
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",serviceDtoPage));
     }
 }

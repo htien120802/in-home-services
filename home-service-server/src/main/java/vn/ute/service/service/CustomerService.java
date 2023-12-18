@@ -80,9 +80,9 @@ public class CustomerService {
             CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
             coordinates.setAddress(addressEntity);
             addressEntity.setCoordinates(coordinates);
-            addressEntity = addressRepository.save(addressEntity);
+            addressRepository.save(addressEntity);
 
-            customerEntity.get().getAddresses().add(addressEntity);
+//            customerEntity.get().getAddresses().add(addressEntity);
 //            customerRepository.save(customerEntity.get());
             CustomerDto customerDto = mapper.map(customerEntity.get(),CustomerDto.class);
             return ResponseEntity.ok(new ResponseDto<>("success","Add address successfully",customerDto));
