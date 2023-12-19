@@ -2,6 +2,7 @@ package vn.ute.service.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.ute.service.dto.ServiceDto;
 import vn.ute.service.dto.request.CreateUserRequest;
 import vn.ute.service.dto.request.ProfileRequest;
+import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.service.AdminService;
 
@@ -25,6 +27,11 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @Operation(summary = "Count entity")
+    @GetMapping("/count")
+    public ResponseEntity<?> countEntity(){
+        return adminService.countEntity();
+    }
     @Operation(summary = "Get all customers")
     @GetMapping("/customer")
     public ResponseEntity<?> getAllCustomers(@RequestParam(defaultValue = "0") @Min(0) int pageNumber, @RequestParam(defaultValue = "10") @Min(1) int size, @RequestParam(defaultValue = "ASC") Sort.Direction sortDirection, @RequestParam(defaultValue = "lastName") String sortBy, @RequestParam(required = false) String name, @RequestParam(required = false) String email, @RequestParam(required = false) String username){
@@ -125,5 +132,50 @@ public class AdminController {
     @PostMapping(value = "/category/{categoryId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateCategory(@PathVariable UUID categoryId, @RequestPart(required = false) MultipartFile thumbnail, @RequestPart String categoryName){
         return adminService.updateCategory(categoryId, thumbnail, categoryName);
+    }
+
+    @Operation(summary =  "Get all bookings")
+    @GetMapping("/booking")
+    public ResponseEntity<?> getAllBookings(@RequestParam(defaultValue = "0") int pageNumber,
+                                            @RequestParam(defaultValue = "10") int size,
+                                            @RequestParam(required = false) BookingStatus status,
+                                            @RequestParam(required = false) String providerName,
+                                            @RequestParam(required = false) String customerName,
+                                            @RequestParam(required = false) String serviceCategorySlug){
+        return adminService.getAllBookings(pageNumber, size, status, providerName, customerName, serviceCategorySlug);
+    }
+
+    @Operation(summary = "Get a booking")
+    @GetMapping("/booking/{bookingId}")
+    public ResponseEntity<?> getBooking(@PathVariable UUID bookingId){
+        return adminService.getBooking(bookingId);
+    }
+
+    @Operation(summary = "Delete a booking")
+    @DeleteMapping("/booking/{bookingId}")
+    public ResponseEntity<?> deleteBooking(@PathVariable UUID bookingId){
+        return adminService.deleteBooking(bookingId);
+    }
+
+    @Operation(summary = "Get all reviews")
+    @GetMapping("/review")
+    public ResponseEntity<?> getAllReviews(@RequestParam(defaultValue = "0") int pageNumber,
+                                          @RequestParam(defaultValue = "10") int size,
+                                          @RequestParam(required = false) @Min(1) @Max(5) int rating,
+                                          @RequestParam(required = false) String customerName,
+                                          @RequestParam(required = false) String serviceName){
+        return adminService.getAllReviews(pageNumber, size, rating, customerName, serviceName);
+    }
+
+    @Operation(summary = "Get a review")
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<?> getReview(@PathVariable UUID reviewId){
+        return adminService.getReview(reviewId);
+    }
+
+    @Operation(summary = "Delete a review")
+    @DeleteMapping("/review/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable UUID reviewId){
+        return adminService.deleteReview(reviewId);
     }
 }

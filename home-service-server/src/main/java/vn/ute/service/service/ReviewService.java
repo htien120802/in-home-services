@@ -3,6 +3,10 @@ package vn.ute.service.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,9 +102,17 @@ public class ReviewService {
         return ResponseEntity.ok(new ResponseDto<>("success","Get your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
     }
 
-    public ResponseEntity<?> getAllReview(UUID serviceId) {
-        List<ReviewEntity> reviews = reviewRepository.findAllByService_Id(serviceId);
+    public ResponseEntity<?> getAllReview(UUID serviceId, int pageNumber, int size, int rating) {
+        Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending());
+        Page<ReviewEntity> reviews;
+        if (rating > 0){
+            reviews = reviewRepository.findAllByService_IdAndRating(serviceId, rating, pageable);
+
+        }else {
+            reviews = reviewRepository.findAllByService_Id(serviceId, pageable);
+        }
+
         List<ReviewDto> reviewDtos = reviews.stream().map(reviewEntity -> mapper.map(reviewEntity, ReviewDto.class)).toList();
-        return ResponseEntity.ok(new ResponseDto<>("success","Get all reviews of this successfully!",mapper.map(reviewDtos, ReviewDto.class)));
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all reviews of this service successfully!",mapper.map(reviewDtos, ReviewDto.class)));
     }
 }

@@ -1,4 +1,4 @@
-package vn.ute.service.dto.response;
+package vn.ute.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
-    private String accessToken;
-    private String refreshToken;
+public class CountItem {
+    private String name;
+    private long quantity;
 }

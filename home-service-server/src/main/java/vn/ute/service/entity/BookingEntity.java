@@ -61,6 +61,8 @@ public class BookingEntity {
 
     private long movingFee;
 
+    private long subTotal;
+
     private long totalPrice;
 
     private Date date;
@@ -87,11 +89,11 @@ public class BookingEntity {
     }
 
     public void calcTotalPrice(){
-        this.totalPrice = 0;
+        this.subTotal = 0;
         for (BookingItemEntity item : this.bookingItems){
-            this.totalPrice = this.totalPrice + (long) item.getWork().getPricePerUnit() * item.getQuantity();
+            this.subTotal = this.subTotal + (long) item.getWork().getPricePerUnit() * item.getQuantity();
         }
-        this.totalPrice += this.movingFee;
+        this.totalPrice = this.subTotal + this.movingFee;
     }
 
 //    @PostPersist

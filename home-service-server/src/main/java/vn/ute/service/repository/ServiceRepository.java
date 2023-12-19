@@ -25,6 +25,8 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, UUID> {
 
     List<ServiceEntity> findAllByProvider_Account_Username(String username);
 
+    long countAllByStatus(ServiceStatus status);
+
     Optional<ServiceEntity> findByIdAndProvider(UUID serviceId, ProviderEntity provider);
 
 }

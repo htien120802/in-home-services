@@ -15,6 +15,8 @@ public class ServiceDto {
 
     private String name;
 
+    private String thumbnail;
+
     private Time openTime;
 
     private Time closeTime;

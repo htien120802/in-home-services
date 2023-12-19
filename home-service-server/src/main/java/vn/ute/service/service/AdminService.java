@@ -16,44 +16,50 @@ import vn.ute.service.dto.request.CreateServiceRequest;
 import vn.ute.service.dto.request.CreateUserRequest;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.response.ResponseDto;
+import vn.ute.service.dto.response.ReviewResponse;
 import vn.ute.service.entity.*;
+import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.repository.*;
-import vn.ute.service.repository.criteria.CustomerCriteriaRepository;
-import vn.ute.service.repository.criteria.ProviderCriteriaRepository;
-import vn.ute.service.repository.criteria.ServiceCriteriaRepository;
+import vn.ute.service.repository.criteria.*;
 import vn.ute.service.utils.SlugUtil;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AdminService {
     private final CustomerCriteriaRepository customerCriteriaRepository;
     private final ProviderCriteriaRepository providerCriteriaRepository;
     private final ServiceCriteriaRepository serviceCriteriaRepository;
+    private final BookingCriteriaRepository bookingCriteriaRepository;
+    private final ReviewCriteriaRepository reviewCriteriaRepository;
     private final ServiceRepository serviceRepository;
     private final WorkRepository workRepository;
     private final CategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
     private final ProviderRepository providerRepository;
+    private final BookingRepository bookingRepository;
     private final AccountRepository accountRepository;
+    private final ReviewRepository reviewRepository;
     private final AddressRepository addressRepository;
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
-    public AdminService(CustomerCriteriaRepository customerCriteriaRepository, ProviderCriteriaRepository providerCriteriaRepository, ServiceCriteriaRepository serviceCriteriaRepository, ServiceRepository serviceRepository, WorkRepository workRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, AccountRepository accountRepository, AddressRepository addressRepository, ImageService imageService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+    public AdminService(CustomerCriteriaRepository customerCriteriaRepository, ProviderCriteriaRepository providerCriteriaRepository, ServiceCriteriaRepository serviceCriteriaRepository, BookingCriteriaRepository bookingCriteriaRepository, ReviewCriteriaRepository reviewCriteriaRepository, ServiceRepository serviceRepository, WorkRepository workRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, BookingRepository bookingRepository, AccountRepository accountRepository, ReviewRepository reviewRepository, AddressRepository addressRepository, ImageService imageService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
         this.customerCriteriaRepository = customerCriteriaRepository;
         this.providerCriteriaRepository = providerCriteriaRepository;
         this.serviceCriteriaRepository = serviceCriteriaRepository;
+        this.bookingCriteriaRepository = bookingCriteriaRepository;
+        this.reviewCriteriaRepository = reviewCriteriaRepository;
         this.serviceRepository = serviceRepository;
         this.workRepository = workRepository;
         this.categoryRepository = categoryRepository;
         this.customerRepository = customerRepository;
         this.providerRepository = providerRepository;
+        this.bookingRepository = bookingRepository;
         this.accountRepository = accountRepository;
+        this.reviewRepository = reviewRepository;
         this.addressRepository = addressRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
@@ -97,6 +103,7 @@ public class AdminService {
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Not found customer with this id!", null));
 
         mapper.map(profileRequest,customer);
+        addressRepository.save(mapper.map(profileRequest.getAddress(),AddressEntity.class));
         customerRepository.save(customer);
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Update customer successfully!",mapper.map(customer,CustomerDto.class)));
     }
@@ -156,6 +163,7 @@ public class AdminService {
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Not found provider with this id!", null));
 
         mapper.map(profileRequest,provider);
+        addressRepository.save(mapper.map(profileRequest.getAddress(),AddressEntity.class));
         providerRepository.save(provider);
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Update customer successfully!",mapper.map(provider,ProviderDto.class)));
     }
@@ -300,5 +308,73 @@ public class AdminService {
 
         category = categoryRepository.save(category);
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(new ResponseDto<>("success","Update category successfully!", mapper.map(category, CategoryDto.class)));
+    }
+
+    public ResponseEntity<?> getAllBookings(int pageNumber, int size, BookingStatus status, String providerName, String customerName, String serviceCategorySlug) {
+        Page<BookingEntity> bookings = bookingCriteriaRepository.findAllWithFilters(pageNumber, size, status, providerName, customerName, serviceCategorySlug);
+        Page<BookingDto> bookingDtos = bookings.map(booking -> mapper.map(booking, BookingDto.class));
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get all bookings successfully!",bookingDtos));
+    }
+
+    @Transactional
+    public ResponseEntity<?> deleteBooking(UUID bookingId) {
+        if (!bookingRepository.existsById(bookingId))
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Not found booking with this id",null));
+
+        bookingRepository.deleteById(bookingId);
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("fail","Delete booking successfully!",null));
+    }
+
+    public ResponseEntity<?> getBooking(UUID bookingId) {
+        BookingEntity booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null)
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Booking not found", null));
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get booking successfully!",mapper.map(booking, BookingDto.class)));
+    }
+
+    public ResponseEntity<?> getAllReviews(int pageNumber, int size, int rating, String customerName, String serviceName) {
+        Page<ReviewEntity> reviewEntities = reviewCriteriaRepository.findAllWithFilters(pageNumber,size,rating,customerName,serviceName);
+        Page<ReviewResponse> reviews = reviewEntities.map(reviewEntity -> mapper.map(reviewEntity,ReviewResponse.class));
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get all reviews successfully!",reviews));
+    }
+
+    public ResponseEntity<?> getReview(UUID reviewId) {
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId).orElse(null);
+        if (reviewEntity == null)
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Review not found",null));
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get review successfully!",mapper.map(reviewEntity, ReviewResponse.class)));
+    }
+    @Transactional
+    public ResponseEntity<?> deleteReview(UUID reviewId) {
+        if (!reviewRepository.existsById(reviewId))
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Review not found",null));
+
+        reviewRepository.deleteById(reviewId);
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete review successfully!",null));
+
+    }
+
+    public ResponseEntity<?> countEntity() {
+        List<CountItem> countItems = new ArrayList<>();
+
+        long customerCount = customerRepository.count();
+        countItems.add(new CountItem("customer",customerCount));
+
+        long providerCount = providerRepository.count();
+        countItems.add(new CountItem("provider",providerCount));
+
+        long serviceCount = serviceRepository.countAllByStatus(ServiceStatus.APPROVED);
+        countItems.add(new CountItem("service", serviceCount));
+
+        long bookingCount = bookingRepository.countAllByStatus(BookingStatus.DONE);
+        countItems.add(new CountItem("booking",bookingCount));
+
+        long reviewCount = reviewRepository.count();
+        countItems.add(new CountItem("review",reviewCount));
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,countItems));
+
     }
 }

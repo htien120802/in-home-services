@@ -62,6 +62,7 @@ public class ProviderService {
         if (provider.isPresent()){
             ProviderEntity temp = provider.get();
             mapper.map(customerProfile,temp);
+            addressRepository.save(mapper.map(customerProfile.getAddress(),AddressEntity.class));
             temp = providerRepository.save(temp);
             return ResponseEntity.ok(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, ProviderDto.class)));
         }

@@ -2,6 +2,10 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -135,20 +139,27 @@ public class BookingService {
         return ResponseEntity.ok(new ResponseDto<>("fail","Payment method is invalid!",null));
     }
 
-    public ResponseEntity<?> getAllBookingOfCustomer(HttpServletRequest request) {
+    public ResponseEntity<?> getAllBookingOfCustomer(int pageNumber, int size, BookingStatus bookingStatus, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
             return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
         }
-        List<BookingEntity> bookings = bookingRepository.findAllByCustomer(customer);
-        List<BookingDto> bookingDtos = new ArrayList<>();
-        for (BookingEntity booking : bookings){
-            PaymentEntity payment = paymentRepository.findByBooking(booking).orElse(null);
-            BookingDto bookingDto = mapper.map(booking, BookingDto.class);
-            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
-            bookingDtos.add(bookingDto);
+        Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending().and(Sort.by("time").descending()));
+        Page<BookingEntity> bookings;
+        if (bookingStatus != null){
+            bookings = bookingRepository.findAllByCustomerAndStatus(customer, bookingStatus, pageable);
+        } else {
+            bookings = bookingRepository.findAllByCustomer(customer, pageable);
         }
+//        List<BookingDto> bookingDtos = new ArrayList<>();
+//        for (BookingEntity booking : bookings){
+//            PaymentEntity payment = paymentRepository.findByBooking(booking).orElse(null);
+//            BookingDto bookingDto = mapper.map(booking, BookingDto.class);
+//            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
+//            bookingDtos.add(bookingDto);
+//        }
+        Page<BookingDto> bookingDtos = bookings.map(booking -> mapper.map(booking,BookingDto.class));
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
 
@@ -248,5 +259,57 @@ public class BookingService {
         } else {
             return ResponseEntity.ok(new ResponseDto<>("fail","You're not allowed to update booking status!",null));
         }
+    }
+
+    public ResponseEntity<?> getAllBookingOfProvider(int pageNumber, int size, BookingStatus bookingStatus, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+        if (provider == null){
+            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+        }
+        Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending().and(Sort.by("time").descending()));
+        Page<BookingEntity> bookings;
+        if (bookingStatus != null){
+            bookings = bookingRepository.findAllByProviderAndStatus(provider, bookingStatus, pageable);
+        } else {
+            bookings = bookingRepository.findAllByProvider(provider, pageable);
+        }
+//        List<BookingDto> bookingDtos = new ArrayList<>();
+//        for (BookingEntity booking : bookings){
+//            PaymentEntity payment = paymentRepository.findByBooking(booking).orElse(null);
+//            BookingDto bookingDto = mapper.map(booking, BookingDto.class);
+//            bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
+//            bookingDtos.add(bookingDto);
+//        }
+        Page<BookingDto> bookingDtos = bookings.map(booking -> mapper.map(booking,BookingDto.class));
+        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+    }
+
+    public ResponseEntity<?> getBookingOfCustomer(UUID bookingId, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Customer not found!",null));
+        }
+        BookingEntity booking = bookingRepository.findByIdAndCustomer(bookingId, customer).orElse(null);
+        if (booking == null)
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","Booking with this id doesn't exsist or isn't owned by you!",null));
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get booking successfully!",mapper.map(booking, BookingDto.class)));
+
+    }
+
+    public ResponseEntity<?> getBookingOfProvider(UUID bookingId, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+        if (provider == null){
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Provider not found!",null));
+        }
+        BookingEntity booking = bookingRepository.findByIdAndProvider(bookingId, provider).orElse(null);
+        if (booking == null)
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","Booking with this id doesn't exsist or isn't owned by you!",null));
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get booking successfully!",mapper.map(booking, BookingDto.class)));
+
     }
 }

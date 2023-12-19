@@ -19,6 +19,7 @@ public class BookingDto {
     private ServiceDto service;
     private Set<BookingItemDto> bookingItems;
     private long movingFee;
+    private long subTotal;
     private long totalPrice;
     private Time time;
     private Date date;
