@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
@@ -35,11 +36,11 @@ public class ReviewEntity {
     @Column(nullable = false)
     private String comment;
     @Column(nullable = false)
-    private Date date;
+    private Timestamp date;
 
     @PrePersist
     private void prePersist(){
-        this.date = new Date(System.currentTimeMillis());
+        this.date = new Timestamp(System.currentTimeMillis());
     }
 
 //    @PostPersist

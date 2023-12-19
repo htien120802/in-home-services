@@ -61,7 +61,7 @@ public class ServiceController {
         return serviceService.registerService(thumbnail, service, request);
     }
     @Operation(summary = "Approve or unapprove register service")
-    @PutMapping(value = "/admin/service")
+    @PutMapping(value = "/admin/service/aprrove")
     public ResponseEntity<ResponseDto<?>> approveRegisterRequest(@RequestBody ApproveRegisterServiceRequest approveRequest){
         return serviceService.approveRegisterRequest(approveRequest);
     }

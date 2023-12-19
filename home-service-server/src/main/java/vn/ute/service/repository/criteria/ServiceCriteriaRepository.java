@@ -1,4 +1,4 @@
-package vn.ute.service.repository;
+package vn.ute.service.repository.criteria;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import vn.ute.service.entity.CategoryEntity;
+import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.ServiceEntity;
 import vn.ute.service.enumerate.ServiceStatus;
 
@@ -26,7 +27,7 @@ public class ServiceCriteriaRepository {
         Root<ServiceEntity> serviceRoot = criteriaQuery.from(ServiceEntity.class);
         criteriaQuery.select(serviceRoot);
 
-        Predicate predicate = getPredicate(name, categorySlug, rating, serviceRoot);
+        Predicate predicate = getPredicate(ServiceStatus.APPROVED, null, name, categorySlug, rating, serviceRoot);
         criteriaQuery.where(predicate);
         setOrder(sortDirection, sortBy, criteriaQuery, serviceRoot);
 
@@ -36,7 +37,7 @@ public class ServiceCriteriaRepository {
 
         Pageable pageable = getPageable(pageNumber, size, sortDirection, sortBy);
 
-        long servicesCount = getCustomersCount(name, categorySlug, rating);
+        long servicesCount = getServicesCount(ServiceStatus.APPROVED,null, name, categorySlug, rating);
 
         return new PageImpl<>(typedQuery.getResultList(), pageable, servicesCount);
     }
@@ -46,7 +47,7 @@ public class ServiceCriteriaRepository {
         Root<ServiceEntity> serviceRoot = criteriaQuery.from(ServiceEntity.class);
         criteriaQuery.select(serviceRoot);
 
-        Predicate predicate = getPredicate(name, categorySlug, rating, serviceRoot);
+        Predicate predicate = getPredicate(ServiceStatus.APPROVED, null, name, categorySlug, rating, serviceRoot);
         criteriaQuery.where(predicate);
 
         TypedQuery<ServiceEntity> typedQuery = entityManager.createQuery(criteriaQuery);
@@ -58,11 +59,19 @@ public class ServiceCriteriaRepository {
 
 
 
-    private Predicate getPredicate(String name, String categorySlug, String rating, Root<ServiceEntity> serviceRoot) {
+    private Predicate getPredicate(ServiceStatus status, String providerName, String name, String categorySlug, String rating, Root<ServiceEntity> serviceRoot) {
 
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(serviceRoot.get("status"), ServiceStatus.APPROVED));
+        if (status != null){
+            predicates.add(criteriaBuilder.equal(serviceRoot.get("status"), status));
+        }
+
+        if (providerName != null){
+            Join<ServiceEntity, ProviderEntity> provider = serviceRoot.join("provider");
+            predicates.add(criteriaBuilder.like(provider.get("name"),"%" + providerName + "%"));
+        }
+
         if (name != null){
             predicates.add(criteriaBuilder.like(serviceRoot.get("name"),"%" + name.toLowerCase() + "%"));
         }
@@ -92,11 +101,31 @@ public class ServiceCriteriaRepository {
         return PageRequest.of(pageNumber,size, sort);
     }
 
-    private long getCustomersCount(String name, String categorySlug, String rating) {
+    private long getServicesCount(ServiceStatus status, String providerName, String name, String categorySlug, String rating) {
         CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         Root<ServiceEntity> countRoot = countQuery.from(ServiceEntity.class);
-        Predicate predicate = getPredicate(name, categorySlug, rating, countRoot);
+        Predicate predicate = getPredicate(status, providerName, name, categorySlug, rating, countRoot);
         countQuery.select(criteriaBuilder.count(countRoot)).where(predicate);
         return entityManager.createQuery(countQuery).getSingleResult();
+    }
+
+    public Page<ServiceEntity> findAllWithFilters(int pageNumber, int size, Sort.Direction sortDirection, String sortBy, ServiceStatus status, String providerName, String name, String categorySlug, String rating) {
+        CriteriaQuery<ServiceEntity> criteriaQuery = criteriaBuilder.createQuery(ServiceEntity.class);
+        Root<ServiceEntity> serviceRoot = criteriaQuery.from(ServiceEntity.class);
+        criteriaQuery.select(serviceRoot);
+
+        Predicate predicate = getPredicate(status, providerName, name, categorySlug, rating, serviceRoot);
+        criteriaQuery.where(predicate);
+        setOrder(sortDirection, sortBy, criteriaQuery, serviceRoot);
+
+        TypedQuery<ServiceEntity> typedQuery = entityManager.createQuery(criteriaQuery);
+        typedQuery.setFirstResult(pageNumber * size);
+        typedQuery.setMaxResults(size);
+
+        Pageable pageable = getPageable(pageNumber, size, sortDirection, sortBy);
+
+        long servicesCount = getServicesCount(status, providerName, name, categorySlug, rating);
+
+        return new PageImpl<>(typedQuery.getResultList(), pageable, servicesCount);
     }
 }

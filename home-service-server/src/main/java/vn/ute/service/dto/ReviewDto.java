@@ -6,6 +6,7 @@ import lombok.Setter;
 
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -15,5 +16,5 @@ public class ReviewDto {
     private UUID id;
     private int rating;
     private String comment;
-    private Date date;
+    private Timestamp date;
 }

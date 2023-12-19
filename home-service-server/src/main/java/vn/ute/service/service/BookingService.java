@@ -2,11 +2,13 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.BookingDto;
 import vn.ute.service.dto.BookingItemDto;
+import vn.ute.service.dto.CoordinatesDto;
 import vn.ute.service.dto.PaymentDto;
 import vn.ute.service.dto.request.CreateBookingRequest;
 import vn.ute.service.dto.response.ResponseDto;
@@ -17,10 +19,13 @@ import vn.ute.service.enumerate.PaymentStatus;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
+import vn.ute.service.utils.MovingFeeUtil;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -33,8 +38,9 @@ public class BookingService {
     private final WorkRepository workRepository;
     private final BookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
+    private final BingMapsService bingMapsService;
 
-    public BookingService(JwtService jwtService, ModelMapper mapper, CustomerRepository customerRepository, ProviderRepository providerRepository, PaymentService paymentService, WorkRepository workRepository, BookingRepository bookingRepository, PaymentRepository paymentRepository) {
+    public BookingService(JwtService jwtService, ModelMapper mapper, CustomerRepository customerRepository, ProviderRepository providerRepository, PaymentService paymentService, WorkRepository workRepository, BookingRepository bookingRepository, PaymentRepository paymentRepository, BingMapsService bingMapsService) {
         this.jwtService = jwtService;
         this.mapper = mapper;
         this.customerRepository = customerRepository;
@@ -43,6 +49,7 @@ public class BookingService {
         this.workRepository = workRepository;
         this.bookingRepository = bookingRepository;
         this.paymentRepository = paymentRepository;
+        this.bingMapsService = bingMapsService;
     }
 
     @Transactional
@@ -52,6 +59,9 @@ public class BookingService {
         if (customer == null){
             return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
         }
+
+        if (customer.getAddresses().size() == 0 || customer.getPhone().isEmpty())
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","You have to add address and phone number first!",null));
 
         Set<BookingItemEntity> bookingItems = new HashSet<>();
         for (BookingItemDto w : bookingRequest.getBookingItems()){
@@ -74,18 +84,35 @@ public class BookingService {
             return ResponseEntity.ok(new ResponseDto<>("fail","List of works is invalid!",null));
         }
 
+        Time currentTime = new Time(System.currentTimeMillis());
+
+        // Convert Time objects to LocalTime
+        LocalTime openTime = objCompare.getOpenTime().toLocalTime();
+        LocalTime closeTime = objCompare.getCloseTime().toLocalTime();
+        LocalTime currentLocalTime = currentTime.toLocalTime();
+
+        if ( !currentLocalTime.isAfter(openTime) || !currentLocalTime.isBefore(closeTime))
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","This service has been closed or not open to provide",null));
+
         ProviderEntity provider = objCompare.getProvider();
 
         BookingEntity booking = new BookingEntity();
         booking.setCustomer(customer);
         booking.setProvider(provider);
-        booking.setTime(bookingRequest.getTime());
-        booking.setDate(bookingRequest.getDate());
+        booking.setTime(currentTime);
+        booking.setDate(new Date(System.currentTimeMillis()));
         booking.setService(objCompare);
+
+        CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(provider.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+        CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(customer.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+        double distance = bingMapsService.calculateDistance(coordinates1,coordinates2);
+        long movingFee = MovingFeeUtil.calcMovingFee(distance);
+        booking.setMovingFee(movingFee);
 
         for (BookingItemEntity item : bookingItems){
             item.setBooking(booking);
         }
+
         booking.setBookingItems(bookingItems);
         booking.calcTotalPrice();
 
@@ -185,7 +212,7 @@ public class BookingService {
         }
     }
     @Transactional
-    public ResponseEntity<?> autoUpdateBookingStatus(UUID bookingId, HttpServletRequest request) {
+    public ResponseEntity<?> autoUpdateBookingStatus(UUID bookingId, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
         if (provider == null){
@@ -195,10 +222,17 @@ public class BookingService {
         if (booking != null){
             if (booking.getStatus().equals(BookingStatus.BOOKED))
                 booking.setStatus(BookingStatus.ACCEPTED);
-            else if (booking.getStatus().equals(BookingStatus.ACCEPTED))
+            else if (booking.getStatus().equals(BookingStatus.ACCEPTED)){
                 booking.setStatus(BookingStatus.COMING);
-            else if (booking.getStatus().equals(BookingStatus.COMING))
+                CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(booking.getCustomer().getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+                CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(booking.getProvider().getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+                Double time = bingMapsService.calcMovingTime(coordinates1,coordinates2);
+                booking.setArriveTime(new Time((long) (System.currentTimeMillis() + time)));
+            }
+            else if (booking.getStatus().equals(BookingStatus.COMING)){
                 booking.setStatus(BookingStatus.DOING);
+                booking.setArriveTime(new Time(System.currentTimeMillis()));
+            }
             else if (booking.getStatus().equals(BookingStatus.DOING)) {
                 booking.setStatus(BookingStatus.DONE);
                 if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){

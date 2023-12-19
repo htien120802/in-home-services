@@ -51,7 +51,7 @@ public class BookingController {
 
     @Operation(summary = "Auto update status for booking")
     @PutMapping("/provider/booking/{bookingId}/status")
-    public ResponseEntity<?> autoUpdateBookingStatus(@PathVariable UUID bookingId, HttpServletRequest request){
+    public ResponseEntity<?> autoUpdateBookingStatus(@PathVariable UUID bookingId, HttpServletRequest request) throws IOException {
         return bookingService.autoUpdateBookingStatus(bookingId, request);
     }
 }

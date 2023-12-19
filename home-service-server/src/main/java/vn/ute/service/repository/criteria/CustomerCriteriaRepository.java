@@ -1,4 +1,4 @@
-package vn.ute.service.repository;
+package vn.ute.service.repository.criteria;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;

@@ -59,11 +59,15 @@ public class BookingEntity {
 //            inverseJoinColumns = @JoinColumn(name = "work_id"))
 //    private Set<WorkEntity> works = new HashSet<>();
 
-    private Integer totalPrice;
+    private long movingFee;
+
+    private long totalPrice;
 
     private Date date;
 
     private Time time;
+
+    private Time arriveTime;
 
 //    @Column(columnDefinition = "enum ('BOOKED','COMING','DOING','DONE') default 'BOOKED'")
     @Enumerated(EnumType.STRING)
@@ -85,8 +89,9 @@ public class BookingEntity {
     public void calcTotalPrice(){
         this.totalPrice = 0;
         for (BookingItemEntity item : this.bookingItems){
-            this.totalPrice = this.totalPrice + item.getWork().getPricePerUnit() * item.getQuantity();
+            this.totalPrice = this.totalPrice + (long) item.getWork().getPricePerUnit() * item.getQuantity();
         }
+        this.totalPrice += this.movingFee;
     }
 
 //    @PostPersist

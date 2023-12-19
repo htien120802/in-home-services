@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
+import vn.ute.service.repository.criteria.ServiceCriteriaRepository;
 
 import java.util.*;
 
@@ -68,6 +70,9 @@ public class ServiceService {
         if (provider == null){
             return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
         }
+
+        if (provider.getAddresses().size() == 0 || provider.getPhone().isEmpty())
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","You have to add address and phone number first!",null));
 
         CategoryEntity category = categoryRepository.findById(serviceRequest.getCategory()).orElse(null);
         if (category == null)
@@ -230,6 +235,8 @@ public class ServiceService {
         }
 
         service.setName(serviceDto.getName());
+        service.setOpenTime(serviceDto.getOpenTime());
+        service.setCloseTime(serviceDto.getCloseTime());
         service.setCategory(category);
         service = serviceRepository.save(service);
 
