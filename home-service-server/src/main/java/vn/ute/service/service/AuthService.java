@@ -23,6 +23,7 @@ import vn.ute.service.entity.TokenEntity;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,7 +112,7 @@ public class AuthService {
 
         revokeAllUserTokens(account.get());
         saveToken(jwtToken,account.get());
-        return ResponseEntity.ok(new ResponseDto<>("success","Sign in successfully",new AuthenticationResponse(jwtToken,refreshToken)));
+        return ResponseEntity.ok(new ResponseDto<>("success","Sign in successfully",new AuthenticationResponse(jwtToken,refreshToken,new ArrayList<>(account.get().getRoles()).get(0).getRoleName())));
     }
 
     private void saveToken(String jwtToken, AccountEntity account){
@@ -149,7 +150,7 @@ public class AuthService {
                 String accessToken = jwtService.generateToken(account.get());
                 revokeAllUserTokens(account.get());
                 saveToken(accessToken, account.get());
-                return ResponseEntity.ok(new ResponseDto<>("success","Refresh token successfully",new AuthenticationResponse(accessToken,refreshToken)));
+                return ResponseEntity.ok(new ResponseDto<>("success","Refresh token successfully",new AuthenticationResponse(accessToken,refreshToken,new ArrayList<>(account.get().getRoles()).get(0).getRoleName())));
             }
         }
         return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
