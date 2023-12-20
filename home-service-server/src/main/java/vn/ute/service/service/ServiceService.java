@@ -72,7 +72,7 @@ public class ServiceService {
             return ResponseEntity.status(404).body(new ResponseDto<>("fail","Provider not found!",null));
         }
 
-        if (provider.getAddresses().size() == 0 || provider.getPhone().isEmpty())
+        if (provider.getAddresses().size() == 0 || provider.getPhone() == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","You have to add address and phone number first!",null));
 
         CategoryEntity category = categoryRepository.findById(serviceRequest.getCategory()).orElse(null);

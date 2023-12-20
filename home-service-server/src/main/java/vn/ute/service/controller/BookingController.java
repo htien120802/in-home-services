@@ -23,6 +23,12 @@ public class BookingController {
     }
 
     @Operation(summary = "Create booking")
+    @PostMapping("/customer/booking/calc")
+    public ResponseEntity<?> calcPriceBooking(@RequestBody CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
+        return bookingService.calcPriceBooking(bookingRequest, request);
+    }
+
+    @Operation(summary = "Create booking")
     @PostMapping("/customer/booking")
     public ResponseEntity<?> createBooking(@RequestBody CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
         return bookingService.createBooking(bookingRequest, request);
