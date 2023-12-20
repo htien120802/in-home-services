@@ -3,6 +3,7 @@ package vn.ute.service.exception;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.java.Log;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.hibernate.PropertyValueException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -49,7 +50,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         response.setHeader("x-error-log-id", logId);
         log.log(Level.WARNING, MessageFormat.format("RestResponseEntityExceptionHandler >> handlePropertyValueException >> logId: {0} >> Exception: {1}", logId, e.getMessage()));
         var responseBody = new ResponseDto<>("fail","Invalid input",Map.of());
-        return ResponseEntity.ok(responseBody);
+        return ResponseEntity.status(400).body(responseBody);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -59,7 +60,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         response.setHeader("x-error-log-id", logId);
         log.log(Level.WARNING, MessageFormat.format("RestResponseEntityExceptionHandler >> handleIllegalArgumentException >> logId: {0} >> Exception: {1}", logId, e.getMessage()));
         var responseBody = new ResponseDto<>("fail","Invalid path variable",Map.of());
-        return ResponseEntity.ok(responseBody);
+        return ResponseEntity.status(400).body(responseBody);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -69,6 +70,26 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         response.setHeader("x-error-log-id", logId);
         log.log(Level.WARNING, MessageFormat.format("RestResponseEntityExceptionHandler >> handleConstraintViolationException >> logId: {0} >> Exception: {1}", logId, e.getMessage()));
         var responseBody = new ResponseDto<>("fail","Invalid input",Map.of());
-        return ResponseEntity.ok(responseBody);
+        return ResponseEntity.status(400).body(responseBody);
+    }
+
+    @ExceptionHandler(ImageUploadException.class)
+    protected ResponseEntity<?> handleImageUploadException(HttpServletResponse response, ImageUploadException e) {
+        var logId = UUIDUtil.getUuid();
+        response.setHeader("x-error-request", String.valueOf(1));
+        response.setHeader("x-error-log-id", logId);
+        log.log(Level.WARNING, MessageFormat.format("RestResponseEntityExceptionHandler >> handleImageUploadException >> logId: {0} >> Exception: {1}", logId, e.getMessage()));
+        var responseBody = new ResponseDto<>("fail",e.getMessage(),Map.of());
+        return ResponseEntity.status(400).body(responseBody);
+    }
+
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    protected ResponseEntity<?> handleFileSizeLimitExceededException(HttpServletResponse response, FileSizeLimitExceededException e) {
+        var logId = UUIDUtil.getUuid();
+        response.setHeader("x-error-request", String.valueOf(1));
+        response.setHeader("x-error-log-id", logId);
+        log.log(Level.WARNING, MessageFormat.format("RestResponseEntityExceptionHandler >> handleFileSizeLimitExceededException >> logId: {0} >> Exception: {1}", logId, e.getMessage()));
+        var responseBody = new ResponseDto<>("fail","Size of file upload is too big!",Map.of());
+        return ResponseEntity.status(400).body(responseBody);
     }
 }

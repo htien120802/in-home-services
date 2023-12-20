@@ -61,7 +61,7 @@ public class BookingService {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
 
         if (customer.getAddresses().size() == 0 || customer.getPhone().isEmpty())
@@ -71,7 +71,7 @@ public class BookingService {
         for (BookingItemDto w : bookingRequest.getBookingItems()){
             WorkEntity work = workRepository.findById(w.getWork().getId()).orElse(null);
             if (work == null){
-                return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
+                return ResponseEntity.status(404).body(new ResponseDto<>("fail","Service not found!",null));
             }
             BookingItemEntity bookingItem = new BookingItemEntity();
             bookingItem.setWork(work);
@@ -81,11 +81,11 @@ public class BookingService {
 
         ServiceEntity objCompare = new ArrayList<>(bookingItems).get(0).getWork().getService();
         if (!objCompare.getStatus().equals(ServiceStatus.APPROVED)){
-            return ResponseEntity.ok(new ResponseDto<>("fail","This service no longer provide!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","This service no longer provide!",null));
         }
         boolean validWorks = bookingItems.stream().allMatch(bookingItem -> bookingItem.getWork().getService().equals(objCompare));
         if (!validWorks){
-            return ResponseEntity.ok(new ResponseDto<>("fail","List of works is invalid!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","List of works is invalid!",null));
         }
 
         Time currentTime = new Time(System.currentTimeMillis());
@@ -131,19 +131,19 @@ public class BookingService {
 
         if (payment.getMethod().equals(PaymentMethod.CASH)){
             BookingDto bookingDto = mapper.map(booking, BookingDto.class);
-            return ResponseEntity.ok(new ResponseDto<>("success","Booking successfully!",bookingDto));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Booking successfully!",bookingDto));
         }else if (payment.getMethod().equals(PaymentMethod.VNPAY)){
             String url = paymentService.createPaymentUrl(payment, request);
-            return ResponseEntity.ok(new ResponseDto<>("success","Booking successfully!",url));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Booking successfully!",url));
         }
-        return ResponseEntity.ok(new ResponseDto<>("fail","Payment method is invalid!",null));
+        return ResponseEntity.status(400).body(new ResponseDto<>("fail","Payment method is invalid!",null));
     }
 
     public ResponseEntity<?> getAllBookingOfCustomer(int pageNumber, int size, BookingStatus bookingStatus, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
         Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending().and(Sort.by("time").descending()));
         Page<BookingEntity> bookings;
@@ -160,14 +160,14 @@ public class BookingService {
 //            bookingDtos.add(bookingDto);
 //        }
         Page<BookingDto> bookingDtos = bookings.map(booking -> mapper.map(booking,BookingDto.class));
-        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
 
     public ResponseEntity<?> getAllBookingOfCustomerByStatus(String status, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
         List<BookingEntity> bookings = bookingRepository.findAllByCustomerAndStatus(customer, BookingStatus.valueOf(status.toUpperCase()));
         List<BookingDto> bookingDtos = new ArrayList<>();
@@ -177,14 +177,14 @@ public class BookingService {
             bookingDto.setPayment(mapper.map(payment, PaymentDto.class));
             bookingDtos.add(bookingDto);
         }
-        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
     @Transactional
     public ResponseEntity<?> cancelBookingByCustomer(UUID bookingId, String reason, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
         BookingEntity booking = bookingRepository.findByIdAndCustomer(bookingId, customer).orElse(null);
         if (booking != null && booking.getStatus().equals(BookingStatus.BOOKED)){
@@ -197,9 +197,9 @@ public class BookingService {
                 message = "Your money will be refunded soon!";
 //                paymentService.refund(booking,request);
             }
-            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", message));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Cancel booking successfully!", message));
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You can't cancel booking now!",null));
         }
 
     }
@@ -209,7 +209,7 @@ public class BookingService {
         String username = jwtService.getUsernameFromRequest(request);
         ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
         if (provider == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Provider not found!",null));
         }
         BookingEntity booking = bookingRepository.findByIdAndProvider(bookingId, provider).orElse(null);
         if (booking != null && booking.getStatus().equals(BookingStatus.BOOKED)){
@@ -217,9 +217,9 @@ public class BookingService {
             booking.setReasonCancel(reason);
             bookingRepository.save(booking);
 
-            return ResponseEntity.ok(new ResponseDto<>("success","Cancel booking successfully!", null));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Cancel booking successfully!", null));
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","You can't cancel booking now!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You can't cancel booking now!",null));
         }
     }
     @Transactional
@@ -227,7 +227,7 @@ public class BookingService {
         String username = jwtService.getUsernameFromRequest(request);
         ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
         if (provider == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Provider not found!",null));
         }
         BookingEntity booking = bookingRepository.findByIdAndProvider(bookingId, provider).orElse(null);
         if (booking != null){
@@ -252,12 +252,12 @@ public class BookingService {
                 }
 
             } else {
-                return ResponseEntity.ok(new ResponseDto<>("fail","Fail to update booking status!",null));
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","Fail to update booking status!",null));
             }
             bookingRepository.save(booking);
-            return ResponseEntity.ok(new ResponseDto<>("success","Update booking status successfully!",null));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Update booking status successfully!",null));
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","You're not allowed to update booking status!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You're not allowed to update booking status!",null));
         }
     }
 
@@ -265,7 +265,7 @@ public class BookingService {
         String username = jwtService.getUsernameFromRequest(request);
         ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
         if (provider == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Provider not found!",null));
         }
         Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending().and(Sort.by("time").descending()));
         Page<BookingEntity> bookings;
@@ -282,7 +282,7 @@ public class BookingService {
 //            bookingDtos.add(bookingDto);
 //        }
         Page<BookingDto> bookingDtos = bookings.map(booking -> mapper.map(booking,BookingDto.class));
-        return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all services successfully!",bookingDtos));
     }
 
     public ResponseEntity<?> getBookingOfCustomer(UUID bookingId, HttpServletRequest request) {

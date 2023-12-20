@@ -13,6 +13,7 @@ import vn.ute.service.dto.request.ApproveRegisterServiceRequest;
 import vn.ute.service.dto.request.RegisterServiceRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.ServiceDto;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.service.ServiceService;
 
 import java.util.List;
@@ -57,7 +58,7 @@ public class ServiceController {
     }
     @Operation(summary = "Register to provide service")
     @PostMapping(value = "/provider/service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestPart MultipartFile thumbnail, @RequestPart("service") String service, HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity<ResponseDto<ServiceDto>> registerService(@RequestPart MultipartFile thumbnail, @RequestPart("service") String service, HttpServletRequest request) throws JsonProcessingException, ImageUploadException {
         return serviceService.registerService(thumbnail, service, request);
     }
     @Operation(summary = "Approve or unapprove register service")

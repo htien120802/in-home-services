@@ -14,6 +14,7 @@ import vn.ute.service.dto.request.CreateUserRequest;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.ServiceStatus;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.service.AdminService;
 
 import java.util.UUID;
@@ -32,6 +33,21 @@ public class AdminController {
     public ResponseEntity<?> countEntity(){
         return adminService.countEntity();
     }
+
+    @Operation(summary = "Quantity statistics of bookings by month, year")
+    @GetMapping("/statistics/booking/quantity")
+    public ResponseEntity<?> quantityStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                         @RequestParam int year){
+        return adminService.quantityStatisticsOfBookingByMonth(month,year);
+    }
+
+    @Operation(summary = "Sales statistics of bookings by month, year")
+    @GetMapping("/statistics/booking/sales")
+    public ResponseEntity<?> salesStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                         @RequestParam int year){
+        return adminService.salesStatisticsOfBookingByMonth(month,year);
+    }
+
     @Operation(summary = "Get all customers")
     @GetMapping("/customer")
     public ResponseEntity<?> getAllCustomers(@RequestParam(defaultValue = "0") @Min(0) int pageNumber, @RequestParam(defaultValue = "10") @Min(1) int size, @RequestParam(defaultValue = "ASC") Sort.Direction sortDirection, @RequestParam(defaultValue = "lastName") String sortBy, @RequestParam(required = false) String name, @RequestParam(required = false) String email, @RequestParam(required = false) String username){
@@ -40,7 +56,7 @@ public class AdminController {
 
     @Operation(summary = "Create a customer")
     @PostMapping (value = "/customer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createCustomer(@ModelAttribute CreateUserRequest customerRequest){
+    public ResponseEntity<?> createCustomer(@ModelAttribute CreateUserRequest customerRequest) throws ImageUploadException {
         return adminService.createCustomer(customerRequest);
     }
     @Operation(summary = "Update profile of a customer")
@@ -68,7 +84,7 @@ public class AdminController {
 
     @Operation(summary = "Create a provider")
     @PostMapping (value = "/provider", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createProvider(@ModelAttribute CreateUserRequest providerRequest){
+    public ResponseEntity<?> createProvider(@ModelAttribute CreateUserRequest providerRequest) throws ImageUploadException {
         return adminService.createProvider(providerRequest);
     }
     @Operation(summary = "Update profile of a provider")
@@ -106,7 +122,7 @@ public class AdminController {
 
     @Operation(summary = "Create a service")
     @PostMapping("/service")
-    public ResponseEntity<?> createService(@RequestPart MultipartFile thumbnail, @RequestPart String createServiceRequest) throws JsonProcessingException {
+    public ResponseEntity<?> createService(@RequestPart MultipartFile thumbnail, @RequestPart String createServiceRequest) throws JsonProcessingException, ImageUploadException {
         return adminService.createService(thumbnail, createServiceRequest);
     }
 
@@ -124,13 +140,13 @@ public class AdminController {
 
     @Operation(summary = "Create a category")
     @PostMapping(value = "/category",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createCategory(@RequestPart(required = false) MultipartFile thumbnail, @RequestPart String categoryName){
+    public ResponseEntity<?> createCategory(@RequestPart(required = false) MultipartFile thumbnail, @RequestPart String categoryName) throws ImageUploadException {
         return adminService.createCategory(thumbnail, categoryName);
     }
 
     @Operation(summary = "Update a category")
     @PostMapping(value = "/category/{categoryId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateCategory(@PathVariable UUID categoryId, @RequestPart(required = false) MultipartFile thumbnail, @RequestPart String categoryName){
+    public ResponseEntity<?> updateCategory(@PathVariable UUID categoryId, @RequestPart(required = false) MultipartFile thumbnail, @RequestPart String categoryName) throws ImageUploadException {
         return adminService.updateCategory(categoryId, thumbnail, categoryName);
     }
 

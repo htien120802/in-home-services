@@ -2,6 +2,8 @@ package vn.ute.service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import vn.ute.service.dto.CustomerDto;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.service.ProviderService;
 
 import java.io.IOException;
@@ -26,7 +29,7 @@ public class ProviderController {
 
     @Operation(summary = "Get profile of provider")
     @GetMapping("/provider/profile")
-    public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request){
+    public ResponseEntity<?> getProfile(HttpServletRequest request){
         return providerService.getProfile(request);
     }
     @Operation(summary = "Update profile of provider")
@@ -51,7 +54,23 @@ public class ProviderController {
     }
     @Operation(summary = "Update password of provider")
     @PutMapping(value = "/provider/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<?>> updateAvatar(@RequestPart MultipartFile avatar, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<?>> updateAvatar(@RequestPart MultipartFile avatar, HttpServletRequest request) throws ImageUploadException {
         return providerService.updateAvatar(avatar, request);
+    }
+
+    @Operation(summary = "Quantity statistics of bookings by month, year")
+    @GetMapping("/provider/statistics/booking/quantity")
+    public ResponseEntity<?> quantityStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                         @RequestParam int year,
+                                                         HttpServletRequest request){
+        return providerService.quantityStatisticsOfBookingByMonth(month,year,request);
+    }
+
+    @Operation(summary = "Sales statistics of bookings by month, year")
+    @GetMapping("/provider/statistics/booking/sales")
+    public ResponseEntity<?> salesStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                      @RequestParam int year,
+                                                      HttpServletRequest request){
+        return providerService.salesStatisticsOfBookingByMonth(month,year,request);
     }
 }

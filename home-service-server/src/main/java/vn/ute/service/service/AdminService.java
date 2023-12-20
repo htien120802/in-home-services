@@ -20,6 +20,7 @@ import vn.ute.service.dto.response.ReviewResponse;
 import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.ServiceStatus;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.repository.*;
 import vn.ute.service.repository.criteria.*;
 import vn.ute.service.utils.SlugUtil;
@@ -73,7 +74,7 @@ public class AdminService {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get all customers successfully",customerDtos));
     }
     @Transactional
-    public ResponseEntity<?> createCustomer(CreateUserRequest customerRequest) {
+    public ResponseEntity<?> createCustomer(CreateUserRequest customerRequest) throws ImageUploadException {
         if (!customerRequest.getPassword().equals(customerRequest.getPasswordConfirm()))
             return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","Password and password confirm don't match!",null));
 
@@ -133,7 +134,7 @@ public class AdminService {
     }
 
     @Transactional
-    public ResponseEntity<?> createProvider(CreateUserRequest providerRequest) {
+    public ResponseEntity<?> createProvider(CreateUserRequest providerRequest) throws ImageUploadException {
         if (!providerRequest.getPassword().equals(providerRequest.getPasswordConfirm()))
             return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","Password and password confirm don't match!",null));
 
@@ -183,7 +184,7 @@ public class AdminService {
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",serviceDtoPage));
     }
     @Transactional
-    public ResponseEntity<?> createService(MultipartFile thumbnail, String createServiceRequest) throws JsonProcessingException {
+    public ResponseEntity<?> createService(MultipartFile thumbnail, String createServiceRequest) throws JsonProcessingException, ImageUploadException {
         CreateServiceRequest serviceRequest = new ObjectMapper().readValue(createServiceRequest, CreateServiceRequest.class);
         ProviderEntity provider = providerRepository.findById(serviceRequest.getProvider()).orElse(null);
 
@@ -275,7 +276,7 @@ public class AdminService {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete service successfully!",null));
     }
     @Transactional
-    public ResponseEntity<?> createCategory(MultipartFile thumbnail, String categoryName) {
+    public ResponseEntity<?> createCategory(MultipartFile thumbnail, String categoryName) throws ImageUploadException {
         String url = imageService.uploadImage(thumbnail);
         if (url == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(new ResponseDto<>("fail","Fail to upload thumbnail!",null));
@@ -290,7 +291,7 @@ public class AdminService {
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(new ResponseDto<>("success","Create category successfully!", mapper.map(category, CategoryDto.class)));
     }
     @Transactional
-    public ResponseEntity<?> updateCategory(UUID categoryId, MultipartFile thumbnail, String categoryName) {
+    public ResponseEntity<?> updateCategory(UUID categoryId, MultipartFile thumbnail, String categoryName) throws ImageUploadException {
         CategoryEntity category = categoryRepository.findById(categoryId).orElse(null);
         if (category == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Category not found",null));
@@ -376,5 +377,25 @@ public class AdminService {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,countItems));
 
+    }
+
+    public ResponseEntity<?> quantityStatisticsOfBookingByMonth(String month, int year) {
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.quantityStatistics(Integer.parseInt(month), year);
+        } else {
+            result = bookingRepository.quantityStatistics(year);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
+    }
+
+    public ResponseEntity<?> salesStatisticsOfBookingByMonth(String month, int year) {
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.salesStatistics(Integer.parseInt(month), year);
+        } else {
+            result = bookingRepository.salesStatistics(year);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
     }
 }
