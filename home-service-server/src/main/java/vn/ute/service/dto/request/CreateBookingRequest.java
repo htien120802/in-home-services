@@ -13,7 +13,5 @@ import java.util.Set;
 @NoArgsConstructor
 public class CreateBookingRequest {
     private Set<BookingItemDto> bookingItems;
-    private Time time;
-    private Date date;
     private String paymentMethoad;
 }

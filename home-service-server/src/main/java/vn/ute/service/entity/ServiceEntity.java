@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import vn.ute.service.enumerate.ServiceStatus;
 
+import java.sql.Time;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -29,6 +30,10 @@ public class ServiceEntity {
     private String thumbnail;
 
     private Double avgRating;
+
+    private Time openTime;
+
+    private Time closeTime;
 
 //    @Column(columnDefinition = "enum('APPROVING', 'APPROVED', 'UNAPPROVED', 'DISABLE', 'DELETE') default 'APPROVING'")
     @Column(nullable = false)

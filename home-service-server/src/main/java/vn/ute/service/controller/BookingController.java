@@ -2,9 +2,12 @@ package vn.ute.service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.ute.service.dto.request.CreateBookingRequest;
+import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.service.BookingService;
 
 import java.io.IOException;
@@ -27,8 +30,17 @@ public class BookingController {
 
     @Operation(summary = "Get all bookings of customer")
     @GetMapping("/customer/booking")
-    public ResponseEntity<?> getAllBookingOfCustomer(HttpServletRequest request){
-        return bookingService.getAllBookingOfCustomer(request);
+    public ResponseEntity<?> getAllBookingOfCustomer(@RequestParam(defaultValue = "0") int pageNumber,
+                                                     @RequestParam(defaultValue = "10") int size,
+                                                     @RequestParam(required = false) BookingStatus bookingStatus,
+                                                     HttpServletRequest request){
+        return bookingService.getAllBookingOfCustomer(pageNumber, size, bookingStatus, request);
+    }
+
+    @Operation(summary = "Get a booking")
+    @GetMapping("/customer/booking/{bookingId}")
+    public ResponseEntity<?> getBookingOfCustomer(@PathVariable UUID bookingId, HttpServletRequest request){
+        return bookingService.getBookingOfCustomer(bookingId, request);
     }
 
     @Operation(summary = "Get all bookings of customer by status")
@@ -51,7 +63,24 @@ public class BookingController {
 
     @Operation(summary = "Auto update status for booking")
     @PutMapping("/provider/booking/{bookingId}/status")
-    public ResponseEntity<?> autoUpdateBookingStatus(@PathVariable UUID bookingId, HttpServletRequest request){
+    public ResponseEntity<?> autoUpdateBookingStatus(@PathVariable UUID bookingId, HttpServletRequest request) throws IOException {
         return bookingService.autoUpdateBookingStatus(bookingId, request);
     }
+
+    @Operation(summary = "Get all bookings of provider")
+    @GetMapping("/provider/booking")
+    public ResponseEntity<?> getAllBookingOfProvider(@RequestParam(defaultValue = "0") int pageNumber,
+                                                     @RequestParam(defaultValue = "10") int size,
+                                                     @RequestParam(required = false) BookingStatus bookingStatus,
+                                                     HttpServletRequest request){
+        return bookingService.getAllBookingOfProvider(pageNumber, size, bookingStatus, request);
+    }
+
+    @Operation(summary = "Get a booking")
+    @GetMapping("/provider/booking/{bookingId}")
+    public ResponseEntity<?> getBookingOfProvider(@PathVariable UUID bookingId, HttpServletRequest request){
+        return bookingService.getBookingOfProvider(bookingId, request);
+    }
+
+
 }

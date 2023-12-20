@@ -2,6 +2,7 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,15 @@ import vn.ute.service.entity.AccountEntity;
 import vn.ute.service.entity.AddressEntity;
 import vn.ute.service.entity.CoordinatesEntity;
 import vn.ute.service.entity.ProviderEntity;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.AccountRepository;
 import vn.ute.service.repository.AddressRepository;
+import vn.ute.service.repository.BookingRepository;
 import vn.ute.service.repository.ProviderRepository;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,6 +37,8 @@ public class ProviderService {
     private final AddressRepository addressRepository;
 
     private final AccountRepository accountRepository;
+
+    private final BookingRepository bookingRepository;
 
     private final JwtService jwtService;
 
@@ -44,10 +50,11 @@ public class ProviderService {
 
     private final BingMapsService bingMapsService;
 
-    public ProviderService(ProviderRepository providerRepository, AddressRepository addressRepository, AccountRepository accountRepository, JwtService jwtService, PasswordEncoder passwordEncoder, ImageService imageService, ModelMapper mapper, BingMapsService bingMapsService) {
+    public ProviderService(ProviderRepository providerRepository, AddressRepository addressRepository, AccountRepository accountRepository, BookingRepository bookingRepository, JwtService jwtService, PasswordEncoder passwordEncoder, ImageService imageService, ModelMapper mapper, BingMapsService bingMapsService) {
         this.providerRepository = providerRepository;
         this.addressRepository = addressRepository;
         this.accountRepository = accountRepository;
+        this.bookingRepository = bookingRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.imageService = imageService;
@@ -62,11 +69,12 @@ public class ProviderService {
         if (provider.isPresent()){
             ProviderEntity temp = provider.get();
             mapper.map(customerProfile,temp);
+            addressRepository.save(mapper.map(customerProfile.getAddress(),AddressEntity.class));
             temp = providerRepository.save(temp);
-            return ResponseEntity.ok(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, ProviderDto.class)));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, ProviderDto.class)));
         }
         else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","Provider not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Provider not found!",null));
         }
     }
     @Transactional
@@ -81,21 +89,21 @@ public class ProviderService {
             CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
             coordinates.setAddress(addressEntity);
             addressEntity.setCoordinates(coordinates);
-            addressEntity = addressRepository.save(addressEntity);
+            addressRepository.save(addressEntity);
 
-            providerEntity.get().getAddresses().add(addressEntity);
+//            providerEntity.get().getAddresses().add(addressEntity);
 //            customerRepository.save(customerEntity.get());
             ProviderDto providerDto = mapper.map(providerEntity.get(), ProviderDto.class);
-            return ResponseEntity.ok(new ResponseDto<>("success","Add address successfully",providerDto));
+            return ResponseEntity.status(201).body(new ResponseDto<>("success","Add address successfully",providerDto));
         }else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","Can not find provider",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Can not find provider",null));
         }
     }
 
-    public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request) {
+    public ResponseEntity<?> getProfile(HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         Optional<ProviderEntity> providerEntity = providerRepository.findByAccount_Username(username);
-        return providerEntity.map(entity -> ResponseEntity.ok(new ResponseDto<>("success", "Get profile successfully", mapper.map(entity, CustomerDto.class)))).orElseGet(() -> ResponseEntity.ok(new ResponseDto<>("fail", "Can not find customer", null)));
+        return providerEntity.map(entity -> ResponseEntity.status(200).body(new ResponseDto<>("success", "Get profile successfully", mapper.map(entity, ProviderDto.class)))).orElseGet(() -> ResponseEntity.status(404).body(new ResponseDto<>("fail", "Can not find provider!", null)));
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> updateAddress(AddressDto addressDto, HttpServletRequest request) throws IOException {
@@ -106,15 +114,15 @@ public class ProviderService {
             mapper.map(addressDto, address);
             CoordinatesDto coordinatesDto = bingMapsService.getLocation(address.toString());
             mapper.map(coordinatesDto,address.getCoordinates());
-            return ResponseEntity.ok(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","You are not allowed",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You are not allowed",null));
         }
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> updatePassword(UpdatePasswordRequest updatePasswordRequest, HttpServletRequest request) {
         if (!updatePasswordRequest.getPassword().equals(updatePasswordRequest.getPasswordConfirm())){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Password and password confirm don't matching!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","Password and password confirm don't matching!",null));
         }
         String username = jwtService.getUsernameFromRequest(request);
         AccountEntity account = accountRepository.findByUsername(username).orElse(null);
@@ -122,32 +130,64 @@ public class ProviderService {
             // String passwordUpdate = passwordEncoder.encode(updatePasswordRequest.getPassword());
             String passwordUpdate = updatePasswordRequest.getPassword();
             if (passwordEncoder.matches(passwordUpdate, account.getPassword())){
-                return ResponseEntity.ok(new ResponseDto<>("fail","This password and current password are the same. Please change!", null));
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","This password and current password are the same. Please change!", null));
             } else {
                 account.setPassword(passwordEncoder.encode(passwordUpdate));
                 accountRepository.save(account);
-                return ResponseEntity.ok(new ResponseDto<>("success","Update password successfully!",null));
+                return ResponseEntity.status(200).body(new ResponseDto<>("success","Update password successfully!",null));
             }
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
         }
     }
     @Transactional
-    public ResponseEntity<ResponseDto<?>> updateAvatar(MultipartFile avatar, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> updateAvatar(MultipartFile avatar, HttpServletRequest request) throws ImageUploadException {
         String username = jwtService.getUsernameFromRequest(request);
         ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
 
         if (provider == null)
-            return ResponseEntity.ok(new ResponseDto<>("fail", "Not found provider with user " + username + "!", null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Not found provider with user " + username + "!", null));
 
         String url = imageService.uploadImage(avatar);
         if (url == null)
-            return ResponseEntity.ok(new ResponseDto<>("fail", "Fail to upload image!", null));
+            return ResponseEntity.status(500).body(new ResponseDto<>("fail", "Fail to upload image!", null));
 
         provider.setAvatar(url);
         provider = providerRepository.save(provider);
 
-        return ResponseEntity.ok(new ResponseDto<>("success","Update avatar successfully!",mapper.map(provider, ProviderDto.class)));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Update avatar successfully!",mapper.map(provider, ProviderDto.class)));
 
+    }
+
+    public ResponseEntity<?> quantityStatisticsOfBookingByMonth(String month, int year, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+
+        if (provider == null)
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Not found provider with user " + username + "!", null));
+
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.quantityStatisticsForProvider(Integer.parseInt(month), year, provider);
+        } else {
+            result = bookingRepository.quantityStatisticsForProvider(year, provider);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
+    }
+
+    public ResponseEntity<?> salesStatisticsOfBookingByMonth(String month, int year, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+
+        if (provider == null)
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Not found provider with user " + username + "!", null));
+
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.salesStatisticsForProvider(Integer.parseInt(month), year, provider);
+        } else {
+            result = bookingRepository.salesStatisticsForProvider(year, provider);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
     }
 }

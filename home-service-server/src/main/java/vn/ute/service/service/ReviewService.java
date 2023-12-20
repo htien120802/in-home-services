@@ -3,6 +3,10 @@ package vn.ute.service.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,22 +55,22 @@ public class ReviewService {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
 
         ServiceEntity service = serviceRepository.findById(serviceId).orElse(null);
         if (service == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Service not found!",null));
         }
 
         BookingEntity booking = bookingRepository.findByCustomerAndServiceAndStatus(customer, service, BookingStatus.DONE).orElse(null);
         if (booking == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","You haven't used this service yet!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You haven't used this service yet!",null));
         }
 
         ReviewEntity reviewEntity = reviewRepository.findByCustomerAndService(customer, service).orElse(null);
         if (reviewEntity != null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","You have written review for this service!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You have written review for this service!",null));
         }
 
         reviewEntity = mapper.map(review, ReviewEntity.class);
@@ -75,32 +79,40 @@ public class ReviewService {
         reviewEntity.setService(service);
         reviewEntity.setCustomer(customer);
         reviewEntity = reviewRepository.save(reviewEntity);
-        return ResponseEntity.ok(new ResponseDto<>("success","Post your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
+        return ResponseEntity.status(201).body(new ResponseDto<>("success","Post your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
     }
 
     public ResponseEntity<?> getReview(UUID serviceId, HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
 
         ServiceEntity service = serviceRepository.findById(serviceId).orElse(null);
         if (service == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Service not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Service not found!",null));
         }
 
         ReviewEntity reviewEntity = reviewRepository.findByCustomerAndService(customer, service).orElse(null);
         if (reviewEntity == null){
-            return ResponseEntity.ok(new ResponseDto<>("fail","You haven't written review for this service yet!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You haven't written review for this service yet!",null));
         }
 
-        return ResponseEntity.ok(new ResponseDto<>("success","Get your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
     }
 
-    public ResponseEntity<?> getAllReview(UUID serviceId) {
-        List<ReviewEntity> reviews = reviewRepository.findAllByService_Id(serviceId);
+    public ResponseEntity<?> getAllReview(UUID serviceId, int pageNumber, int size, int rating) {
+        Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending());
+        Page<ReviewEntity> reviews;
+        if (rating > 0){
+            reviews = reviewRepository.findAllByService_IdAndRating(serviceId, rating, pageable);
+
+        }else {
+            reviews = reviewRepository.findAllByService_Id(serviceId, pageable);
+        }
+
         List<ReviewDto> reviewDtos = reviews.stream().map(reviewEntity -> mapper.map(reviewEntity, ReviewDto.class)).toList();
-        return ResponseEntity.ok(new ResponseDto<>("success","Get all reviews of this successfully!",mapper.map(reviewDtos, ReviewDto.class)));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all reviews of this service successfully!",mapper.map(reviewDtos, ReviewDto.class)));
     }
 }

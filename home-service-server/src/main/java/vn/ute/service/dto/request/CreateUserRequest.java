@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CreateCustomerRequest {
+public class CreateUserRequest {
     private String username;
     private String password;
     private String passwordConfirm;

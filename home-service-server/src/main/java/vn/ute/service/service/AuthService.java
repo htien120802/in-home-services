@@ -23,6 +23,7 @@ import vn.ute.service.entity.TokenEntity;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,12 +54,12 @@ public class AuthService {
     @Transactional
     public ResponseEntity<ResponseDto<?>> createAccount(SignUpRequest signUpRequest) {
         if (accountRepository.existsByUsername(signUpRequest.getUsername()))
-            return ResponseEntity.ok(new ResponseDto<>("fail","Username is already exist",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","Username is already exist",null));
         if (accountRepository.existsByCustomer_Email(signUpRequest.getEmail()) || accountRepository.existsByProvider_Email(signUpRequest.getEmail()))
-            return ResponseEntity.ok(new ResponseDto<>("fail","This email has been used",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","This email has been used",null));
 
         if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword()))
-            return ResponseEntity.ok(new ResponseDto<>("fail","Password and confirm password don't match!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","Password and confirm password don't match!",null));
 
 
         AccountEntity account = mapper.map(signUpRequest,AccountEntity.class);
@@ -83,7 +84,7 @@ public class AuthService {
 //
 //        saveToken(jwtToken,account);
 
-        return ResponseEntity.ok(new ResponseDto<>("success","Create account successfully", null));
+        return ResponseEntity.status(201).body(new ResponseDto<>("success","Create account successfully", null));
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> signIn(SignInRequest signInRequest, HttpServletResponse response){
@@ -93,10 +94,10 @@ public class AuthService {
         }
         Optional<AccountEntity> account = accountRepository.findByUsername(signInRequest.getUsername());
         if (account.isEmpty())
-            return ResponseEntity.ok(new ResponseDto<>("fail","Login name is incorrect!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","Login name is incorrect!",null));
 
         if (!passwordEncoder.matches(signInRequest.getPassword(), account.get().getPassword()))
-            return ResponseEntity.ok(new ResponseDto<>("fail","Password is incorrect!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","Password is incorrect!",null));
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(),signInRequest.getPassword()));
         String jwtToken = jwtService.generateToken(account.get());
@@ -111,7 +112,7 @@ public class AuthService {
 
         revokeAllUserTokens(account.get());
         saveToken(jwtToken,account.get());
-        return ResponseEntity.ok(new ResponseDto<>("success","Sign in successfully",new AuthenticationResponse(jwtToken,refreshToken)));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Sign in successfully",new AuthenticationResponse(jwtToken,refreshToken)));
     }
 
     private void saveToken(String jwtToken, AccountEntity account){
@@ -138,26 +139,26 @@ public class AuthService {
     public ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request) {
         String refreshToken = getRefreshTokenInCookies(request);
         if (refreshToken == null)
-            return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token not found",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Refresh token not found",null));
 
         String username = jwtService.extractUsername(refreshToken);
         if (username != null) {
             Optional<AccountEntity> account = accountRepository.findByUsername(username);
             if (account.isEmpty())
-                return ResponseEntity.ok(new ResponseDto<>("fail","Account not found",null));
+                return ResponseEntity.status(404).body(new ResponseDto<>("fail","Account not found",null));
             if (jwtService.isTokenValid(refreshToken, account.get())) {
                 String accessToken = jwtService.generateToken(account.get());
                 revokeAllUserTokens(account.get());
                 saveToken(accessToken, account.get());
-                return ResponseEntity.ok(new ResponseDto<>("success","Refresh token successfully",new AuthenticationResponse(accessToken,refreshToken)));
+                return ResponseEntity.status(200).body(new ResponseDto<>("success","Refresh token successfully",new AuthenticationResponse(accessToken,refreshToken)));
             }
         }
-        return ResponseEntity.ok(new ResponseDto<>("fail","Refresh token is not valid",null));
+        return ResponseEntity.status(400).body(new ResponseDto<>("fail","Refresh token is not valid",null));
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> logout(HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("Authorization").isEmpty())
-            return ResponseEntity.ok(new ResponseDto<>("fail","Token not found",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Token not found",null));
         String jwt = jwtService.getTokenFromRequest(request);
         TokenEntity storedToken = tokenRepository.findByToken(jwt)
                 .orElse(null);
@@ -173,7 +174,7 @@ public class AuthService {
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         response.addCookie(cookie);
-        return ResponseEntity.ok(new ResponseDto<>("success","Logout successfully",null));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Logout successfully",null));
     }
 
     private String getRefreshTokenInCookies(HttpServletRequest req) {
