@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.ute.service.dto.request.ResetPasswordRequest;
 import vn.ute.service.dto.request.SignInRequest;
 import vn.ute.service.dto.request.SignUpRequest;
 import vn.ute.service.dto.response.AuthenticationResponse;
@@ -22,6 +24,7 @@ import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.TokenEntity;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
+import vn.ute.service.utils.UUIDUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,5 +186,48 @@ public class AuthService {
                 return c.getValue();
         }
         return null;
+    }
+
+    public ResponseEntity<?> generateResetPasswordToken(String loginName) {
+        if (EmailValidator.getInstance().isValid(loginName)){
+            Optional<AccountEntity> temp = accountRepository.findByCustomer_EmailOrProvider_Email(loginName,loginName);
+            if (temp.isPresent())
+                loginName = temp.get().getUsername();
+        }
+        Optional<AccountEntity> account = accountRepository.findByUsername(loginName);
+        if (account.isEmpty())
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Not found account with this login name!", null));
+
+        String resetToken = UUIDUtil.getUuid();
+        account.get().setResetPasswordToken(resetToken);
+        accountRepository.save(account.get());
+
+        JSONObject object = new JSONObject();
+        object.put("success",true);
+        object.put("email",account.get().getCustomer().getEmail() != null ? account.get().getCustomer().getEmail() : account.get().getProvider().getEmail());
+        object.put("resetToken", resetToken);
+        return ResponseEntity.status(200).body(object.toString(3));
+    }
+
+    public ResponseEntity<?> resetPassword(ResetPasswordRequest resetPasswordRequest){
+        AccountEntity account = accountRepository.findByCustomer_EmailOrProvider_Email(resetPasswordRequest.getEmail(),resetPasswordRequest.getEmail()).orElse(null);
+        if (account == null)
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Not found account with this login name!", null));
+
+        String resetToken = account.getResetPasswordToken();
+        account.setResetPasswordToken(null);
+        account = accountRepository.save(account);
+
+        if (resetToken != null && resetToken.equals(resetPasswordRequest.getResetToken())){
+            if (!resetPasswordRequest.getPassword().equals(resetPasswordRequest.getPasswordConfirm()))
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","Password and password confirm don't match!", null));
+
+            account.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+            accountRepository.save(account);
+
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Reset password successfully!", null));
+        }
+
+        return ResponseEntity.status(400).body(new ResponseDto<>("fail","Reset token is invalid!", null));
     }
 }

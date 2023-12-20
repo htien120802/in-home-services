@@ -10,13 +10,12 @@ public final class MovingFeeUtil {
         distance = (double) Math.round(distance * 100) / 100;
 
         double cost = 0;
-        if (distance > 20) {
-            cost = cost + (distance - 20) * 5000;
-            distance = 20;
+        if (distance <= 5) {
+            cost = cost + 12000;
         }
 
-        if (distance > 5) {
-            cost = cost + (distance - 5) * 3000;
+        if (distance > 5){
+            cost = cost + 12000 + (distance - 5) * 2000;
         }
 
         return Math.round(cost);

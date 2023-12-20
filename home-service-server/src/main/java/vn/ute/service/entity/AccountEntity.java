@@ -29,6 +29,8 @@ public class AccountEntity implements UserDetails {
 
     private String password;
 
+    private String resetPasswordToken;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "account_role",
             joinColumns = @JoinColumn(name = "account_id"),

@@ -1,6 +1,7 @@
 package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -311,5 +312,81 @@ public class BookingService {
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get booking successfully!",mapper.map(booking, BookingDto.class)));
 
+    }
+
+    public ResponseEntity<?> calcPriceBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
+        }
+
+        if (customer.getAddresses().size() == 0 || customer.getPhone() == null)
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","You have to add address and phone number first!",null));
+
+        Set<BookingItemEntity> bookingItems = new HashSet<>();
+        for (BookingItemDto w : bookingRequest.getBookingItems()){
+            WorkEntity work = workRepository.findById(w.getWork().getId()).orElse(null);
+            if (work == null){
+                return ResponseEntity.status(404).body(new ResponseDto<>("fail","Service not found!",null));
+            }
+            BookingItemEntity bookingItem = new BookingItemEntity();
+            bookingItem.setWork(work);
+            bookingItem.setQuantity(w.getQuantity());
+            bookingItems.add(bookingItem);
+        }
+
+        ServiceEntity objCompare = new ArrayList<>(bookingItems).get(0).getWork().getService();
+        if (!objCompare.getStatus().equals(ServiceStatus.APPROVED)){
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","This service no longer provide!",null));
+        }
+        boolean validWorks = bookingItems.stream().allMatch(bookingItem -> bookingItem.getWork().getService().equals(objCompare));
+        if (!validWorks){
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","List of works is invalid!",null));
+        }
+
+        Time currentTime = new Time(System.currentTimeMillis());
+
+        // Convert Time objects to LocalTime
+        LocalTime openTime = objCompare.getOpenTime().toLocalTime();
+        LocalTime closeTime = objCompare.getCloseTime().toLocalTime();
+        LocalTime currentLocalTime = currentTime.toLocalTime();
+
+        if ( !currentLocalTime.isAfter(openTime) || !currentLocalTime.isBefore(closeTime))
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(new ResponseDto<>("fail","This service has been closed or not open to provide",null));
+
+        ProviderEntity provider = objCompare.getProvider();
+
+        BookingEntity booking = new BookingEntity();
+        booking.setCustomer(customer);
+        booking.setProvider(provider);
+        booking.setTime(currentTime);
+        booking.setDate(new Date(System.currentTimeMillis()));
+        booking.setService(objCompare);
+
+        CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(provider.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+        CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(customer.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+        double distance = bingMapsService.calculateDistance(coordinates1,coordinates2);
+        long movingFee = MovingFeeUtil.calcMovingFee(distance);
+        booking.setMovingFee(movingFee);
+
+        for (BookingItemEntity item : bookingItems){
+            item.setBooking(booking);
+        }
+
+        booking.setBookingItems(bookingItems);
+        booking.calcTotalPrice();
+
+        JSONObject price = new JSONObject();
+        price.put("movingFee", booking.getMovingFee());
+        price.put("subTotal", booking.getSubTotal());
+        price.put("totalPrice", booking.getTotalPrice());
+
+        JSONObject object = new JSONObject();
+        object.put("success",true);
+        object.put("message", "Calculate price booking successfully!");
+        object.put("data", price);
+
+        return ResponseEntity.status(200).body(object.toString(3));
     }
 }
