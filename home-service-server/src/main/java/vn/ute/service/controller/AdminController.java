@@ -177,7 +177,7 @@ public class AdminController {
     @GetMapping("/review")
     public ResponseEntity<?> getAllReviews(@RequestParam(defaultValue = "0") int pageNumber,
                                           @RequestParam(defaultValue = "10") int size,
-                                          @RequestParam(required = false) @Min(1) @Max(5) int rating,
+                                          @RequestParam(required = false) @Min(1) @Max(5) String rating,
                                           @RequestParam(required = false) String customerName,
                                           @RequestParam(required = false) String serviceName){
         return adminService.getAllReviews(pageNumber, size, rating, customerName, serviceName);

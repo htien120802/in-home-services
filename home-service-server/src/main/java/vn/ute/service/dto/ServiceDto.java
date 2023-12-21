@@ -31,5 +31,7 @@ public class ServiceDto {
 
     private Double distance;
 
+    private ProviderDto provider;
+
 //    private Set<ReviewDto> reviews;
 }

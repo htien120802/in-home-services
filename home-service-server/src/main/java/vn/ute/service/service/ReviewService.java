@@ -102,11 +102,11 @@ public class ReviewService {
         return ResponseEntity.status(200).body(new ResponseDto<>("success","Get your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
     }
 
-    public ResponseEntity<?> getAllReview(UUID serviceId, int pageNumber, int size, int rating) {
+    public ResponseEntity<?> getAllReview(UUID serviceId, int pageNumber, int size, String rating) {
         Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending());
         Page<ReviewEntity> reviews;
-        if (rating > 0){
-            reviews = reviewRepository.findAllByService_IdAndRating(serviceId, rating, pageable);
+        if (rating != null){
+            reviews = reviewRepository.findAllByService_IdAndRating(serviceId, Integer.parseInt(rating), pageable);
 
         }else {
             reviews = reviewRepository.findAllByService_Id(serviceId, pageable);

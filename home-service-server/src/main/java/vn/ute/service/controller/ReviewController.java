@@ -26,7 +26,7 @@ public class ReviewController {
     public ResponseEntity<?> getAllReview(@PathVariable UUID serviceId,
                                           @RequestParam(defaultValue = "0") int pageNumber,
                                           @RequestParam(defaultValue = "10") int size,
-                                          @RequestParam(required = false) @Min(1) @Max(5) int rating){
+                                          @RequestParam(required = false) @Min(1) @Max(5) String rating){
         return reviewService.getAllReview(serviceId,pageNumber,size,rating);
     }
 
