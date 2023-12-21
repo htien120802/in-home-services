@@ -55,7 +55,6 @@ function* getAllServiceReviews({ payload }) {
     const { id } = payload;
 
     const response = yield call(reviewAPI.getAllServiceReviews, id);
-    console.log(response);
 
     yield put(actionGetAllServiceReviewsSuccess(response.data.reviews));
   } catch (error) {

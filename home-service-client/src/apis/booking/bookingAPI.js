@@ -31,6 +31,12 @@ export default {
     return response.data;
   },
 
+  // GET /customer/booking
+  async getAllProviderBookings() {
+    const response = await axiosClient.get(providerEndpoint);
+    return response.data;
+  },
+
   // POST /customer/booking
   async createBooking(bookingData) {
     const response = await axiosClient.post(customerEndpoint, bookingData);

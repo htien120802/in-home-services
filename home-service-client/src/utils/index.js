@@ -65,7 +65,8 @@ export const decodeJWT = (token) => {
     const decoded = jwt.decode(token);
     return decoded;
   } catch (error) {
-    console.error('Error decoding token:', error);
     return null;
   }
 };
+
+export const formatPriceWithCommas = (price) => price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

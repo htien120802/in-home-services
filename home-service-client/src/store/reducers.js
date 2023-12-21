@@ -7,6 +7,7 @@ import Customer from 'store/customer/reducer';
 import Payment from 'store/payment/reducer';
 import Provider from 'store/provider/reducer';
 import Review from 'store/review/reducer';
+import Category from 'store/category/reducer';
 
 import Login from 'store/auth/login/reducer';
 import Register from 'store/auth/register/reducer';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   Payment,
   Provider,
   Review,
+  Category,
 
   Login,
   Register,

@@ -13,12 +13,14 @@ function ServiceList() {
   const servicesState = useSelector((state) => state.Services);
   const { publicServices } = servicesState;
 
+  console.log(publicServices);
+
   const totalPages = Array.isArray(publicServices) ? publicServices.length : 0;
 
   const organizeServices = (services) => {
     const groupedServices = [];
-    for (let i = 0; i < services.length; i += 4) {
-      groupedServices.push(services.slice(i, i + 4));
+    for (let i = 0; i < services.length; i += 3) {
+      groupedServices.push(services.slice(i, i + 3));
     }
     return groupedServices;
   };
@@ -56,12 +58,12 @@ function ServiceList() {
   };
 
   const renderServiceRows = () => {
-    const groupedServices = organizeServices(publicServices);
+    const groupedServices = organizeServices(publicServices.content || []);
 
     return groupedServices.map((serviceGroup) => (
       <div key={uuidv4()} className="row">
         {serviceGroup.map((service) => (
-          <div key={uuidv4()} className="col-md-3">
+          <div key={uuidv4()} className="col-md-4">
             <div className="full decorate_blog">
               <img src={`assets/images/${service.images}`} alt="#" />
               <Link className="decorate_blog_bt" to={`/services/${service.id}`}>

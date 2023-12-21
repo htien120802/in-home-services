@@ -8,6 +8,9 @@ import {
   CUSTOMER_CANCEL_BOOKING,
   CUSTOMER_CANCEL_BOOKING_SUCCESS,
   CUSTOMER_CANCEL_BOOKING_FAILED,
+  GET_PROVIDER_BOOKINGS,
+  GET_PROVIDER_BOOKINGS_SUCCESS,
+  GET_PROVIDER_BOOKINGS_FAILED,
   GET_CUSTOMER_BOOKINGS,
   GET_CUSTOMER_BOOKINGS_SUCCESS,
   GET_CUSTOMER_BOOKINGS_FAILED,
@@ -33,6 +36,7 @@ const bookingReducer = (state = initialState, action) => {
     case GET_CUSTOMER_BOOKINGS:
     case CREATE_BOOKING:
     case GET_CUSTOMER_BOOKINGS_BY_STATUS:
+    case GET_PROVIDER_BOOKINGS:
       return {
         ...state,
         loading: true,
@@ -45,7 +49,7 @@ const bookingReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        bookings: action.payload.bookings,
+        bookings: action.payload,
       };
 
     case GET_CUSTOMER_BOOKINGS_SUCCESS:
@@ -59,7 +63,14 @@ const bookingReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        bookings: action.payload.bookings,
+        bookings: action.payload,
+      };
+
+    case GET_PROVIDER_BOOKINGS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        bookings: action.payload,
       };
 
     case UPDATE_BOOKING_STATUS_FAILED:
@@ -68,6 +79,7 @@ const bookingReducer = (state = initialState, action) => {
     case GET_CUSTOMER_BOOKINGS_FAILED:
     case CREATE_BOOKING_FAILED:
     case GET_CUSTOMER_BOOKINGS_BY_STATUS_FAILED:
+    case GET_PROVIDER_BOOKINGS_FAILED:
       return {
         ...state,
         loading: false,

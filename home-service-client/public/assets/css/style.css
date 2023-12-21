@@ -103,6 +103,10 @@ button {
     -o-transition: all linear .3s ease;
 }
 
+.del_btn {
+  background: var(--paraColor);
+}
+
 .common_btn:hover {
     background: #0162dd;
     color: var(--colorWhite);
@@ -801,6 +805,7 @@ button {
 ================================*/
 
 .wsus__single_categories {
+    min-height: 250px;
     background: #F5F9FF;
     border-radius: 5px;
     padding: 30px 15px;
@@ -818,15 +823,18 @@ button {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    display: block;
+    display: flex;
     margin: 0 auto;
     background: var(--colorWhite);
-    padding: 20px;
     transition: all linear .3s;
     -webkit-transition: all linear .3s;
     -moz-transition: all linear .3s;
     -ms-transition: all linear .3s;
     -o-transition: all linear .3s;
+}
+
+.wsus__single_categories span img {
+  border-radius: inherit;
 }
 
 .wsus__single_categories a {
@@ -893,6 +901,16 @@ button {
     opacity: 1;
 }
 
+.slick-dots li button {
+  position: relative;
+}
+
+.slick-dots li button::before {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, 0%);
+  line-height: 0 !important;
+}
 
 /*================================
     CATEGORIES END

@@ -31,7 +31,7 @@ function* getProviderProfile() {
   try {
     const response = yield call(providerAPI.getProviderProfile);
 
-    yield put(actionGetProviderProfileSuccess(response.data.provider));
+    yield put(actionGetProviderProfileSuccess(response.data));
   } catch (error) {
     yield put(actionGetProviderProfileFailed());
   }
@@ -43,7 +43,7 @@ function* updateProviderProfile({ payload }) {
 
     const response = yield call(providerAPI.updateProviderProfile, providerData);
 
-    yield put(actionUpdateProviderProfileSuccess(response.data.provider));
+    yield put(actionUpdateProviderProfileSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -63,7 +63,7 @@ function* updateProviderPassword({ payload }) {
 
     const response = yield call(providerAPI.updateProviderPassword, newPassword);
 
-    yield put(actionUpdateProviderPasswordSuccess(response.data.provider));
+    yield put(actionUpdateProviderPasswordSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -83,7 +83,7 @@ function* updateProviderAvatar({ payload }) {
 
     const response = yield call(providerAPI.updateProviderAvatar, avatar);
 
-    yield put(actionUpdateProviderAvatarSuccess(response.data.provider));
+    yield put(actionUpdateProviderAvatarSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -103,7 +103,7 @@ function* updateProviderAddress({ payload }) {
 
     const response = yield call(providerAPI.updateProviderAddress, addressData);
 
-    yield put(actionUpdateProviderAddressSuccess(response.data.addresses));
+    yield put(actionUpdateProviderAddressSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -123,7 +123,7 @@ function* addProviderAddress({ payload }) {
 
     const response = yield call(providerAPI.addProviderAddress, newAddress);
 
-    yield put(actionAddProviderAddressSuccess(response.data.addresses));
+    yield put(actionAddProviderAddressSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);

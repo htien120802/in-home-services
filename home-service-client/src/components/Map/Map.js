@@ -10,9 +10,9 @@ import { Icon } from 'leaflet';
 
 import 'leaflet/dist/leaflet.css';
 
-const iconRetinaUrl = 'assets/icons/marker-icon-2x.png';
-const iconUrl = 'assets/icons/marker-icon.png';
-const shadowUrl = 'assets/icons/marker-shadow.png';
+const iconRetinaUrl = '/assets/icons/marker-icon-2x.png';
+const iconUrl = '/assets/icons/marker-icon.png';
+const shadowUrl = '/assets/icons/marker-shadow.png';
 const iconDefault = new Icon({
   iconRetinaUrl,
   iconUrl,

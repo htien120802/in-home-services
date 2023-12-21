@@ -10,6 +10,7 @@ import {
   GET_CUSTOMER_BOOKINGS,
   CREATE_BOOKING,
   GET_CUSTOMER_BOOKINGS_BY_STATUS,
+  GET_PROVIDER_BOOKINGS,
 } from './actionTypes';
 
 import {
@@ -25,6 +26,8 @@ import {
   actionCreateBookingFailed,
   actionGetCustomerBookingsByStatusSuccess,
   actionGetCustomerBookingsByStatusFailed,
+  actionGetProviderBookingsSuccess,
+  actionGetProviderBookingsFailed,
 } from './actions';
 
 function* updateBookingStatus({ payload }) {
@@ -89,9 +92,9 @@ function* customerCancelBooking({ payload }) {
 
 function* getCustomerBookings() {
   try {
-    const response = yield call(bookingAPI.getCustomerBookings);
+    const response = yield call(bookingAPI.getAllCustomerBookings);
 
-    yield put(actionGetCustomerBookingsSuccess(response.data.bookings));
+    yield put(actionGetCustomerBookingsSuccess(response.data));
   } catch (error) {
     yield put(actionGetCustomerBookingsFailed());
   }
@@ -129,11 +132,22 @@ function* getCustomerBookingsByStatus({ payload }) {
   }
 }
 
+function* getProviderBookings() {
+  try {
+    const response = yield call(bookingAPI.getAllProviderBookings);
+
+    yield put(actionGetProviderBookingsSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetProviderBookingsFailed());
+  }
+}
+
 export default function* bookingSaga() {
   yield takeLeading(UPDATE_BOOKING_STATUS, updateBookingStatus);
   yield takeLeading(PROVIDER_CANCEL_BOOKING, providerCancelBooking);
   yield takeLeading(CUSTOMER_CANCEL_BOOKING, customerCancelBooking);
   yield takeLeading(GET_CUSTOMER_BOOKINGS, getCustomerBookings);
+  yield takeLeading(GET_PROVIDER_BOOKINGS, getProviderBookings);
   yield takeLeading(CREATE_BOOKING, createBooking);
   yield takeLeading(GET_CUSTOMER_BOOKINGS_BY_STATUS, getCustomerBookingsByStatus);
 }

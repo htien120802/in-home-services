@@ -1,23 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 function CategoryCard(props) {
   const {
-    imageSrc, categoryLink, categoryName, servicesCount, slickIndex,
+    thumbnail, slug, categoryName, numberService, slickIndex,
   } = props;
 
   return (
-    <div className="slick-slide slick-cloned" data-slick-index={slickIndex} aria-hidden="true" style={{ width: '228px' }} tabIndex="-1">
+    <div className="slick-slide slick-cloned" data-slick-index={slickIndex} style={{ width: '270px' }}>
       <div>
-        <div className="col-xl-2" style={{ width: '100%', display: 'inline-block' }}>
+        <div style={{ width: '100%' }}>
           <div className="wsus__single_categories">
             <span>
-              <img src={imageSrc} alt="categories" className="img-fluid w-100" />
+              <img src={thumbnail} alt="categories" className="img-fluid w-100" />
             </span>
-            <a href={categoryLink} tabIndex="-1">
+            <Link to={`/category/${slug}`}>
               {categoryName}
-            </a>
-            <p>{`${servicesCount}+ Services`}</p>
+            </Link>
+            <p>{`${numberService}+ Services`}</p>
           </div>
         </div>
       </div>
@@ -27,10 +28,10 @@ function CategoryCard(props) {
 
 CategoryCard.propTypes = {
   slickIndex: PropTypes.number.isRequired,
-  imageSrc: PropTypes.string.isRequired,
-  categoryLink: PropTypes.string.isRequired,
+  thumbnail: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
   categoryName: PropTypes.string.isRequired,
-  servicesCount: PropTypes.number.isRequired,
+  numberService: PropTypes.number.isRequired,
 };
 
 export default CategoryCard;

@@ -1,8 +1,6 @@
 import { toast } from 'react-toastify';
 import { put, takeLeading, call } from 'redux-saga/effects';
 
-import axiosClient from 'utils/axios';
-
 import customerAPI from 'apis/customer/customerAPI';
 
 import {
@@ -31,13 +29,9 @@ import {
 
 function* getCustomerProfile() {
   try {
-    const token = localStorage.getItem('accessToken');
-
-    axiosClient.defaults.headers.Authorization = `Bearer ${token}`;
-
     const response = yield call(customerAPI.getCustomerProfile);
 
-    yield put(actionGetCustomerProfileSuccess(response.data.customer));
+    yield put(actionGetCustomerProfileSuccess(response.data));
   } catch (error) {
     yield put(actionGetCustomerProfileFailed());
   }

@@ -40,7 +40,7 @@ function* getAllProviderServices() {
   try {
     const response = yield call(serviceAPI.getAllProviderServices);
 
-    yield put(actionGetAllProviderServicesSuccess(response.data.services));
+    yield put(actionGetAllProviderServicesSuccess(response.data));
   } catch (error) {
     yield put(actionGetAllProviderServicesFailed());
   }
@@ -52,7 +52,7 @@ function* updateProviderService({ payload }) {
 
     const response = yield call(serviceAPI.updateProviderService, serviceData);
 
-    yield put(actionUpdateProviderServiceSuccess(response.data.service));
+    yield put(actionUpdateProviderServiceSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -72,7 +72,7 @@ function* registerProviderService({ payload }) {
 
     const response = yield call(serviceAPI.registerProviderService, serviceData);
 
-    yield put(actionRegisterProviderServiceSuccess(response.data.service));
+    yield put(actionRegisterProviderServiceSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -92,7 +92,7 @@ function* enableOrDisableProviderService({ payload }) {
 
     const response = yield call(serviceAPI.enableOrDisableProviderService, serviceId, actionType);
 
-    yield put(actionEnableOrDisableProviderServiceSuccess(response.data.service));
+    yield put(actionEnableOrDisableProviderServiceSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -112,7 +112,7 @@ function* approveOrUnapproveRegisterService({ payload }) {
 
     const response = yield call(serviceAPI.approveOrUnapproveRegisterService, serviceData);
 
-    yield put(actionApproveOrUnapproveRegisterServiceSuccess(response.data.service));
+    yield put(actionApproveOrUnapproveRegisterServiceSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -154,7 +154,7 @@ function* getProviderServicesByStatus({ payload }) {
 
     const response = yield call(serviceAPI.getProviderServicesByStatus, status);
 
-    yield put(actionGetProviderServicesByStatusSuccess(response.data.services));
+    yield put(actionGetProviderServicesByStatusSuccess(response.data));
   } catch (error) {
     yield put(actionGetProviderServicesByStatusFailed());
   }

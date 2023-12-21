@@ -1,3 +1,5 @@
+import axiosClient from 'utils/axios';
+
 const checkAuth = () => {
   const TOKEN = localStorage.getItem('accessToken');
   const PUBLIC_ROUTES = ['login', 'forgot-password', 'register', '', 'about', 'contact', 'service'];
@@ -8,6 +10,8 @@ const checkAuth = () => {
     window.location.href = '/login';
     return null;
   }
+
+  axiosClient.defaults.headers.Authorization = `Bearer ${TOKEN}`;
 
   return TOKEN;
 };

@@ -7,6 +7,7 @@ import Customer from 'store/customer/saga';
 import Payment from 'store/payment/saga';
 import Provider from 'store/provider/saga';
 import Review from 'store/review/saga';
+import Category from 'store/category/saga';
 
 import Login from 'store/auth/login/saga';
 import Register from 'store/auth/register/saga';
@@ -22,6 +23,7 @@ export default function* rootSaga() {
     fork(Payment),
     fork(Provider),
     fork(Review),
+    fork(Category),
 
     fork(Login),
     fork(Register),

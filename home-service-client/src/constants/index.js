@@ -11,8 +11,6 @@ export const LOCATION = {
   BOOKING: '/booking',
   CHECKOUT: '/checkout',
 
-  BOOKINGMANAGER: '/provider/booking-manager',
-  SERVICESMANAGER: '/provider/services-manager',
   STATISTIC: '/provider/statistic',
   PROVIDERSERVICE: '/provider/services',
   PROVIDERPROFILE: '/provider/profile',

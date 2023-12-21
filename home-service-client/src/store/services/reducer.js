@@ -60,7 +60,7 @@ const serviceReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        providerServices: action.payload.services,
+        providerServices: action.payload,
       };
 
     case GET_ALL_PUBLIC_SERVICES_SUCCESS:
@@ -81,7 +81,7 @@ const serviceReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        providerServices: action.payload.services,
+        providerServices: action.payload,
       };
 
     case DELETE_PROVIDER_SERVICE_SUCCESS:

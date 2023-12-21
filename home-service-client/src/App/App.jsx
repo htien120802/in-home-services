@@ -25,7 +25,7 @@ import BookingPage from 'pages/Booking/BookingPage';
 import BookingManagerPage from 'pages/Provider/BookingManager/BookingManagerPage';
 import ServiceManagerPage from 'pages/Provider/ServiceManager/ServiceManagerPage';
 import StatisticPage from 'pages/Provider/Statistic/StatisticPage';
-import ProviderDashboard from 'pages/Provider/ProviderService/ProviderDashboard';
+import ProviderService from 'pages/Provider/ProviderService/ProviderService';
 import ProviderProfilePage from 'pages/Provider/ProviderProfile/ProviderProfilePage';
 import AdminBookingManagerPage from 'pages/Admin/AdminBookingManager/AdminBookingManagerPage';
 import AdminProviderManagerPage from 'pages/Admin/AdminProviderManager/AdminProviderManagerPage';
@@ -54,13 +54,13 @@ function App() {
           <Route exact path={LOCATION.CONTACT} element={<ContactPage />} />
 
           <Route exact path={LOCATION.PROFILE} element={<ProfilePage />} />
-          <Route exact path={LOCATION.BOOKING} element={<BookingPage />} />
+          <Route exact path={`${LOCATION.BOOKING}/:id`} element={<BookingPage />} />
           <Route exact path={LOCATION.CHECKOUT} element={<CheckoutPage />} />
 
           <Route exact path={LOCATION.BOOKINGMANAGER} element={<BookingManagerPage />} />
           <Route exact path={LOCATION.SERVICESMANAGER} element={<ServiceManagerPage />} />
           <Route exact path={LOCATION.STATISTIC} element={<StatisticPage />} />
-          <Route exact path={LOCATION.PROVIDERSERVICE} element={<ProviderDashboard />} />
+          <Route exact path={LOCATION.PROVIDERSERVICE} element={<ProviderService />} />
           <Route exact path={LOCATION.PROVIDERPROFILE} element={<ProviderProfilePage />} />
 
           <Route exact path={LOCATION.ADMINBOOKINGMANAGER} element={<AdminBookingManagerPage />} />

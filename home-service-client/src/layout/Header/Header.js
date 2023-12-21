@@ -84,16 +84,15 @@ function Header() {
 
                         {isDropdownOpen && (
                         <div className="dropdown-content">
-                          <a href="/profile">Profile</a>
-                          <a href="/">Settings</a>
+                          <Link to="/profile">Profile</Link>
                           <button className="dropdown-content-logout" type="button" onClick={handleLogout}>Logout</button>
                         </div>
                         )}
                       </div>
                     ) : (
-                      <a href="/login" className="login-redirect">
+                      <Link to="/login" className="login-redirect">
                         <img className="profile-icon" src="/assets/images/profile_icon.png" alt="#" />
-                      </a>
+                      </Link>
                     )}
 
                     <li className="searchbar">

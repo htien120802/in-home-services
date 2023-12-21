@@ -5,6 +5,7 @@ export * from 'store/customer/actions';
 export * from 'store/payment/actions';
 export * from 'store/provider/actions';
 export * from 'store/review/actions';
+export * from 'store/category/actions';
 
 export * from 'store/auth/login/actions';
 export * from 'store/auth/register/actions';

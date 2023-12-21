@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetAllPublicServices } from 'store/actions';
+import { actionGetAllCategory, actionGetAllPublicServices } from 'store/actions';
 
 import { LOCATION } from 'constants/index';
 import Categories from 'components/Categories/Categories';
@@ -10,9 +10,11 @@ import Categories from 'components/Categories/Categories';
 function Home() {
   const dispatch = useDispatch();
   const servicesState = useSelector((state) => state.Services);
+  const categoriesState = useSelector((state) => state.Category);
 
   useEffect(() => {
     dispatch(actionGetAllPublicServices());
+    dispatch(actionGetAllCategory());
   }, []);
 
   return (
@@ -70,7 +72,7 @@ function Home() {
         </div>
       </div>
 
-      <Categories />
+      <Categories categoriesState={categoriesState} />
 
       <section className="layout_padding what_we_do">
         <div className="container">
@@ -108,8 +110,8 @@ function Home() {
               </div>
             </div> */}
 
-            {servicesState.publicServices
-            && servicesState.publicServices.slice(0, 4).map((service, index) => (
+            {servicesState.publicServices.content
+            && servicesState.publicServices.content.slice(0, 4).map((service, index) => (
               <Link to={`services/${service.id}`} className="col-md-3" key={service.id}>
                 <div className="full decorate_blog">
                   {/* Đổi ảnh lại sau khi sửa db */}

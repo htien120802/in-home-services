@@ -11,6 +11,9 @@ import {
   GET_CUSTOMER_BOOKINGS,
   GET_CUSTOMER_BOOKINGS_SUCCESS,
   GET_CUSTOMER_BOOKINGS_FAILED,
+  GET_PROVIDER_BOOKINGS,
+  GET_PROVIDER_BOOKINGS_SUCCESS,
+  GET_PROVIDER_BOOKINGS_FAILED,
   CREATE_BOOKING,
   CREATE_BOOKING_SUCCESS,
   CREATE_BOOKING_FAILED,
@@ -76,6 +79,20 @@ export const actionGetCustomerBookingsSuccess = (payload) => ({
 
 export const actionGetCustomerBookingsFailed = () => ({
   type: GET_CUSTOMER_BOOKINGS_FAILED,
+});
+
+// GET_PROVIDER_BOOKINGS
+export const actionGetProviderBookings = () => ({
+  type: GET_PROVIDER_BOOKINGS,
+});
+
+export const actionGetProviderBookingsSuccess = (payload) => ({
+  type: GET_PROVIDER_BOOKINGS_SUCCESS,
+  payload,
+});
+
+export const actionGetProviderBookingsFailed = () => ({
+  type: GET_PROVIDER_BOOKINGS_FAILED,
 });
 
 // CREATE_BOOKING

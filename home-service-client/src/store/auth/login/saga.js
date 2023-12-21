@@ -40,7 +40,7 @@ function* login({ payload }) {
 
     callback();
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionLoginFailed());
   }

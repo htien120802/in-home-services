@@ -46,7 +46,7 @@ const providerReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        provider: action.payload.provider,
+        provider: action.payload,
       };
 
     case UPDATE_PROVIDER_ADDRESS_SUCCESS:
@@ -54,7 +54,7 @@ const providerReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        addresses: action.payload.addresses,
+        addresses: action.payload,
       };
 
     case GET_PROVIDER_PROFILE_FAILED:

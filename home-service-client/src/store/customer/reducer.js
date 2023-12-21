@@ -22,7 +22,6 @@ import {
 const initialState = {
   loading: false,
   customer: null,
-  addresses: [],
 };
 
 const customerReducer = (state = initialState, action) => {
@@ -46,7 +45,7 @@ const customerReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        customer: action.payload.customer,
+        customer: action.payload,
       };
 
     case UPDATE_CUSTOMER_ADDRESS_SUCCESS:

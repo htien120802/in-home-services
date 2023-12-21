@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { actionGetServiceById, actionGetAllServiceReviews } from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 import ServicesRelated from './ServicesRelated/ServicesRelated';
+
+import { formatPriceWithCommas } from 'utils';
 
 import './index.module.css';
 
@@ -214,7 +216,7 @@ function ServiceDetails() {
                     <div className="wsus__package">
                       <p>My Package</p>
                       <h2>
-                        {works && works.reduce((total, work) => total + work.pricePerUnit, 0)}
+                        {works && formatPriceWithCommas(works.reduce((total, work) => total + work.pricePerUnit, 0))}
                         đ
                       </h2>
                       <ul>
@@ -222,7 +224,7 @@ function ServiceDetails() {
                           <li key={work.id}>{work.description}</li>
                         ))}
                       </ul>
-                      <a href="https://demo.websolutionus.com/aabcserv/ready-to-booking/ac-cleaning-service-get-asap-and-take-the-best-benifits">Book Now</a>
+                      <Link to={`/booking/${id}`}>Book Now</Link>
                     </div>
                   </div>
                   <div className="col-12 col-md-6 col-lg-12">
