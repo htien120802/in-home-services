@@ -41,6 +41,7 @@
 /home-service-client/.pnp
 /home-service-client/.pnp.js
 
+/home-service-admin/node_modules
 # testing
 /home-service-client/coverage
 
