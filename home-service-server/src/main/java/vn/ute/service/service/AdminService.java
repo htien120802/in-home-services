@@ -334,8 +334,12 @@ public class AdminService {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get booking successfully!",mapper.map(booking, BookingDto.class)));
     }
 
-    public ResponseEntity<?> getAllReviews(int pageNumber, int size, int rating, String customerName, String serviceName) {
-        Page<ReviewEntity> reviewEntities = reviewCriteriaRepository.findAllWithFilters(pageNumber,size,rating,customerName,serviceName);
+    public ResponseEntity<?> getAllReviews(int pageNumber, int size, String rating, String customerName, String serviceName) {
+        int temp = 0;
+        if (rating != null){
+            temp =  Integer.parseInt(rating);
+        }
+        Page<ReviewEntity> reviewEntities = reviewCriteriaRepository.findAllWithFilters(pageNumber,size,temp,customerName,serviceName);
         Page<ReviewResponse> reviews = reviewEntities.map(reviewEntity -> mapper.map(reviewEntity,ReviewResponse.class));
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Get all reviews successfully!",reviews));
     }
