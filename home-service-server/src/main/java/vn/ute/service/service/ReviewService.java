@@ -16,6 +16,7 @@ import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -74,7 +75,9 @@ public class ReviewService {
         reviewEntity = reviewRepository.save(reviewEntity);
 
         ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
-        provider.calcAvgRating();
+        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
+        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avg);
         providerRepository.save(provider);
 
         return ResponseEntity.status(201).body(new ResponseDto<>("success","Post your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
