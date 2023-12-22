@@ -33,6 +33,7 @@ public class ServiceService {
 
     private final CategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
+    private final ReviewRepository reviewRepository;
 
     private final ProviderRepository providerRepository;
 
@@ -46,11 +47,12 @@ public class ServiceService {
 
     private final ModelMapper mapper;
 
-    public ServiceService(ServiceRepository serviceRepository, ServiceCriteriaRepository serviceCriteriaRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, WorkRepository workRepository, BingMapsService bingMapsService, ImageService imageService, JwtService jwtService, ModelMapper mapper) {
+    public ServiceService(ServiceRepository serviceRepository, ServiceCriteriaRepository serviceCriteriaRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ReviewRepository reviewRepository, ProviderRepository providerRepository, WorkRepository workRepository, BingMapsService bingMapsService, ImageService imageService, JwtService jwtService, ModelMapper mapper) {
         this.serviceRepository = serviceRepository;
         this.serviceCriteriaRepository = serviceCriteriaRepository;
         this.categoryRepository = categoryRepository;
         this.customerRepository = customerRepository;
+        this.reviewRepository = reviewRepository;
         this.providerRepository = providerRepository;
         this.workRepository = workRepository;
         this.bingMapsService = bingMapsService;
@@ -154,7 +156,9 @@ public class ServiceService {
 //        service.setStatus(ServiceStatus.DELETE);
 //        serviceRepository.save(service);
 
-        provider.calcAvgRating();
+        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
+        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avg);
         providerRepository.save(provider);
 
         return ResponseEntity.status(200).body(new ResponseDto<>("success","Delete service successfully!",null));

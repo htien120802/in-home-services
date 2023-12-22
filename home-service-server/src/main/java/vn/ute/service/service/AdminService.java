@@ -276,7 +276,9 @@ public class AdminService {
         serviceRepository.delete(service);
 
         ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
-        provider.calcAvgRating();
+        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
+        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avg);
         providerRepository.save(provider);
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete service successfully!",null));
@@ -369,7 +371,9 @@ public class AdminService {
         serviceRepository.save(service);
 
         ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
-        provider.calcAvgRating();
+        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
+        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avg);
         providerRepository.save(provider);
 
 
