@@ -14,6 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BookingDto {
     private UUID id;
+    private String address;
+    private String note;
     private CustomerDto customer;
     private ProviderDto provider;
     private ServiceDto service;
