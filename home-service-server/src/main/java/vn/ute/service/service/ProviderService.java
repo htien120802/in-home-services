@@ -63,13 +63,17 @@ public class ProviderService {
     }
 
     @Transactional
-    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest providerProfile, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         Optional<ProviderEntity> provider = providerRepository.findByAccount_Username(username);
         if (provider.isPresent()){
             ProviderEntity temp = provider.get();
-            mapper.map(customerProfile,temp);
-            addressRepository.save(mapper.map(customerProfile.getAddress(),AddressEntity.class));
+            mapper.map(providerProfile,temp);
+            AddressEntity addressEntity = addressRepository.findById(providerProfile.getAddress().getId()).get();
+            mapper.map(providerProfile.getAddress(), addressEntity);
+            CoordinatesDto coordinatesDto = bingMapsService.getLocation(addressEntity.toString());
+            mapper.map(coordinatesDto,addressEntity.getCoordinates());
+            addressRepository.save(addressEntity);
             temp = providerRepository.save(temp);
             return ResponseEntity.status(200).body(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, ProviderDto.class)));
         }

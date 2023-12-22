@@ -34,8 +34,8 @@ public class ProviderController {
     }
     @Operation(summary = "Update profile of provider")
     @PutMapping(value = "/provider/profile")
-    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest customerProfile, HttpServletRequest request){
-        return providerService.updateProfile(customerProfile,request);
+    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest providerProfile, HttpServletRequest request) throws IOException {
+        return providerService.updateProfile(providerProfile,request);
     }
     @Operation(summary = "Add new address for provider")
     @PostMapping(value = "/provider/address")

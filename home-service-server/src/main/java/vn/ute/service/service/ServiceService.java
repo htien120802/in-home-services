@@ -153,6 +153,10 @@ public class ServiceService {
         serviceRepository.deleteById(id);
 //        service.setStatus(ServiceStatus.DELETE);
 //        serviceRepository.save(service);
+
+        provider.calcAvgRating();
+        providerRepository.save(provider);
+
         return ResponseEntity.status(200).body(new ResponseDto<>("success","Delete service successfully!",null));
     }
 

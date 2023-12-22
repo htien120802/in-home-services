@@ -33,7 +33,7 @@ public class CustomerController {
     }
     @Operation(summary = "Update profile of customer")
     @PutMapping(value = "/customer/profile")
-    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest customerProfile, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest customerProfile, HttpServletRequest request) throws IOException {
         return customerService.updateProfile(customerProfile,request);
     }
     @Operation(summary = "Add new address for customer")

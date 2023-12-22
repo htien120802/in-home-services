@@ -16,7 +16,7 @@ public class CategoryController {
 
     @Operation(summary = "Get all categories")
     @GetMapping("public/category")
-    public ResponseEntity getAllCategories(){
+    public ResponseEntity<?> getAllCategories(){
         return categoryService.getAllCategories();
     }
 }

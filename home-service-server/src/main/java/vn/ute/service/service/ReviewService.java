@@ -2,7 +2,6 @@ package vn.ute.service.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,26 +11,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ute.service.dto.ReviewDto;
 import vn.ute.service.dto.response.ResponseDto;
-import vn.ute.service.entity.BookingEntity;
-import vn.ute.service.entity.CustomerEntity;
-import vn.ute.service.entity.ReviewEntity;
-import vn.ute.service.entity.ServiceEntity;
+import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.jwt.JwtService;
-import vn.ute.service.repository.BookingRepository;
-import vn.ute.service.repository.CustomerRepository;
-import vn.ute.service.repository.ReviewRepository;
-import vn.ute.service.repository.ServiceRepository;
+import vn.ute.service.repository.*;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     private final CustomerRepository customerRepository;
+    private final ProviderRepository providerRepository;
 
     private final ServiceRepository serviceRepository;
 
@@ -41,9 +33,10 @@ public class ReviewService {
 
     private final ModelMapper mapper;
 
-    public ReviewService(ReviewRepository reviewRepository, CustomerRepository customerRepository, ServiceRepository serviceRepository, BookingRepository bookingRepository, JwtService jwtService, ModelMapper mapper) {
+    public ReviewService(ReviewRepository reviewRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, ServiceRepository serviceRepository, BookingRepository bookingRepository, JwtService jwtService, ModelMapper mapper) {
         this.reviewRepository = reviewRepository;
         this.customerRepository = customerRepository;
+        this.providerRepository = providerRepository;
         this.serviceRepository = serviceRepository;
         this.bookingRepository = bookingRepository;
         this.jwtService = jwtService;
@@ -79,6 +72,11 @@ public class ReviewService {
         reviewEntity.setService(service);
         reviewEntity.setCustomer(customer);
         reviewEntity = reviewRepository.save(reviewEntity);
+
+        ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
+        provider.calcAvgRating();
+        providerRepository.save(provider);
+
         return ResponseEntity.status(201).body(new ResponseDto<>("success","Post your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
     }
 
@@ -104,6 +102,10 @@ public class ReviewService {
 
     public ResponseEntity<?> getAllReview(UUID serviceId, int pageNumber, int size, String rating) {
         Pageable pageable = PageRequest.of(pageNumber,size, Sort.by("date").descending());
+
+        if (!serviceRepository.existsById(serviceId))
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Service not found",null));
+
         Page<ReviewEntity> reviews;
         if (rating != null){
             reviews = reviewRepository.findAllByService_IdAndRating(serviceId, Integer.parseInt(rating), pageable);
@@ -112,7 +114,7 @@ public class ReviewService {
             reviews = reviewRepository.findAllByService_Id(serviceId, pageable);
         }
 
-        List<ReviewDto> reviewDtos = reviews.stream().map(reviewEntity -> mapper.map(reviewEntity, ReviewDto.class)).toList();
-        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all reviews of this service successfully!",mapper.map(reviewDtos, ReviewDto.class)));
+        Page<ReviewDto> reviewDtos = reviews.map(reviewEntity -> mapper.map(reviewEntity, ReviewDto.class));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all reviews of this service successfully!",reviewDtos));
     }
 }

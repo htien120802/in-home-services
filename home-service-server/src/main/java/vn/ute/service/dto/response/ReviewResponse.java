@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.ute.service.dto.CustomerDto;
+import vn.ute.service.dto.CustomerReviewDto;
 import vn.ute.service.dto.ServiceDto;
 
 import java.sql.Timestamp;
@@ -17,6 +18,6 @@ public class ReviewResponse {
     private int rating;
     private String comment;
     private Timestamp date;
-    private CustomerDto customer;
+    private CustomerReviewDto customer;
     private ServiceDto service;
 }

@@ -35,6 +35,8 @@ public class ProviderEntity {
 
     private String avatar;
 
+    private double avgRating;
+
 //    private String specialization;
 
     private double rating;
@@ -56,4 +58,12 @@ public class ProviderEntity {
 //    @OneToOne
 //    @JoinColumn(name = "image_id")
 //    private ImageEntity avatar;
+    @PrePersist
+    private void prePersist(){
+        this.avgRating = 0.0;
+    }
+
+    public void calcAvgRating(){
+        this.avgRating = this.getServices().stream().mapToDouble(ServiceEntity::getAvgRating).average().orElse(0.0);
+    }
 }
