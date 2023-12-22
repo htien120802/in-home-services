@@ -20,6 +20,9 @@ import {
   GET_CUSTOMER_BOOKINGS_BY_STATUS,
   GET_CUSTOMER_BOOKINGS_BY_STATUS_SUCCESS,
   GET_CUSTOMER_BOOKINGS_BY_STATUS_FAILED,
+  SET_SELECTED_WORKS,
+  SET_SELECTED_WORKS_SUCCESS,
+  SET_SELECTED_WORKS_FAILED,
 } from './actionTypes';
 
 // UPDATE_BOOKING_STATUS
@@ -96,9 +99,9 @@ export const actionGetProviderBookingsFailed = () => ({
 });
 
 // CREATE_BOOKING
-export const actionCreateBooking = (bookingData) => ({
+export const actionCreateBooking = (payload) => ({
   type: CREATE_BOOKING,
-  payload: bookingData,
+  payload,
 });
 
 export const actionCreateBookingSuccess = (payload) => ({
@@ -123,4 +126,18 @@ export const actionGetCustomerBookingsByStatusSuccess = (payload) => ({
 
 export const actionGetCustomerBookingsByStatusFailed = () => ({
   type: GET_CUSTOMER_BOOKINGS_BY_STATUS_FAILED,
+});
+
+export const actionSetSelectedWorks = (payload) => ({
+  type: SET_SELECTED_WORKS,
+  payload,
+});
+
+export const actionSetSelectedWorksSuccess = (payload) => ({
+  type: SET_SELECTED_WORKS_SUCCESS,
+  payload,
+});
+
+export const actionSetSelectedWorksFailed = () => ({
+  type: SET_SELECTED_WORKS_FAILED,
 });

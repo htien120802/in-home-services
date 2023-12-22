@@ -39,9 +39,7 @@ function* getProviderProfile() {
 
 function* updateProviderProfile({ payload }) {
   try {
-    const { providerData } = payload;
-
-    const response = yield call(providerAPI.updateProviderProfile, providerData);
+    const response = yield call(providerAPI.updateProviderProfile, payload.values);
 
     yield put(actionUpdateProviderProfileSuccess(response.data));
 
@@ -51,7 +49,7 @@ function* updateProviderProfile({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateProviderProfileFailed());
   }
@@ -71,7 +69,7 @@ function* updateProviderPassword({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateProviderPasswordFailed());
   }
@@ -79,9 +77,7 @@ function* updateProviderPassword({ payload }) {
 
 function* updateProviderAvatar({ payload }) {
   try {
-    const { avatar } = payload;
-
-    const response = yield call(providerAPI.updateProviderAvatar, avatar);
+    const response = yield call(providerAPI.updateProviderAvatar, payload);
 
     yield put(actionUpdateProviderAvatarSuccess(response.data));
 
@@ -91,7 +87,7 @@ function* updateProviderAvatar({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateProviderAvatarFailed());
   }
@@ -111,7 +107,7 @@ function* updateProviderAddress({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateProviderAddressFailed());
   }
@@ -131,7 +127,7 @@ function* addProviderAddress({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionAddProviderAddressFailed());
   }

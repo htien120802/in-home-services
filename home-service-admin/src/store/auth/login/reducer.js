@@ -23,7 +23,6 @@ const login = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        accessToken: action.payload.accessToken,
       };
 
     case LOGIN_FAILED:

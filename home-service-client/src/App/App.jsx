@@ -55,7 +55,7 @@ function App() {
 
           <Route exact path={LOCATION.PROFILE} element={<ProfilePage />} />
           <Route exact path={`${LOCATION.BOOKING}/:id`} element={<BookingPage />} />
-          <Route exact path={LOCATION.CHECKOUT} element={<CheckoutPage />} />
+          <Route exact path={`${LOCATION.CHECKOUT}/:id`} element={<CheckoutPage />} />
 
           <Route exact path={LOCATION.BOOKINGMANAGER} element={<BookingManagerPage />} />
           <Route exact path={LOCATION.SERVICESMANAGER} element={<ServiceManagerPage />} />

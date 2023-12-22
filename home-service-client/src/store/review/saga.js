@@ -24,7 +24,7 @@ function* getCustomerServiceReview({ payload }) {
 
     const response = yield call(reviewAPI.getCustomerServiceReview, serviceId);
 
-    yield put(actionGetCustomerServiceReviewSuccess(response.data.reviews));
+    yield put(actionGetCustomerServiceReviewSuccess(response.data));
   } catch (error) {
     yield put(actionGetCustomerServiceReviewFailed());
   }
@@ -36,7 +36,7 @@ function* createCustomerServiceReview({ payload }) {
 
     const response = yield call(reviewAPI.createCustomerServiceReview, serviceId, reviewData);
 
-    yield put(actionCreateCustomerServiceReviewSuccess(response.data.review));
+    yield put(actionCreateCustomerServiceReviewSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -44,7 +44,7 @@ function* createCustomerServiceReview({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionCreateCustomerServiceReviewFailed());
   }
@@ -56,7 +56,7 @@ function* getAllServiceReviews({ payload }) {
 
     const response = yield call(reviewAPI.getAllServiceReviews, id);
 
-    yield put(actionGetAllServiceReviewsSuccess(response.data.reviews));
+    yield put(actionGetAllServiceReviewsSuccess(response.data));
   } catch (error) {
     yield put(actionGetAllServiceReviewsFailed());
   }

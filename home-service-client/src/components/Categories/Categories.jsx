@@ -1,4 +1,7 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 
 import PropTypes from 'prop-types';
@@ -9,6 +12,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 function Categories({ categoriesState }) {
+  const navigate = useNavigate();
   const { categories } = categoriesState;
 
   const sliderSettings = {
@@ -17,6 +21,10 @@ function Categories({ categoriesState }) {
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
+  };
+
+  const handleCategoryClick = (categorySlug) => {
+    navigate(`/services/page/0?categorySlug=${categorySlug}`);
   };
 
   return (
@@ -34,7 +42,9 @@ function Categories({ categoriesState }) {
         <div className="row category_slider slick-initialized slick-slider slick-dotted">
           <Slider {...sliderSettings}>
             {categories.map((category, index) => (
-              <CategoryCard key={category.id} slickIndex={index} {...category} />
+              <div onClick={() => handleCategoryClick(category.slug)}>
+                <CategoryCard key={category.id} slickIndex={index} {...category} />
+              </div>
             ))}
           </Slider>
         </div>

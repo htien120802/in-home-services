@@ -5,10 +5,13 @@ import authAPI from 'apis/auth/authAPI';
 import { removeSpacesWithTrim } from 'utils';
 import axiosClient from 'utils/axios';
 
-import { LOGIN } from './actionTypes';
+import { LOGIN, LOGOUT } from './actionTypes';
 import {
   actionLoginSuccess,
   actionLoginFailed,
+
+  actionLogoutSuccess,
+  actionLogoutFailed,
 } from './actions';
 
 function* login({ payload }) {
@@ -46,6 +49,34 @@ function* login({ payload }) {
   }
 }
 
+function* logout({ payload }) {
+  try {
+    const {
+      callback,
+    } = payload;
+
+    const accessToken = localStorage.getItem('accessToken');
+    axiosClient.defaults.headers.Authorization = `Bearer ${accessToken}`;
+
+    yield call(authAPI.logout);
+
+    localStorage.removeItem('accessToken');
+
+    axiosClient.defaults.headers.Authorization = '';
+
+    yield put(actionLogoutSuccess());
+
+    toast.success('Logged out successfully');
+
+    callback();
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionLogoutFailed());
+  }
+}
+
 export default function* loginSaga() {
   yield takeLeading(LOGIN, login);
+  yield takeLeading(LOGOUT, logout);
 }

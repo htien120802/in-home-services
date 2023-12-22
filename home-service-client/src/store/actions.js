@@ -7,7 +7,6 @@ export * from 'store/provider/actions';
 export * from 'store/review/actions';
 export * from 'store/category/actions';
 
-export * from 'store/auth/login/actions';
+export * from 'store/auth/actions';
 export * from 'store/auth/register/actions';
 export * from 'store/auth/refreshToken/actions';
-export * from 'store/auth/logout/actions';

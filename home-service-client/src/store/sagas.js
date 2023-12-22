@@ -9,10 +9,9 @@ import Provider from 'store/provider/saga';
 import Review from 'store/review/saga';
 import Category from 'store/category/saga';
 
-import Login from 'store/auth/login/saga';
+import Auth from 'store/auth/saga';
 import Register from 'store/auth/register/saga';
 import RefreshToken from 'store/auth/refreshToken/saga';
-import Logout from 'store/auth/logout/saga';
 
 export default function* rootSaga() {
   yield all([
@@ -25,9 +24,8 @@ export default function* rootSaga() {
     fork(Review),
     fork(Category),
 
-    fork(Login),
+    fork(Auth),
     fork(Register),
     fork(RefreshToken),
-    fork(Logout),
   ]);
 }

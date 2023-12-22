@@ -34,9 +34,9 @@ export const actionGetCustomerProfileFailed = () => ({
 });
 
 // UPDATE_CUSTOMER_PROFILE
-export const actionUpdateCustomerProfile = (profileData) => ({
+export const actionUpdateCustomerProfile = (payload) => ({
   type: UPDATE_CUSTOMER_PROFILE,
-  payload: profileData,
+  payload,
 });
 
 export const actionUpdateCustomerProfileSuccess = (payload) => ({

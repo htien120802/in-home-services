@@ -60,7 +60,7 @@ function* updateProviderService({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateProviderServiceFailed());
   }
@@ -70,7 +70,7 @@ function* registerProviderService({ payload }) {
   try {
     const { serviceData } = payload;
 
-    const response = yield call(serviceAPI.registerProviderService, serviceData);
+    const response = yield call(serviceAPI.registerToProvideService, serviceData);
 
     yield put(actionRegisterProviderServiceSuccess(response.data));
 
@@ -80,7 +80,7 @@ function* registerProviderService({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionRegisterProviderServiceFailed());
   }
@@ -90,7 +90,7 @@ function* enableOrDisableProviderService({ payload }) {
   try {
     const { serviceId, actionType } = payload;
 
-    const response = yield call(serviceAPI.enableOrDisableProviderService, serviceId, actionType);
+    const response = yield call(serviceAPI.enableOrDisableService, serviceId, actionType);
 
     yield put(actionEnableOrDisableProviderServiceSuccess(response.data));
 
@@ -100,7 +100,7 @@ function* enableOrDisableProviderService({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionEnableOrDisableProviderServiceFailed());
   }
@@ -120,15 +120,15 @@ function* approveOrUnapproveRegisterService({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionApproveOrUnapproveRegisterServiceFailed());
   }
 }
 
-function* getAllPublicServices() {
+function* getAllPublicServices({ payload }) {
   try {
-    const response = yield call(serviceAPI.getAllPublicServices);
+    const response = yield call(serviceAPI.getAllPublicServices, payload);
 
     yield put(actionGetAllPublicServicesSuccess(response.data));
   } catch (error) {
@@ -174,7 +174,7 @@ function* deleteProviderService({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionDeleteProviderServiceFailed());
   }

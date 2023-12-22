@@ -39,11 +39,9 @@ function* getCustomerProfile() {
 
 function* updateCustomerProfile({ payload }) {
   try {
-    const { customerData } = payload;
+    const response = yield call(customerAPI.updateCustomerProfile, payload.values);
 
-    const response = yield call(customerAPI.updateCustomerProfile, customerData);
-
-    yield put(actionUpdateCustomerProfileSuccess(response.data.customer));
+    yield put(actionUpdateCustomerProfileSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -51,7 +49,7 @@ function* updateCustomerProfile({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateCustomerProfileFailed());
   }
@@ -63,7 +61,7 @@ function* updateCustomerPassword({ payload }) {
 
     const response = yield call(customerAPI.updateCustomerPassword, newPassword);
 
-    yield put(actionUpdateCustomerPasswordSuccess(response.data.customer));
+    yield put(actionUpdateCustomerPasswordSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -71,7 +69,7 @@ function* updateCustomerPassword({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateCustomerPasswordFailed());
   }
@@ -79,11 +77,9 @@ function* updateCustomerPassword({ payload }) {
 
 function* updateCustomerAvatar({ payload }) {
   try {
-    const { avatar } = payload;
+    const response = yield call(customerAPI.updateCustomerAvatar, payload);
 
-    const response = yield call(customerAPI.updateCustomerAvatar, avatar);
-
-    yield put(actionUpdateCustomerAvatarSuccess(response.data.customer));
+    yield put(actionUpdateCustomerAvatarSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -91,7 +87,7 @@ function* updateCustomerAvatar({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateCustomerAvatarFailed());
   }
@@ -103,7 +99,7 @@ function* updateCustomerAddress({ payload }) {
 
     const response = yield call(customerAPI.updateCustomerAddress, addressData);
 
-    yield put(actionUpdateCustomerAddressSuccess(response.data.addresses));
+    yield put(actionUpdateCustomerAddressSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -111,7 +107,7 @@ function* updateCustomerAddress({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateCustomerAddressFailed());
   }
@@ -123,7 +119,7 @@ function* addCustomerAddress({ payload }) {
 
     const response = yield call(customerAPI.addCustomerAddress, newAddress);
 
-    yield put(actionAddCustomerAddressSuccess(response.data.addresses));
+    yield put(actionAddCustomerAddressSuccess(response.data));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -131,7 +127,7 @@ function* addCustomerAddress({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionAddCustomerAddressFailed());
   }

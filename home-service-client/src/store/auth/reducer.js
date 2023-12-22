@@ -2,6 +2,10 @@ import {
   LOGIN,
   LOGIN_SUCCESS,
   LOGIN_FAILED,
+
+  LOGOUT,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILED,
 } from './actionTypes';
 
 const initialState = {
@@ -32,6 +36,25 @@ const login = (state = initialState, action) => {
         loading: false,
       };
 
+    case LOGOUT:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case LOGOUT_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        accessToken: null,
+        refreshToken: null,
+      };
+
+    case LOGOUT_FAILED:
+      return {
+        ...state,
+        loading: false,
+      };
     default:
       return state;
   }

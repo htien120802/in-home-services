@@ -22,7 +22,7 @@ const imageUpload = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        image: action.payload.image,
+        image: action.payload,
       };
 
     case IMAGE_UPLOAD_FAILED:

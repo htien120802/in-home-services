@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetServiceById, actionGetAllServiceReviews } from 'store/actions';
+import {
+  actionGetServiceById, actionGetAllServiceReviews, actionSetSelectedWorks, actionCreateCustomerServiceReview,
+} from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 import ServicesRelated from './ServicesRelated/ServicesRelated';
@@ -16,20 +18,112 @@ function ServiceDetails() {
   const dispatch = useDispatch();
 
   const data = useSelector((state) => state.Services);
+  const reviews = useSelector((state) => state.Review.serviceReviews);
+  const selectedWorks = useSelector((state) => state.Booking.works);
+  const totalPrice = useSelector((state) => state.Booking.totalPrice);
 
   const {
     name,
     descriptions,
     category,
-    images,
+    thumbnail,
+    openTime,
+    closeTime,
     works,
+    provider,
   } = data.serviceDetails || {};
 
   const [activeTab, setActiveTab] = useState('description');
+  const [userRating, setUserRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [selectedWorksQuantity, setSelectedWorksQuantity] = useState({});
+
+  const handleUserRating = (rating) => {
+    setUserRating(rating);
+  };
+
+  const handleQuantityChange = (event, workDescription) => {
+    const quantity = parseInt(event.target.value, 10) || 0;
+
+    setSelectedWorksQuantity((prevQuantities) => ({
+      ...prevQuantities,
+      [workDescription]: quantity,
+    }));
+
+    dispatchSelectedWorks();
+  };
+
+  const handleIncrementQuantity = (workDescription) => {
+    setSelectedWorksQuantity((prevQuantities) => ({
+      ...prevQuantities,
+      [workDescription]: (prevQuantities[workDescription] || 0) + 1,
+    }));
+
+    dispatchSelectedWorks();
+  };
+
+  const handleDecrementQuantity = (workDescription) => {
+    setSelectedWorksQuantity((prevQuantities) => {
+      const updatedQuantity = (prevQuantities[workDescription] || 0) - 1;
+      const updatedQuantities = { ...prevQuantities };
+      if (updatedQuantity > 0) {
+        updatedQuantities[workDescription] = updatedQuantity;
+      } else {
+        delete updatedQuantities[workDescription];
+      }
+      return updatedQuantities;
+    });
+
+    dispatchSelectedWorks();
+  };
+
+  const calculateTotalPrice = () => Object.entries(selectedWorksQuantity).reduce((acc, [workDescription, quantity]) => {
+    const work = works.find((item) => item.description === workDescription);
+    if (work) {
+      return acc + work.pricePerUnit * quantity;
+    }
+    return acc;
+  }, 0);
+
+  const dispatchSelectedWorks = () => {
+    const updatedSelectedWorks = Object.keys(selectedWorksQuantity).map((workDescription) => {
+      const work = works.find((item) => item.description === workDescription);
+
+      if (work) {
+        return {
+          work,
+          quantity: selectedWorksQuantity[workDescription],
+        };
+      }
+
+      return null;
+    }).filter(Boolean);
+
+    const tp = calculateTotalPrice();
+
+    dispatch(actionSetSelectedWorks({ selectedWorks: updatedSelectedWorks, totalPrice: tp }));
+  };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+
+    dispatch(actionCreateCustomerServiceReview(id, {
+      rating: userRating,
+      comment,
+    }));
+  };
+
+  const openGmail = () => {
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(provider?.email)}`, '_blank');
+  };
+
+  useEffect(() => {
+    dispatchSelectedWorks();
+  }, [selectedWorksQuantity]);
 
   useEffect(() => {
     dispatch(actionGetServiceById({ id }));
@@ -46,7 +140,7 @@ function ServiceDetails() {
             <div className="col-xl-8 col-lg-8">
               <div className="wsus__service_details_content">
                 <div className="wsus__service_details_img">
-                  <img src={images && images[0]?.url} alt="service setails" className="imf-fluid w-100 h-100" />
+                  <img src={thumbnail} alt="service setails" className="imf-fluid w-100 h-100" />
                 </div>
                 <div className="wsus__service_details_text">
                   <h2>{name}</h2>
@@ -87,63 +181,74 @@ function ServiceDetails() {
                       </p>
 
                       <div className="row">
-                        <div className="col-xl-7 col-md-7">
+                        <div className="col-xl-12 col-md-12">
                           <div className="wsus_details_list_item">
                             <h4>What you will get:</h4>
                             <ul className="list">
-                              <li>Washroom Cleaning</li>
-                              <li>Page Load (time, size, number of requests).</li>
-                              <li>Company Profile Build</li>
-                              <li>Adance Data analysis operation.</li>
-                              <li>Page Load (time, size, number of requests)</li>
+                              {works && works.map((work) => (
+                                <li key={work.id} className="d-flex justify-content-between align-items-center">
+                                  <label htmlFor={`work_${work.id}`}>
+                                    {work.description}
+                                    {' '}
+                                    - $
+                                    {work.pricePerUnit}
+                                    {' '}
+                                    per unit
+                                  </label>
+
+                                  <div className="align-items-center">
+                                    <div className="input-group">
+                                      <div className="input-group-prepend">
+                                        <button
+                                          className="btn-outline-secondary"
+                                          type="button"
+                                          style={{ border: '1px solid #ced4da', padding: '5px', width: '35px' }}
+                                          onClick={() => handleDecrementQuantity(work.description)}
+                                        >
+                                          -
+                                        </button>
+                                      </div>
+                                      <input
+                                        type="text"
+                                        className="form-control"
+                                        style={{ width: '40px', textAlign: 'center' }}
+                                        value={selectedWorksQuantity[work.description] || 0}
+                                        onChange={(e) => handleQuantityChange(e, work.description)}
+                                      />
+                                      <div className="input-group-append">
+                                        <button
+                                          className="btn-outline-secondary"
+                                          type="button"
+                                          style={{ border: '1px solid #ced4da', padding: '5px', width: '35px' }}
+                                          onClick={() => handleIncrementQuantity(work.description)}
+                                        >
+                                          +
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         </div>
-
-                        <div className="col-xl-7 col-md-7">
-                          <div className="wsus_details_list_item">
-                            <h4>Benifits of the Package:</h4>
-                            <ul className="list">
-                              <li>Home Service</li>
-                              <li>Service Gurantee</li>
-                              <li>Quality Service</li>
-                              <li>Page Load (time, size, number of requests)</li>
-                              <li>Kitchenroom Cleaning</li>
-                            </ul>
-                          </div>
-                        </div>
-
                       </div>
                     </div>
 
                     <div className={`tab-pane fade ${activeTab === 'availability' ? 'show active' : ''}`} role="tabpanel">
                       <h4>Service Availability  </h4>
                       <ul className="details_time">
-                        <li>
-                          <span>Sunday</span>
-                          {' '}
-                          08:00 AM - 02:00 PM
-                        </li>
-                        <li>
-                          <span>Monday</span>
-                          {' '}
-                          08:00 AM - 02:00 PM
-                        </li>
-                        <li>
-                          <span>Tuesday</span>
-                          {' '}
-                          08:00 AM - 02:00 PM
-                        </li>
-                        <li>
-                          <span>Wednesday</span>
-                          {' '}
-                          08:00 AM - 02:00 PM
-                        </li>
-                        <li>
-                          <span>Thursday</span>
-                          {' '}
-                          08:00 AM - 02:00 PM
-                        </li>
+                        {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+                          <li key={day}>
+                            <span>{day}</span>
+                            {' '}
+                            {openTime}
+                            {' '}
+                            -
+                            {' '}
+                            {closeTime}
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
@@ -156,38 +261,72 @@ function ServiceDetails() {
                         </div>
                       </div>
 
-                      <div className="wsus__review_input mt_65 xs_mt_35">
-                        <form id="serviceReviewForm">
-                          <input type="hidden" name="_token" value="d7jmTeUP8xuGr7OBDDdSLphIk3RnZ82L0RbOsp1D" />
+                      <div className="other-reviews">
+                        <h4>Other Reviews</h4>
+                        <ul>
+                          {reviews && reviews.content && reviews.content.map((review) => (
+                            <li key={review.id}>
+                              <div>
+                                <strong>{`${review.customer.firstName} ${review.customer.lastName}`}</strong>
+                                <img
+                                  src={review.customer.avatar}
+                                  alt={`Avatar of ${review.customer.firstName}`}
+                                  style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    borderRadius: '50%',
+                                    marginRight: '10px',
+                                  }}
+                                />
+                                <p>
+                                  Rating:
+                                  {' '}
+                                  {review.rating}
+                                </p>
+                                <p>{review.comment}</p>
+                                <p>
+                                  Date:
+                                  {' '}
+                                  {new Date(review.date).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
+                      <div className="wsus__review_input mt_65 xs_mt_35">
+                        <form onSubmit={(e) => handleSubmitReview(e)}>
                           <h4>Write Your Reviews</h4>
                           <p>
                             <span>Rating : </span>
-                            <i className="fas fa-star service_rat" data-rating="1" onClick="productReview(1)" aria-hidden="true" />
-                            <i className="fas fa-star service_rat" data-rating="2" onClick="productReview(2)" aria-hidden="true" />
-                            <i className="fas fa-star service_rat" data-rating="3" onClick="productReview(3)" aria-hidden="true" />
-                            <i className="fas fa-star service_rat" data-rating="4" onClick="productReview(4)" aria-hidden="true" />
-                            <i className="fas fa-star service_rat" data-rating="5" onClick="productReview(5)" aria-hidden="true" />
-                            <span id="show_rating">(5.0)</span>
+                            {[1, 2, 3, 4, 5].map((value) => (
+                              <i
+                                key={value}
+                                className={`fa${value <= userRating ? 's' : 'r'} fa-star`}
+                                onClick={() => handleUserRating(value)}
+                                aria-hidden="true"
+                              />
+                            ))}
+                            <span id="show_rating">{userRating}</span>
                           </p>
                           <div className="row">
-
-                            <input type="hidden" id="service_id" name="service_id" value="11" />
-                            <input type="hidden" id="service_id" name="provider_id" value="2" />
-                            <input type="hidden" name="rating" value="5" id="service_rating" />
-
                             <div className="col-xl-12">
                               <fieldset>
                                 <legend>Comment*</legend>
-                                <textarea rows="5" name="comment" placeholder="Write a Comment" />
+                                <textarea
+                                  rows="5"
+                                  name="comment"
+                                  value={comment}
+                                  onChange={(e) => setComment(e.target.value)}
+                                  placeholder="Write a Comment"
+                                />
                               </fieldset>
                             </div>
 
                             <div className="col-xl-12">
-                              <button type="button" id="after_login" className="common_btn mt_20">
-
+                              <button type="submit" className="btn common_btn mt_20">
                                 Submit Review
-
                               </button>
                             </div>
                           </div>
@@ -216,26 +355,30 @@ function ServiceDetails() {
                     <div className="wsus__package">
                       <p>My Package</p>
                       <h2>
-                        {works && formatPriceWithCommas(works.reduce((total, work) => total + work.pricePerUnit, 0))}
+                        {formatPriceWithCommas(totalPrice || 0)}
                         đ
                       </h2>
                       <ul>
-                        {works && works.map((work) => (
-                          <li key={work.id}>{work.description}</li>
+                        {selectedWorks.map((selectedWork) => (
+                          <li key={selectedWork.description}>
+                            {selectedWork.work.description}
+                            :
+                            {' '}
+                            {selectedWork.quantity}
+                          </li>
                         ))}
                       </ul>
                       <Link to={`/booking/${id}`}>Book Now</Link>
                     </div>
                   </div>
-                  <div className="col-12 col-md-6 col-lg-12">
+                  <div id="providerInfo" className="col-12 col-md-6 col-lg-12">
                     <div className="wsus__service_provider mt_25">
-                      <img src="https://demo.websolutionus.com/aabcserv/uploads/custom-images/david-simmons-2023-05-07-10-44-34-5733.png" alt="service provider" className="img-fluid w-100" />
-                      <h3><a href="https://demo.websolutionus.com/aabcserv/providers/david-simmons83">David Simmons</a></h3>
-                      <h6>Member Since Sep 2022</h6>
+                      <img id="providerAvatar" src={provider?.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=200&d=mp'} alt="service provider" className="img-fluid w-100" />
+                      <h3><a id="providerLink" href="#">{`${provider?.firstName} ${provider?.lastName}`}</a></h3>
                       <div className="info">
                         <p>
                           Order Complete
-                          <span>10</span>
+                          <span id="orderComplete">0</span>
                         </p>
                         <p>
                           Provider Rating
@@ -245,24 +388,22 @@ function ServiceDetails() {
                             <i className="fas fa-star" aria-hidden="true" />
                             <i className="fas fa-star" aria-hidden="true" />
                             <i className="fas fa-star" aria-hidden="true" />
-                            <span>(2)</span>
+                            <span id="providerRating">(0)</span>
                           </b>
                         </p>
                         <hr />
 
-                        <a href="callto:123-343-4444">
+                        <a id="providerPhone" href="tel:">
                           <i className="fas fa-phone-alt" aria-hidden="true" />
                           {' '}
-                          123-343-4444
+                          {provider?.phone}
                         </a>
-                        <a href="mailto:provider@gmail.com">
+                        <a id="providerEmail" href="mailto:">
                           <i className="fas fa-envelope" aria-hidden="true" />
-                          provider@gmail.com
-
+                          {provider?.email}
                         </a>
 
-                        <a href="javascript:;" className="contact_provider_btn" onClick="sendNewMessagePrevLogin()">Contact Here</a>
-
+                        <a href="javascript:;" className="contact_provider_btn" onClick={openGmail}>Contact Here</a>
                       </div>
                     </div>
                   </div>

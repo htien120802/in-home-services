@@ -1,5 +1,7 @@
 import { toast } from 'react-toastify';
-import { put, takeLeading, call } from 'redux-saga/effects';
+import {
+  put, takeLeading, call, takeLatest,
+} from 'redux-saga/effects';
 
 import bookingAPI from 'apis/booking/bookingAPI';
 
@@ -11,6 +13,7 @@ import {
   CREATE_BOOKING,
   GET_CUSTOMER_BOOKINGS_BY_STATUS,
   GET_PROVIDER_BOOKINGS,
+  SET_SELECTED_WORKS,
 } from './actionTypes';
 
 import {
@@ -28,6 +31,8 @@ import {
   actionGetCustomerBookingsByStatusFailed,
   actionGetProviderBookingsSuccess,
   actionGetProviderBookingsFailed,
+  actionSetSelectedWorksSuccess,
+  actionSetSelectedWorksFailed,
 } from './actions';
 
 function* updateBookingStatus({ payload }) {
@@ -44,7 +49,7 @@ function* updateBookingStatus({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionUpdateBookingStatusFailed());
   }
@@ -64,7 +69,7 @@ function* providerCancelBooking({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionProviderCancelBookingFailed());
   }
@@ -84,7 +89,7 @@ function* customerCancelBooking({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionCustomerCancelBookingFailed());
   }
@@ -102,9 +107,7 @@ function* getCustomerBookings() {
 
 function* createBooking({ payload }) {
   try {
-    const { bookingData } = payload;
-
-    const response = yield call(bookingAPI.createBooking, bookingData);
+    const response = yield call(bookingAPI.createBooking, payload);
 
     yield put(actionCreateBookingSuccess(response.data));
 
@@ -114,7 +117,7 @@ function* createBooking({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionCreateBookingFailed());
   }
@@ -142,6 +145,14 @@ function* getProviderBookings() {
   }
 }
 
+function* setSelectedWorks(action) {
+  try {
+    yield put(actionSetSelectedWorksSuccess(action.payload));
+  } catch (error) {
+    yield put(actionSetSelectedWorksFailed(action.payload));
+  }
+}
+
 export default function* bookingSaga() {
   yield takeLeading(UPDATE_BOOKING_STATUS, updateBookingStatus);
   yield takeLeading(PROVIDER_CANCEL_BOOKING, providerCancelBooking);
@@ -150,4 +161,5 @@ export default function* bookingSaga() {
   yield takeLeading(GET_PROVIDER_BOOKINGS, getProviderBookings);
   yield takeLeading(CREATE_BOOKING, createBooking);
   yield takeLeading(GET_CUSTOMER_BOOKINGS_BY_STATUS, getCustomerBookingsByStatus);
+  yield takeLatest(SET_SELECTED_WORKS, setSelectedWorks);
 }

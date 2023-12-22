@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
 import {
+  actionAddCustomerAddress,
   actionUpdateCustomerProfile,
 } from 'store/actions';
 
@@ -40,7 +41,13 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
       firstName: customerState.customer?.firstName || '',
       lastName: customerState.customer?.lastName || '',
       phone: customerState.customer?.phone || '',
-      addresses: customerState.customer?.addresses || [],
+      address: customerState.customer?.addresses[0] || {
+        number: '',
+        street: '',
+        ward: '',
+        district: '',
+        city: '',
+      },
     },
 
     validationSchema: Yup.object({
@@ -53,15 +60,13 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
       phone: Yup.string()
         .trim()
         .required('Phone không được bỏ trống.'),
-      addresses: Yup.array().of(
-        Yup.object().shape({
-          number: Yup.string().trim(),
-          street: Yup.string().trim(),
-          ward: Yup.string().trim(),
-          district: Yup.string().trim(),
-          city: Yup.string().trim(),
-        }),
-      ),
+      address: Yup.object().shape({
+        number: Yup.string().trim(),
+        street: Yup.string().trim(),
+        ward: Yup.string().trim(),
+        district: Yup.string().trim(),
+        city: Yup.string().trim(),
+      }),
     }),
 
     onSubmit: (values) => {
@@ -73,27 +78,18 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
     },
   });
 
-  const handleAddressChange = (index, field, value) => {
-    validation.setFieldValue(`addresses[${index}].${field}`, value);
+  const handleAddressChange = (field, value) => {
+    validation.setFieldValue(`address.${field}`, value);
   };
 
   const handleAddAddress = () => {
-    validation.setFieldValue('addresses', [
-      ...validation.values.addresses,
-      {
-        number: '',
-        street: '',
-        ward: '',
-        district: '',
-        city: '',
-      },
-    ]);
-  };
-
-  const handleRemoveAddress = (index) => {
-    const updatedAddresses = [...validation.values.addresses];
-    updatedAddresses.splice(index, 1);
-    validation.setFieldValue('addresses', updatedAddresses);
+    dispatch(actionAddCustomerAddress({
+      number: '',
+      street: '',
+      ward: '',
+      district: '',
+      city: '',
+    }));
   };
 
   return (
@@ -145,61 +141,39 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
 
             <div className="col-xl-12">
               <fieldset>
-                <legend>address*</legend>
-                {validation.values.addresses.map((address, index) => (
-                  <div key={address.id}>
+                <legend>Address*</legend>
+                {Object.keys(validation.values.address).map((field) => (
+                  field.toLowerCase() !== 'id' && (
+                  <div key={field}>
+                    <label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
                     <input
                       type="text"
-                      name={`number-${index}`}
-                      value={address.number}
-                      onChange={(e) => handleAddressChange(index, 'number', e.target.value)}
-                      placeholder="Number"
+                      name={field}
+                      value={validation.values.address[field]}
+                      onChange={(e) => handleAddressChange(field, e.target.value)}
+                      placeholder={`Enter ${field}`}
+                      {...(validation.values.address[field] && { id: field })}
                     />
-                    <input
-                      type="text"
-                      name={`street-${index}`}
-                      value={address.street}
-                      onChange={(e) => handleAddressChange(index, 'street', e.target.value)}
-                      placeholder="Street"
-                    />
-                    <input
-                      type="text"
-                      name={`ward-${index}`}
-                      value={address.ward}
-                      onChange={(e) => handleAddressChange(index, 'ward', e.target.value)}
-                      placeholder="Ward"
-                    />
-                    <input
-                      type="text"
-                      name={`district-${index}`}
-                      value={address.district}
-                      onChange={(e) => handleAddressChange(index, 'district', e.target.value)}
-                      placeholder="District"
-                    />
-                    <input
-                      type="text"
-                      name={`city-${index}`}
-                      value={address.city}
-                      onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
-                      placeholder="City"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => handleRemoveAddress(index)}
-                    >
-                      Remove
-                    </button>
                   </div>
+                  )
                 ))}
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleAddAddress}
-                >
-                  Add Address
-                </button>
+
+                {!validation.values.address && (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleAddAddress}
+                  >
+                    Add Address
+                  </button>
+                  {validation.touched.address && validation.errors.address && (
+                  <div className="text-danger">{validation.errors.address}</div>
+                  )}
+                </>
+                )}
               </fieldset>
+
               <button type="submit" className="btn btn-primary mt_20">
                 Save Profile
               </button>

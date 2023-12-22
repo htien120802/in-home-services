@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetServiceById } from 'store/actions';
+import { actionGetCustomerProfile, actionGetServiceById } from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 
@@ -12,16 +12,25 @@ function BookingPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const data = useSelector((state) => state.Services);
+  const selectedWorks = useSelector((state) => state.Booking.works);
+  const totalPrice = useSelector((state) => state.Booking.totalPrice);
+  const customerProfile = useSelector((state) => state.Customer.customer);
+  const servicesDetails = useSelector((state) => state.Services.serviceDetails);
+
+  console.log(selectedWorks);
+
+  const [selectedSchedule, setSelectedSchedule] = useState('');
+
+  const handleScheduleSelect = (selectedValue) => {
+    setSelectedSchedule(selectedValue);
+  };
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    postCode: '',
     address: '',
     orderNote: '',
-    agreeWith: false,
   });
 
   const handleInputChange = (e) => {
@@ -39,9 +48,49 @@ function BookingPage() {
     console.log(formData);
   };
 
+  const generateTimeOptions = (start, end) => {
+    const timeOptions = [];
+    let currentTime = start;
+
+    while (currentTime <= end) {
+      timeOptions.push(
+        <option key={currentTime} value={currentTime}>
+          {currentTime}
+        </option>,
+      );
+
+      currentTime = addTime(currentTime, 60);
+    }
+
+    return timeOptions;
+  };
+
+  const addTime = (time, minutes) => {
+    const [hours, mins] = time.split(':').map(Number);
+    const newTime = new Date(0, 0, 0, hours, mins + minutes);
+    const newHours = newTime.getHours();
+    const newMinutes = newTime.getMinutes();
+
+    return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}:00`;
+  };
+
   useEffect(() => {
+    dispatch(actionGetCustomerProfile());
     dispatch(actionGetServiceById({ id }));
   }, []);
+
+  useEffect(() => {
+    if (customerProfile) {
+      setFormData((prevData) => ({
+        ...prevData,
+        name: `${customerProfile.firstName || ''} ${customerProfile.lastName || ''}`,
+        email: customerProfile.email || '',
+        phone: customerProfile.phone || '',
+        address: `${customerProfile.addresses[0]?.number || ''} ${customerProfile.addresses[0]?.street || ''}, ${customerProfile.addresses[0]?.ward || ''}, ${customerProfile.addresses[0]?.district || ''}, ${customerProfile.addresses[0]?.city || ''}`,
+        orderNote: '',
+      }));
+    }
+  }, [customerProfile]);
 
   return (
     <>
@@ -106,18 +155,6 @@ function BookingPage() {
                         </fieldset>
                       </div>
 
-                      <div className="col-xl-6">
-                        <fieldset>
-                          <legend>Post Code</legend>
-                          <input
-                            type="text"
-                            name="postCode"
-                            value={formData.postCode}
-                            onChange={handleInputChange}
-                          />
-                        </fieldset>
-                      </div>
-
                       <div className="col-xl-12">
                         <fieldset>
                           <legend>Your Address*</legend>
@@ -143,41 +180,20 @@ function BookingPage() {
                         </fieldset>
                       </div>
 
-                      <div className="col-xl-12">
-                        <div className="wsus__login_check d-flex flex-wrap mt_20">
-                          <div className="form-check">
-                            <input
-                              required
-                              className=""
-                              type="checkbox"
-                              name="agreeWith"
-                              id="flexCheckDefault"
-                              checked={formData.agreeWith}
-                              onChange={handleInputChange}
-                            />
-                            <label className="form-check-label" htmlFor="flexCheckDefault">
-                              I agree with
-                              {' '}
-                              <a href="YOUR_TERMS_AND_CONDITIONS_LINK">Terms and Conditions</a>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-
                       <input type="hidden" name="extras" value="YOUR_EXTRAS_DATA" />
                     </div>
-                    <button type="submit" id="customer_info_btn" className="common_btn">
+                    <Link to={`/checkout/${id}`} id="customer_info_btn" className="common_btn">
                       Next
-                    </button>
+                    </Link>
                   </form>
                 </div>
               </div>
 
               <ul className="wsus__booking_button_area d-flex">
                 <li>
-                  <a href="YOUR_PREVIOUS_LINK" className="common_btn">
+                  <Link to={`/services/${id}`} className="common_btn">
                     Previous
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -187,10 +203,13 @@ function BookingPage() {
                 <div className="wsus__booking_summery m-0">
                   <h3>Booking Summery</h3>
                   <ul>
-                    {data.serviceDetails
-                    && data.serviceDetails.works
-                    && data.serviceDetails.works.map((work) => (
-                      <li key={work.id}>{work.description}</li>
+                    {selectedWorks.map((selectedWork) => (
+                      <li key={selectedWork.description}>
+                        {selectedWork.work.description}
+                        :
+                        {' '}
+                        {selectedWork.quantity !== undefined ? selectedWork.quantity : 'N/A'}
+                      </li>
                     ))}
                   </ul>
                   <div className="wsus__booking_cost">
@@ -198,13 +217,19 @@ function BookingPage() {
                       Package Fee
                       {' '}
                       <span>
-                        {data.serviceDetails
-                        && data.serviceDetails.works
-                        && formatPriceWithCommas(data.serviceDetails.works.reduce((total, work) => total + work.pricePerUnit, 0))}
+                        {formatPriceWithCommas(totalPrice || 0)}
                         đ
                       </span>
                     </p>
                   </div>
+                </div>
+
+                <div className="wsus__booking_pic_up mt_25">
+                  <h3>Select Schedule</h3>
+                  <select id="schedule_box" onChange={(e) => handleScheduleSelect(e.target.value)}>
+                    <option value={selectedSchedule}>Select</option>
+                    {generateTimeOptions(servicesDetails?.openTime, servicesDetails?.closeTime)}
+                  </select>
                 </div>
               </div>
             </div>

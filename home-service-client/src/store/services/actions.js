@@ -103,8 +103,9 @@ export const actionApproveOrUnapproveRegisterServiceFailed = () => ({
 });
 
 // GET_ALL_PUBLIC_SERVICES
-export const actionGetAllPublicServices = () => ({
+export const actionGetAllPublicServices = (payload) => ({
   type: GET_ALL_PUBLIC_SERVICES,
+  payload,
 });
 
 export const actionGetAllPublicServicesSuccess = (payload) => ({

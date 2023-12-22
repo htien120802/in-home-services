@@ -32,7 +32,10 @@ function ChangePassword() {
 
     onSubmit: (values) => {
       dispatch(actionUpdateCustomerPassword({
-        values,
+        newPassword: {
+          password: values.newPassword,
+          passwordConfirm: values.confirmNewPassword,
+        },
       }));
     },
   });
@@ -54,7 +57,7 @@ function ChangePassword() {
                   <legend>Current Password*</legend>
                   <input
                     type="password"
-                    name="current_password"
+                    name="currentPassword"
                     value={validation.values.currentPassword}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
@@ -66,7 +69,7 @@ function ChangePassword() {
                   <legend>New Password*</legend>
                   <input
                     type="password"
-                    name="password"
+                    name="newPassword"
                     value={validation.values.newPassword}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
@@ -78,7 +81,7 @@ function ChangePassword() {
                   <legend>Confirm New Password*</legend>
                   <input
                     type="password"
-                    name="password_confirmation"
+                    name="confirmNewPassword"
                     value={validation.values.confirmNewPassword}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}

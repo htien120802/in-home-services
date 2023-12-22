@@ -2,7 +2,7 @@ import { toast } from 'react-toastify';
 import { put, takeLeading, call } from 'redux-saga/effects';
 
 import authAPI from 'apis/auth/authAPI';
-import { removeSpacesWithTrim } from 'utils';
+import { decodeJWT, removeSpacesWithTrim } from 'utils';
 import axiosClient from 'utils/axios';
 
 import { LOGIN } from './actionTypes';
@@ -13,7 +13,6 @@ import {
 
 function* login({ payload }) {
   try {
-    console.log(payload);
     const {
       loginObj: {
         username,
@@ -30,9 +29,16 @@ function* login({ payload }) {
 
     const response = yield call(authAPI.login, newData);
 
+    if (decodeJWT(response.data.accessToken).role !== "ROLE_ADMIN") {
+      toast.error("User not authorized");
+
+      yield put(actionLoginFailed());
+      return;
+    }
+
     localStorage.setItem('accessToken', response.data.accessToken);
 
-    yield put(actionLoginSuccess(response.data));
+    yield put(actionLoginSuccess());
 
     toast.success(response.message);
 

@@ -20,11 +20,16 @@ import {
   GET_CUSTOMER_BOOKINGS_BY_STATUS,
   GET_CUSTOMER_BOOKINGS_BY_STATUS_SUCCESS,
   GET_CUSTOMER_BOOKINGS_BY_STATUS_FAILED,
+  SET_SELECTED_WORKS,
+  SET_SELECTED_WORKS_SUCCESS,
+  SET_SELECTED_WORKS_FAILED,
 } from './actionTypes';
 
 const initialState = {
   loading: false,
   bookings: [],
+  works: [],
+  totalPrice: 0,
 };
 
 const bookingReducer = (state = initialState, action) => {
@@ -37,6 +42,7 @@ const bookingReducer = (state = initialState, action) => {
     case CREATE_BOOKING:
     case GET_CUSTOMER_BOOKINGS_BY_STATUS:
     case GET_PROVIDER_BOOKINGS:
+    case SET_SELECTED_WORKS:
       return {
         ...state,
         loading: true,
@@ -73,6 +79,14 @@ const bookingReducer = (state = initialState, action) => {
         bookings: action.payload,
       };
 
+    case SET_SELECTED_WORKS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        works: action.payload.selectedWorks,
+        totalPrice: action.payload.totalPrice,
+      };
+
     case UPDATE_BOOKING_STATUS_FAILED:
     case PROVIDER_CANCEL_BOOKING_FAILED:
     case CUSTOMER_CANCEL_BOOKING_FAILED:
@@ -80,6 +94,7 @@ const bookingReducer = (state = initialState, action) => {
     case CREATE_BOOKING_FAILED:
     case GET_CUSTOMER_BOOKINGS_BY_STATUS_FAILED:
     case GET_PROVIDER_BOOKINGS_FAILED:
+    case SET_SELECTED_WORKS_FAILED:
       return {
         ...state,
         loading: false,

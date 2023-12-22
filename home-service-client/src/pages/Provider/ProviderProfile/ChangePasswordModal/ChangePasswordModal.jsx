@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
-import { actionUpdateCustomerPassword } from 'store/actions';
+import { actionUpdateProviderPassword } from 'store/actions';
 
 Modal.setAppElement('#root');
 
@@ -55,8 +55,11 @@ function ChangePassword({ isOpen, onClose }) {
     }),
 
     onSubmit: (values) => {
-      dispatch(actionUpdateCustomerPassword({
-        values,
+      dispatch(actionUpdateProviderPassword({
+        newPassword: {
+          password: values.newPassword,
+          passwordConfirm: values.confirmNewPassword,
+        },
       }));
     },
   });
@@ -81,7 +84,7 @@ function ChangePassword({ isOpen, onClose }) {
                   <legend>Current Password*</legend>
                   <input
                     type="password"
-                    name="current_password"
+                    name="currentPassword"
                     value={validation.values.currentPassword}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
@@ -93,7 +96,7 @@ function ChangePassword({ isOpen, onClose }) {
                   <legend>New Password*</legend>
                   <input
                     type="password"
-                    name="password"
+                    name="newPassword"
                     value={validation.values.newPassword}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
@@ -105,7 +108,7 @@ function ChangePassword({ isOpen, onClose }) {
                   <legend>Confirm New Password*</legend>
                   <input
                     type="password"
-                    name="password_confirmation"
+                    name="confirmNewPassword"
                     value={validation.values.confirmNewPassword}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}

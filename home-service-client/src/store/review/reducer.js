@@ -31,14 +31,14 @@ const reviewReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        customerReview: action.payload.review,
+        customerReview: action.payload,
       };
 
     case CREATE_CUSTOMER_SERVICE_REVIEW_SUCCESS:
       return {
         ...state,
         loading: false,
-        customerReview: action.payload.review,
+        customerReview: action.payload,
       };
 
     case GET_ALL_SERVICE_REVIEWS_SUCCESS:

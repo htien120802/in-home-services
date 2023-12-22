@@ -23,7 +23,7 @@ function* logout() {
 
     toast.success('Logged out successfully');
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionLogoutFailed());
   }

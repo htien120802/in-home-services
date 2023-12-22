@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import {
   actionGetCustomerProfile, actionGetCustomerBookings, actionLogout,
@@ -13,14 +14,21 @@ import LogoutModal from './LogoutModal/LogoutModal';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag } from '@fortawesome/free-solid-svg-icons';
+import UpdateAvatarModal from './Dashboard/UpdateAvatarModal/UpdateAvatarModal';
 
 function CustomerProfile() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const bookingState = useSelector((state) => state.Booking);
   const customerState = useSelector((state) => state.Customer);
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLogoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [isEditAvatarModalOpen, setEditAvatarModalOpen] = useState(false);
+
+  const closeAvatarModal = () => {
+    setEditAvatarModalOpen(false);
+  };
 
   const tabs = [
     {
@@ -49,8 +57,12 @@ function CustomerProfile() {
     setLogoutModalOpen(false);
   };
 
+  const callbackLogoutSuccess = useCallback(() => {
+    navigate('/');
+  }, [navigate]);
+
   const handleLogout = () => {
-    dispatch(actionLogout());
+    dispatch(actionLogout({ callback: callbackLogoutSuccess }));
 
     setLogoutModalOpen(false);
   };
@@ -71,7 +83,13 @@ function CustomerProfile() {
               <div className="col-xl-3 col-lg-4">
                 <div className="wsus__dashboard_menu">
                   <div className="dasboard_header d-flex flex-wrap align-items-center">
-                    <img src={customerState?.customer?.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=200&d=mp'} alt="user" className="img-fluid w-100 user_avatar" />
+                    <a href="javascript:;" onClick={() => setEditAvatarModalOpen(true)}>
+                      <img
+                        src={customerState?.customer?.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=200&d=mp'}
+                        alt="user"
+                        className="img-fluid w-100 user_avatar"
+                      />
+                    </a>
                     <div className="text">
                       <h2>{customerState?.customer?.name}</h2>
                     </div>
@@ -122,6 +140,11 @@ function CustomerProfile() {
           onClose={closeModal}
           handleLogout={handleLogout}
           firstName={customerState?.customer?.firstName}
+        />
+        <UpdateAvatarModal
+          isOpen={isEditAvatarModalOpen}
+          onClose={closeAvatarModal}
+          customerState={customerState}
         />
       </section>
     </>

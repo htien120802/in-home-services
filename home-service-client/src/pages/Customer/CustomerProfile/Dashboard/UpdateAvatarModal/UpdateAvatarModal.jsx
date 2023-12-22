@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import Modal from 'react-modal';
 
 import PropTypes from 'prop-types';
-import { actionImageUpload, actionUpdateCustomerAvatar } from 'store/actions';
+import { actionUpdateCustomerAvatar } from 'store/actions';
 
 Modal.setAppElement('#root');
 
@@ -43,13 +43,10 @@ function UpdateAvatarModal({ customerState, isOpen, onClose }) {
     }
 
     const formData = new FormData();
+
     formData.append('avatar', selectedAvatar);
 
-    const { data: { imageUrl } } = await dispatch(actionImageUpload(formData));
-
-    dispatch(actionUpdateCustomerAvatar({
-      avatar: imageUrl,
-    }));
+    dispatch(actionUpdateCustomerAvatar(formData));
 
     onClose();
   };
@@ -70,7 +67,7 @@ function UpdateAvatarModal({ customerState, isOpen, onClose }) {
           <legend>Avatar</legend>
           {selectedAvatar && (
           <img
-            src={URL.createObjectURL(selectedAvatar)}
+            src={!isAvatarChanged ? selectedAvatar : URL.createObjectURL(selectedAvatar)}
             alt="Avatar Preview"
             style={{ width: '100px', height: '100px' }}
           />

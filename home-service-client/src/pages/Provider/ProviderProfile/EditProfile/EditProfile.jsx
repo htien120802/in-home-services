@@ -7,6 +7,8 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
 import {
+  actionAddProviderAddress,
+  actionUpdateProviderAvatar,
   actionUpdateProviderProfile,
 } from 'store/actions';
 
@@ -20,8 +22,14 @@ function EditProfileModal({ providerState }) {
       firstName: providerState.provider?.firstName || '',
       lastName: providerState.provider?.lastName || '',
       phone: providerState.provider?.phone || '',
-      addresses: providerState.provider?.addresses || [],
-      image: null,
+      address: providerState.provider?.addresses[0] || {
+        number: '',
+        street: '',
+        ward: '',
+        district: '',
+        city: '',
+      },
+      avatar: providerState.provider?.avatar || '',
     },
 
     validationSchema: Yup.object({
@@ -34,45 +42,42 @@ function EditProfileModal({ providerState }) {
       phone: Yup.string()
         .trim()
         .required('Phone không được bỏ trống.'),
-      addresses: Yup.array().of(
-        Yup.object().shape({
-          number: Yup.string().trim(),
-          street: Yup.string().trim(),
-          ward: Yup.string().trim(),
-          district: Yup.string().trim(),
-          city: Yup.string().trim(),
-        }),
-      ),
+      address: Yup.object().shape({
+        number: Yup.string().trim(),
+        street: Yup.string().trim(),
+        ward: Yup.string().trim(),
+        district: Yup.string().trim(),
+        city: Yup.string().trim(),
+      }),
     }),
 
     onSubmit: (values) => {
       dispatch(actionUpdateProviderProfile({
         values,
       }));
+
+      if (values.avatar instanceof File) {
+        const formData = new FormData();
+
+        formData.append('avatar', values.avatar);
+
+        dispatch(actionUpdateProviderAvatar(formData));
+      }
     },
   });
 
-  const handleAddressChange = (index, field, value) => {
-    validation.setFieldValue(`addresses[${index}].${field}`, value);
+  const handleAddressChange = (field, value) => {
+    validation.setFieldValue(`address.${field}`, value);
   };
 
   const handleAddAddress = () => {
-    validation.setFieldValue('addresses', [
-      ...validation.values.addresses,
-      {
-        number: '',
-        street: '',
-        ward: '',
-        district: '',
-        city: '',
-      },
-    ]);
-  };
-
-  const handleRemoveAddress = (index) => {
-    const updatedAddresses = [...validation.values.addresses];
-    updatedAddresses.splice(index, 1);
-    validation.setFieldValue('addresses', updatedAddresses);
+    dispatch(actionAddProviderAddress({
+      number: '',
+      street: '',
+      ward: '',
+      district: '',
+      city: '',
+    }));
   };
 
   return (
@@ -90,13 +95,22 @@ function EditProfileModal({ providerState }) {
           <div className="card-body">
             <div className="row">
               <div className="form-group col-12">
+                <img
+                  src={validation.values.avatar instanceof File
+                    ? URL.createObjectURL(validation.values.avatar)
+                    : validation.values.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=200&d=mp'}
+                  alt="user"
+                  className="img-fluid user_avatar"
+                  style={{ width: '100px', height: '100px' }}
+                />
+                <br />
                 <label>New Image</label>
                 <input
                   type="file"
                   className="form-control-file"
-                  name="image"
+                  name="avatar"
                   onChange={(event) => {
-                    validation.setFieldValue('image', event.currentTarget.files[0]);
+                    validation.setFieldValue('avatar', event.currentTarget.files[0]);
                   }}
                 />
               </div>
@@ -157,65 +171,39 @@ function EditProfileModal({ providerState }) {
 
               <div className="form-group col-6">
                 <label>
-                  Addresses
+                  Address
                   {' '}
                   <span className="text-danger">*</span>
                 </label>
-                {validation.values.addresses.map((address, index) => (
-                  <div key={address.id}>
+                {Object.keys(validation.values.address).map((field) => (
+                  field.toLowerCase() !== 'id' && (
+                  <div key={field}>
+                    <label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
                     <input
                       type="text"
-                      name={`addresses[${index}].number`}
-                      value={address.number}
-                      onChange={(e) => handleAddressChange(index, 'number', e.target.value)}
-                      placeholder="Number"
+                      name={field}
+                      value={validation.values.address[field]}
+                      onChange={(e) => handleAddressChange(field, e.target.value)}
+                      placeholder={`Enter ${field}`}
+                      {...(validation.values.address[field] && { id: field })}
                     />
-                    <input
-                      type="text"
-                      name={`addresses[${index}].street`}
-                      value={address.street}
-                      onChange={(e) => handleAddressChange(index, 'street', e.target.value)}
-                      placeholder="Street"
-                    />
-                    <input
-                      type="text"
-                      name={`addresses[${index}].ward`}
-                      value={address.ward}
-                      onChange={(e) => handleAddressChange(index, 'ward', e.target.value)}
-                      placeholder="Ward"
-                    />
-                    <input
-                      type="text"
-                      name={`addresses[${index}].district`}
-                      value={address.district}
-                      onChange={(e) => handleAddressChange(index, 'district', e.target.value)}
-                      placeholder="District"
-                    />
-                    <input
-                      type="text"
-                      name={`addresses[${index}].city`}
-                      value={address.city}
-                      onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
-                      placeholder="City"
-                    />
+                  </div>
+                  )
+                ))}
+
+                {!validation.values.address && (
+                  <>
                     <button
                       type="button"
-                      className="btn btn-secondary"
-                      onClick={() => handleRemoveAddress(index)}
+                      className="btn btn-primary"
+                      onClick={handleAddAddress}
                     >
-                      Remove
+                      Add Address
                     </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleAddAddress}
-                >
-                  Add Address
-                </button>
-                {validation.touched.addresses && validation.errors.addresses && (
-                  <div className="text-danger">{validation.errors.addresses}</div>
+                    {validation.touched.address && validation.errors.address && (
+                    <div className="text-danger">{validation.errors.address}</div>
+                    )}
+                  </>
                 )}
               </div>
 

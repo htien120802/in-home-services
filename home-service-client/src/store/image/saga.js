@@ -11,13 +11,7 @@ import {
 
 function* image({ payload }) {
   try {
-    const { file } = payload;
-
-    const requestBody = {
-      file,
-    };
-
-    const response = yield call(imageAPI.createService, requestBody);
+    const response = yield call(imageAPI.imageUpload, payload);
 
     yield put(actionImageUploadSuccess(response.data));
 
@@ -27,7 +21,7 @@ function* image({ payload }) {
       toast.error(response.message);
     }
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response.data.message);
 
     yield put(actionImageUploadFailed());
   }

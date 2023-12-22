@@ -38,8 +38,40 @@ export default {
   },
 
   // GET /public/service
-  async getAllPublicServices() {
-    const response = await axiosClient.get(publicEndpoint);
+  async getAllPublicServices(payload) {
+    const {
+      pageNumber = '', size = '', sortBy = '', sortDirection = '', name = '', categorySlug = '',
+    } = payload || {};
+
+    const params = {};
+
+    if (pageNumber !== '') {
+      params.pageNumber = pageNumber;
+    }
+
+    if (size !== '') {
+      params.size = size;
+    }
+
+    if (sortBy !== '') {
+      params.sortBy = sortBy;
+    }
+
+    if (sortDirection !== '') {
+      params.sortDirection = sortDirection;
+    }
+
+    if (name !== '') {
+      params.name = name;
+    }
+
+    if (categorySlug !== '') {
+      params.categorySlug = categorySlug;
+    }
+
+    const response = await axiosClient.get(publicEndpoint, {
+      params,
+    });
     return response.data;
   },
 

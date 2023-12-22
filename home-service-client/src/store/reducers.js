@@ -9,10 +9,9 @@ import Provider from 'store/provider/reducer';
 import Review from 'store/review/reducer';
 import Category from 'store/category/reducer';
 
-import Login from 'store/auth/login/reducer';
+import Auth from 'store/auth/reducer';
 import Register from 'store/auth/register/reducer';
 import RefreshToken from 'store/auth/refreshToken/reducer';
-import Logout from 'store/auth/logout/reducer';
 
 const rootReducer = combineReducers({
   Services,
@@ -24,10 +23,9 @@ const rootReducer = combineReducers({
   Review,
   Category,
 
-  Login,
+  Auth,
   Register,
   RefreshToken,
-  Logout,
 });
 
 export default rootReducer;

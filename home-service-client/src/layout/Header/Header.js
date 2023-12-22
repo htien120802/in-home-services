@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { actionLogout } from 'store/actions';
 
@@ -10,14 +10,19 @@ import './index.css';
 
 function Header() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isLoggedIn = useSelector((state) => state.Auth.accessToken);
 
   const [navWidth, setNavWidth] = useState('0px');
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('accessToken'));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const callbackLogoutSuccess = useCallback(() => {
+    navigate('/');
+  }, [navigate]);
 
   const handleLogout = () => {
-    dispatch(actionLogout());
-    setIsLoggedIn(false);
+    dispatch(actionLogout({ callback: callbackLogoutSuccess }));
   };
 
   const openNav = () => {
@@ -28,18 +33,34 @@ function Header() {
     setNavWidth('0px');
   };
 
-  const updateLoginStatus = () => {
-    const accessToken = localStorage.getItem('accessToken');
-    setIsLoggedIn(!!accessToken);
-  };
-
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const handleSearch = (event) => {
+    event.preventDefault();
+    navigate(`/services/page/0?name=${encodeURIComponent(searchTerm)}`);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
+    }
+  };
+
   useEffect(() => {
-    updateLoginStatus();
-  }, []);
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest('.dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <>
@@ -96,8 +117,22 @@ function Header() {
                     )}
 
                     <li className="searchbar">
-                      <input className="search_input" type="text" name="" placeholder="Search..." />
-                      <a href="/" className="search_icon"><img src="/assets/images/search_icon.png" alt="#" /></a>
+                      <input
+                        className="search_input"
+                        type="text"
+                        name=""
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                      />
+                      <a
+                        href="/"
+                        className="search_icon"
+                        onClick={handleSearch}
+                      >
+                        <img src="/assets/images/search_icon.png" alt="#" />
+                      </a>
                     </li>
                   </ul>
                 </div>
