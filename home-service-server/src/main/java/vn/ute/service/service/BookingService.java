@@ -124,7 +124,7 @@ public class BookingService {
 
         PaymentEntity payment = new PaymentEntity();
         payment.setBooking(booking);
-        payment.setMethod(PaymentMethod.valueOf(bookingRequest.getPaymentMethoad().toUpperCase()));
+        payment.setMethod(PaymentMethod.valueOf(bookingRequest.getPaymentMethod().toUpperCase()));
         payment.setAmount(booking.getTotalPrice());
         booking.setPayment(payment);
         booking = bookingRepository.save(booking);

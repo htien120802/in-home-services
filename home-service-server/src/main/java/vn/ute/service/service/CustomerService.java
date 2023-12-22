@@ -129,7 +129,10 @@ public class CustomerService {
         String username = jwtService.getUsernameFromRequest(request);
         AccountEntity account = accountRepository.findByUsername(username).orElse(null);
         if (account != null){
-            // String passwordUpdate = passwordEncoder.encode(updatePasswordRequest.getPassword());
+
+            if (!passwordEncoder.matches(updatePasswordRequest.getCurrentPassword(), account.getPassword()))
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","Current password is incorrect!",null));
+
             String passwordUpdate = updatePasswordRequest.getPassword();
             if (passwordEncoder.matches(passwordUpdate, account.getPassword())){
                 return ResponseEntity.status(400).body(new ResponseDto<>("fail","This password and current password are the same. Please change!", null));
