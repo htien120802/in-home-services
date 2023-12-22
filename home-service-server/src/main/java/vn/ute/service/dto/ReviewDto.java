@@ -17,4 +17,5 @@ public class ReviewDto {
     private int rating;
     private String comment;
     private Timestamp date;
+    private CustomerReviewDto customer;
 }

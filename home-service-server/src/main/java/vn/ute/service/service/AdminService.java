@@ -269,10 +269,16 @@ public class AdminService {
     }
     @Transactional
     public ResponseEntity<?> deleteService(UUID serviceId) {
-        if (!serviceRepository.existsById(serviceId))
+        ServiceEntity service = serviceRepository.findById(serviceId).orElse(null);
+        if (service == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Not found service with this id",null));
         
-        serviceRepository.deleteById(serviceId);
+        serviceRepository.delete(service);
+
+        ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
+        provider.calcAvgRating();
+        providerRepository.save(provider);
+
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete service successfully!",null));
     }
     @Transactional
@@ -353,10 +359,20 @@ public class AdminService {
     }
     @Transactional
     public ResponseEntity<?> deleteReview(UUID reviewId) {
-        if (!reviewRepository.existsById(reviewId))
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewId).orElse(null);
+        if (reviewEntity == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Review not found",null));
 
-        reviewRepository.deleteById(reviewId);
+        reviewRepository.delete(reviewEntity);
+        ServiceEntity service = serviceRepository.findById(reviewEntity.getService().getId()).get();
+        service.calcAvgRating();
+        serviceRepository.save(service);
+
+        ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
+        provider.calcAvgRating();
+        providerRepository.save(provider);
+
+
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete review successfully!",null));
 
     }

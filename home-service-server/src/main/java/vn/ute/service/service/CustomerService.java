@@ -56,13 +56,17 @@ public class CustomerService {
     }
 
     @Transactional
-    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         Optional<CustomerEntity> customer = customerRepository.findByAccount_Username(username);
         if (customer.isPresent()){
             CustomerEntity temp = customer.get();
             mapper.map(customerProfile,temp);
-            addressRepository.save(mapper.map(customerProfile.getAddress(),AddressEntity.class));
+            AddressEntity addressEntity = addressRepository.findById(customerProfile.getAddress().getId()).get();
+            mapper.map(customerProfile.getAddress(), addressEntity);
+            CoordinatesDto coordinatesDto = bingMapsService.getLocation(addressEntity.toString());
+            mapper.map(coordinatesDto,addressEntity.getCoordinates());
+            addressRepository.save(addressEntity);
             temp = customerRepository.save(temp);
             return ResponseEntity.status(200).body(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, CustomerDto.class)));
         }
@@ -77,17 +81,22 @@ public class CustomerService {
 
         Optional<CustomerEntity> customerEntity = customerRepository.findByAccount_Username(username);
         if (customerEntity.isPresent()){
+
+            if (customerEntity.get().getAddresses().size() == 1)
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","You have already added address!", null));
+
             addressEntity.setCustomer(customerEntity.get());
             CoordinatesDto coordinatesDto = bingMapsService.getLocation(addressEntity.toString());
             CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
             coordinates.setAddress(addressEntity);
             addressEntity.setCoordinates(coordinates);
+            addressEntity.setCustomer(customerEntity.get());
             addressRepository.save(addressEntity);
 
 //            customerEntity.get().getAddresses().add(addressEntity);
 //            customerRepository.save(customerEntity.get());
-            CustomerDto customerDto = mapper.map(customerEntity.get(),CustomerDto.class);
-            return ResponseEntity.status(200).body(new ResponseDto<>("success","Add address successfully",customerDto));
+//            CustomerDto customerDto = mapper.map(customerEntity.get(),CustomerDto.class);
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Add address successfully",mapper.map(addressEntity, AddressDto.class)));
         }else {
             return ResponseEntity.status(404).body(new ResponseDto<>("fail","Can not find customer",null));
         }
