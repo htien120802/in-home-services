@@ -22,8 +22,6 @@ import checkAuth from './auth';
 
 import ProfilePage from 'pages/Profile/ProfilePage';
 import BookingPage from 'pages/Booking/BookingPage';
-import BookingManagerPage from 'pages/Provider/BookingManager/BookingManagerPage';
-import ServiceManagerPage from 'pages/Provider/ServiceManager/ServiceManagerPage';
 import StatisticPage from 'pages/Provider/Statistic/StatisticPage';
 import ProviderService from 'pages/Provider/ProviderService/ProviderService';
 import ProviderProfilePage from 'pages/Provider/ProviderProfile/ProviderProfilePage';
@@ -34,6 +32,8 @@ import AdminStatisticPage from 'pages/Admin/AdminStatistic/AdminStatisticPage';
 import CustomerManagerPage from 'pages/Admin/CustomerManager/CustomerManagerPage';
 import ReviewManagerPage from 'pages/Admin/ReviewManager/ReviewManagerPage';
 import CheckoutPage from 'pages/Checkout/CheckoutPage';
+import BookingDetailPage from 'pages/BookingDetail/BookingDetail';
+import BookingFailedPage from 'pages/BookingFailed/BookingFailed';
 
 import './App.css';
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -57,8 +57,9 @@ function App() {
           <Route exact path={`${LOCATION.BOOKING}/:id`} element={<BookingPage />} />
           <Route exact path={`${LOCATION.CHECKOUT}/:id`} element={<CheckoutPage />} />
 
-          <Route exact path={LOCATION.BOOKINGMANAGER} element={<BookingManagerPage />} />
-          <Route exact path={LOCATION.SERVICESMANAGER} element={<ServiceManagerPage />} />
+          <Route exact path={`${LOCATION.BOOKING}/detail/:id`} element={<BookingDetailPage />} />
+          <Route exact path={`${LOCATION.BOOKING}/failed`} element={<BookingFailedPage />} />
+
           <Route exact path={LOCATION.STATISTIC} element={<StatisticPage />} />
           <Route exact path={LOCATION.PROVIDERSERVICE} element={<ProviderService />} />
           <Route exact path={LOCATION.PROVIDERPROFILE} element={<ProviderProfilePage />} />

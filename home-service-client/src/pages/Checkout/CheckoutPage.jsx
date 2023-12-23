@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionCreateBooking, actionGetCustomerProfile, actionGetServiceById } from 'store/actions';
+import {
+  actionCreateBooking, actionCreateBookingCalc, actionGetCustomerProfile, actionGetServiceById, actionSetSelectedWorks,
+} from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 import PaymentMethods from './PaymentMethods/PaymentMethods';
@@ -12,29 +14,77 @@ import { formatPriceWithCommas } from 'utils';
 function CheckoutPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const selectedWorks = useSelector((state) => state.Booking.works);
-  const totalPrice = useSelector((state) => state.Booking.totalPrice);
   const customerProfile = useSelector((state) => state.Customer.customer);
   const servicesDetails = useSelector((state) => state.Services.serviceDetails);
+  const finalPrice = useSelector((state) => state.Booking.finalPrice);
+  const bookingDetail = useSelector((state) => state.Booking.bookingDetail);
 
-  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [selectedMethod, setSelectedMethod] = useState('cash');
+  const [customerNote, setCustomerNote] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [isCreatedBooking, setIsCreatedBooking] = useState(false);
 
   const handleSelectMethod = (method) => {
     setSelectedMethod(method);
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     dispatch(actionCreateBooking({
-      bookingItem: selectedWorks,
-      paymentMethoad: selectedMethod,
+      address: customerAddress,
+      note: customerNote,
+      bookingItems: selectedWorks,
+      paymentMethod: selectedMethod,
     }));
+
+    setIsCreatedBooking(true);
   };
 
+  const callbackLoginSuccess = useCallback(() => {
+    navigate('/login');
+  }, [navigate]);
+
   useEffect(() => {
-    dispatch(actionGetCustomerProfile());
+    dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
     dispatch(actionGetServiceById({ id }));
   }, []);
+
+  useEffect(() => {
+    const savedSelectedWorks = JSON.parse(sessionStorage.getItem('selectedWorks')) || [];
+    const savedTotalPrice = JSON.parse(sessionStorage.getItem('totalPrice')) || 0;
+    const savedAddress = JSON.parse(sessionStorage.getItem('address')) || {};
+    const savedNote = JSON.parse(sessionStorage.getItem('note')) || '';
+
+    const savedAddressWithoutId = `${savedAddress?.number || ''} ${savedAddress?.street || ''}, ${savedAddress?.ward || ''}, ${savedAddress?.district || ''}, ${savedAddress?.city || ''}`;
+    const customerProfileAddressWithoutId = `${customerProfile?.addresses[0]?.number || ''} ${customerProfile?.addresses[0]?.street || ''}, ${customerProfile?.addresses[0]?.ward || ''}, ${customerProfile?.addresses[0]?.district || ''}, ${customerProfile?.addresses[0]?.city || ''}`;
+
+    setCustomerAddress(savedAddressWithoutId || customerProfileAddressWithoutId);
+    setCustomerNote(savedNote);
+
+    dispatch(actionSetSelectedWorks({
+      selectedWorks: savedSelectedWorks,
+      totalPrice: savedTotalPrice,
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (bookingDetail && bookingDetail.id && isCreatedBooking) {
+      navigate(`/booking/detail/${bookingDetail.id}`);
+    }
+  }, [bookingDetail, navigate, isCreatedBooking]);
+
+  useEffect(() => {
+    if (customerAddress && selectedWorks) {
+      dispatch(actionCreateBookingCalc({
+        address: customerAddress,
+        note: customerNote,
+        bookingItems: selectedWorks,
+        paymentMethod: selectedMethod || 'cash',
+      }));
+    }
+  }, [selectedMethod, customerProfile]);
 
   return (
     <>
@@ -85,17 +135,12 @@ function CheckoutPage() {
                   <p>
                     <span>Address:</span>
                     {' '}
-                    {`${customerProfile?.addresses[0]?.number || ''} ${customerProfile?.addresses[0]?.street || ''}, ${customerProfile?.addresses[0]?.ward || ''}, ${customerProfile?.addresses[0]?.district || ''}, ${customerProfile?.addresses[0]?.city || ''}`}
+                    {customerAddress}
                   </p>
                   <p>
-                    <span>Date:</span>
+                    <span>Booking Note:</span>
                     {' '}
-                    extra_services date
-                  </p>
-                  <p>
-                    <span>Order Note:</span>
-                    {' '}
-                    customer order_note
+                    {customerNote || 'Not provided'}
                   </p>
                 </div>
               </div>
@@ -122,7 +167,16 @@ function CheckoutPage() {
                       Package Fee
                       {' '}
                       <span>
-                        {formatPriceWithCommas(totalPrice || 0) }
+                        {formatPriceWithCommas(finalPrice.subTotal || 0) }
+                        đ
+                      </span>
+                    </p>
+
+                    <p>
+                      Moving Fee
+                      {' '}
+                      <span>
+                        {formatPriceWithCommas(finalPrice.movingFee || 0) }
                         đ
                       </span>
                     </p>
@@ -131,7 +185,7 @@ function CheckoutPage() {
                       Total
                       {' '}
                       <span>
-                        {formatPriceWithCommas(totalPrice || 0)}
+                        {formatPriceWithCommas(finalPrice.totalPrice || 0)}
                         đ
                       </span>
                     </h5>

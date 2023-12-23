@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../features/common/headerSlice';
 import { actionGetAllCategory } from 'store/actions';
@@ -6,10 +6,21 @@ import { openModal } from 'features/common/modalSlice';
 import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
+import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage() {
     const dispatch = useDispatch();
     const categories = useSelector((state) => state.Category.categories);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const indexOfLastItem = currentPage * 5;
+    const indexOfFirstItem = indexOfLastItem - 5;
+    const currentData = categories?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     const handleUpdateProduct = (couponId) => {
         const selectedProduct = categories.find((product) => product.id === couponId);
@@ -45,17 +56,15 @@ function InternalPage() {
             <table className="table w-full mt-4">
                 <thead>
                 <tr>
-                    <th style={{ position: 'static', left: 'auto' }}>ID</th>
-                    <th>Name</th>
+                    <th style={{ position: 'static', left: 'auto' }}>Name</th>
                     <th>Number of Services</th>
                     <th>Thumbnail</th>
                 </tr>
                 </thead>
                 <tbody>
-                {categories ? (
-                    categories.map((category) => (
+                {currentData ? (
+                    currentData.map((category) => (
                     <tr key={category.id}>
-                        <td>{category.id}</td>
                         <td>{category.categoryName}</td>
                         <td>{category.numberService}</td>
                         <td>
@@ -75,6 +84,12 @@ function InternalPage() {
                 )}
                 </tbody>
             </table>
+
+            <Pagination
+                totalItems={categories?.length}
+                onPageChange={handlePageChange}
+                currentPage={currentPage}
+            />
             </div>
         </div>
         </div>

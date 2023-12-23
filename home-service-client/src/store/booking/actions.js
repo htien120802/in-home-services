@@ -17,12 +17,21 @@ import {
   CREATE_BOOKING,
   CREATE_BOOKING_SUCCESS,
   CREATE_BOOKING_FAILED,
+  CREATE_BOOKING_CALC,
+  CREATE_BOOKING_CALC_SUCCESS,
+  CREATE_BOOKING_CALC_FAILED,
   GET_CUSTOMER_BOOKINGS_BY_STATUS,
   GET_CUSTOMER_BOOKINGS_BY_STATUS_SUCCESS,
   GET_CUSTOMER_BOOKINGS_BY_STATUS_FAILED,
   SET_SELECTED_WORKS,
   SET_SELECTED_WORKS_SUCCESS,
   SET_SELECTED_WORKS_FAILED,
+  GET_CUSTOMER_BOOKING,
+  GET_CUSTOMER_BOOKING_SUCCESS,
+  GET_CUSTOMER_BOOKING_FAILED,
+  GET_PROVIDER_BOOKING,
+  GET_PROVIDER_BOOKING_SUCCESS,
+  GET_PROVIDER_BOOKING_FAILED,
 } from './actionTypes';
 
 // UPDATE_BOOKING_STATUS
@@ -113,6 +122,21 @@ export const actionCreateBookingFailed = () => ({
   type: CREATE_BOOKING_FAILED,
 });
 
+// CREATE_BOOKING_CALC
+export const actionCreateBookingCalc = (payload) => ({
+  type: CREATE_BOOKING_CALC,
+  payload,
+});
+
+export const actionCreateBookingCalcSuccess = (payload) => ({
+  type: CREATE_BOOKING_CALC_SUCCESS,
+  payload,
+});
+
+export const actionCreateBookingCalcFailed = () => ({
+  type: CREATE_BOOKING_CALC_FAILED,
+});
+
 // GET_CUSTOMER_BOOKINGS_BY_STATUS
 export const actionGetCustomerBookingsByStatus = (status) => ({
   type: GET_CUSTOMER_BOOKINGS_BY_STATUS,
@@ -140,4 +164,32 @@ export const actionSetSelectedWorksSuccess = (payload) => ({
 
 export const actionSetSelectedWorksFailed = () => ({
   type: SET_SELECTED_WORKS_FAILED,
+});
+
+export const actionGetProviderBooking = (payload) => ({
+  type: GET_PROVIDER_BOOKING,
+  payload,
+});
+
+export const actionGetProviderBookingSuccess = (payload) => ({
+  type: GET_PROVIDER_BOOKING_SUCCESS,
+  payload,
+});
+
+export const actionGetProviderBookingFailed = () => ({
+  type: GET_PROVIDER_BOOKING_FAILED,
+});
+
+export const actionGetCustomerBooking = (payload) => ({
+  type: GET_CUSTOMER_BOOKING,
+  payload,
+});
+
+export const actionGetCustomerBookingSuccess = (payload) => ({
+  type: GET_CUSTOMER_BOOKING_SUCCESS,
+  payload,
+});
+
+export const actionGetCustomerBookingFailed = () => ({
+  type: GET_CUSTOMER_BOOKING_FAILED,
 });

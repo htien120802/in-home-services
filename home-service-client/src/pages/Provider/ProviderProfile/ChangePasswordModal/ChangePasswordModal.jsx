@@ -57,10 +57,13 @@ function ChangePassword({ isOpen, onClose }) {
     onSubmit: (values) => {
       dispatch(actionUpdateProviderPassword({
         newPassword: {
+          currentPassword: values.currentPassword,
           password: values.newPassword,
           passwordConfirm: values.confirmNewPassword,
         },
       }));
+
+      onClose();
     },
   });
 

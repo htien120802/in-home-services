@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { actionDeleteCustomer, actionGetAllCustomers } from 'store/actions'
@@ -7,10 +7,21 @@ import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
+import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
     const dispatch = useDispatch()
     const customers = useSelector((state) => state.Admin.customers);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const indexOfLastItem = currentPage * 5;
+    const indexOfFirstItem = indexOfLastItem - 5;
+    const currentData = customers.content?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     const handleUpdateProduct = (couponId) => {
         const selectedProduct = customers.content.find((product) => product.id === couponId);
@@ -51,8 +62,8 @@ function InternalPage(){
                             </tr>
                         </thead>
                         <tbody>
-                            {customers && customers.content ? (
-                                customers.content.map((customer) => (
+                            {currentData ? (
+                                currentData.map((customer) => (
                                 <tr key={customer.email}>
                                     <td>{customer.firstName}</td>
                                     <td>{customer.lastName}</td>
@@ -89,6 +100,12 @@ function InternalPage(){
                             )}
                         </tbody>
                     </table>
+
+                    <Pagination
+                totalItems={customers?.content?.length}
+                onPageChange={handlePageChange}
+                currentPage={currentPage}
+            />
                 </div>
             </div>
         </div>

@@ -58,9 +58,9 @@ export const actionUpdateProviderServiceFailed = () => ({
 });
 
 // REGISTER_PROVIDER_SERVICE
-export const actionRegisterProviderService = (serviceData) => ({
+export const actionRegisterProviderService = (payload) => ({
   type: REGISTER_PROVIDER_SERVICE,
-  payload: serviceData,
+  payload,
 });
 
 export const actionRegisterProviderServiceSuccess = (payload) => ({
@@ -73,9 +73,9 @@ export const actionRegisterProviderServiceFailed = () => ({
 });
 
 // ENABLE_OR_DISABLE_PROVIDER_SERVICE
-export const actionEnableOrDisableProviderService = (serviceId, action) => ({
+export const actionEnableOrDisableProviderService = (payload) => ({
   type: ENABLE_OR_DISABLE_PROVIDER_SERVICE,
-  payload: { serviceId, action },
+  payload,
 });
 
 export const actionEnableOrDisableProviderServiceSuccess = (payload) => ({
@@ -148,9 +148,9 @@ export const actionGetProviderServicesByStatusFailed = () => ({
 });
 
 // DELETE_PROVIDER_SERVICE
-export const actionDeleteProviderService = (serviceId) => ({
+export const actionDeleteProviderService = (payload) => ({
   type: DELETE_PROVIDER_SERVICE,
-  payload: serviceId,
+  payload,
 });
 
 export const actionDeleteProviderServiceSuccess = (payload) => ({

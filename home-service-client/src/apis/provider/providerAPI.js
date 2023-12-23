@@ -38,4 +38,29 @@ export default {
     const response = await axiosClient.post(`${providerEndpoint}/address`, newAddressData);
     return response.data;
   },
+
+  async getProviderSalesStatistics(payload) {
+    const params = {
+      year: payload.year,
+      month: payload.month,
+    };
+
+    const response = await axiosClient.get(`${providerEndpoint}/statistics/booking/sales`, {
+      params,
+    });
+    return response.data;
+  },
+
+  // GET /provider/statistics/booking/quantity
+  async getProviderQuantityStatistics(payload) {
+    const params = {
+      year: payload.year,
+      month: payload.month,
+    };
+
+    const response = await axiosClient.get(`${providerEndpoint}/statistics/booking/quantity`, {
+      params,
+    });
+    return response.data;
+  },
 };

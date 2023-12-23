@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { actionDeleteReview, actionGetAllReviews } from 'store/actions';
@@ -7,13 +7,24 @@ import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
 import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
+import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
     const dispatch = useDispatch();
     const reviews = useSelector((state) => state.Admin.reviews);
 
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const indexOfLastItem = currentPage * 5;
+    const indexOfFirstItem = indexOfLastItem - 5;
+    const currentData = reviews.content?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
+
     const handleUpdateReview = (couponId) => {
-        const selectedReview = reviews.find((review) => review._id === couponId);
+        const selectedReview = reviews?.content.find((review) => review._id === couponId);
 
         dispatch(
             openModal({
@@ -40,37 +51,47 @@ function InternalPage(){
             <table className="table w-full mt-4">
             <thead>
                 <tr>
-                <th style={{ position: 'static', left: 'auto' }}>ID</th>
-                <th>Star</th>
-                <th>Product ID</th>
+                <th style={{ position: 'static', left: 'auto' }}>Star</th>
+                <th>Customer</th>
+                <th>Service</th>
                 <th>Comment</th>
+                <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {reviews.length > 0 ? (
-                reviews.map((review) => (
-                    <tr key={review._id}>
-                    <td>{review._id}</td>
-                    <td>{review.star}</td>
-                    <td>{review.productID}</td>
-                    <td>{review.comment}</td>
-                    <td>
-                        <button className="icon-btn" onClick={() => handleUpdateReview(review._id)}>
-                            <ArrowPathIcon className="h-5 w-5" />
-                        </button>
-                        <button className="icon-btn" onClick={() => handleDeleteReview(review._id)}>
-                            <TrashIcon className="h-5 w-5" />
-                        </button>
-                    </td>
-                    </tr>
-                ))
-                ) : (
+            {currentData ? (
+            currentData.map((review) => (
+                <tr key={review.id}>
+                <td>{review.rating}</td>
+                <td>
+                    <strong>Customer:</strong> {review.customer.firstName} {review.customer.lastName}
+                </td>
+                <td><strong>Service:</strong> {review.service.name}</td>
+                <td>{review.comment}</td>
+                <td>
+                    {/* Add your update and delete handlers here */}
+                    <button className="icon-btn" onClick={() => handleUpdateReview(review.id)}>
+                    <ArrowPathIcon className="h-5 w-5" />
+                    </button>
+                    <button className="icon-btn" onClick={() => handleDeleteReview(review.id)}>
+                    <TrashIcon className="h-5 w-5" />
+                    </button>
+                </td>
+                </tr>
+            ))
+            ) : (
                 <tr>
                     <td colSpan="4">No reviews found</td>
                 </tr>
                 )}
             </tbody>
             </table>
+
+            <Pagination
+                totalItems={reviews?.content?.length}
+                onPageChange={handlePageChange}
+                currentPage={currentPage}
+            />
         </div>
         </div>
     </div>

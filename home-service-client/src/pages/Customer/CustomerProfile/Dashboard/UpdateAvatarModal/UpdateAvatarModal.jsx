@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-modal';
 
 import PropTypes from 'prop-types';
@@ -26,9 +26,11 @@ const customStyles = {
 
 function UpdateAvatarModal({ customerState, isOpen, onClose }) {
   const dispatch = useDispatch();
+  const loading = useSelector((state) => state.Customer.loading);
 
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [isAvatarChanged, setIsAvatarChanged] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
@@ -48,13 +50,21 @@ function UpdateAvatarModal({ customerState, isOpen, onClose }) {
 
     dispatch(actionUpdateCustomerAvatar(formData));
 
-    onClose();
+    setIsSubmitting(true);
   };
 
   useEffect(() => {
     setSelectedAvatar(customerState.customer?.avatar || null);
     setIsAvatarChanged(false);
   }, [customerState.customer, isOpen]);
+
+  useEffect(() => {
+    if (isSubmitting && !loading) {
+      onClose();
+
+      setIsSubmitting(false);
+    }
+  }, [loading, isSubmitting, onClose]);
 
   return (
     <Modal
@@ -80,7 +90,11 @@ function UpdateAvatarModal({ customerState, isOpen, onClose }) {
           className="common_btn mt_20"
           disabled={!isAvatarChanged}
         >
-          Save Avatar
+          {loading ? (
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden text-white">Loading...</span>
+            </div>
+          ) : ' Save Avatar'}
         </button>
       </div>
     </Modal>

@@ -17,6 +17,12 @@ import {
   ADD_PROVIDER_ADDRESS,
   ADD_PROVIDER_ADDRESS_SUCCESS,
   ADD_PROVIDER_ADDRESS_FAILED,
+  GET_PROVIDER_SALES_STATISTICS,
+  GET_PROVIDER_SALES_STATISTICS_SUCCESS,
+  GET_PROVIDER_SALES_STATISTICS_FAILED,
+  GET_PROVIDER_QUANTITY_STATISTICS,
+  GET_PROVIDER_QUANTITY_STATISTICS_SUCCESS,
+  GET_PROVIDER_QUANTITY_STATISTICS_FAILED,
 } from './actionTypes';
 
 // GET_PROVIDER_PROFILE
@@ -106,4 +112,33 @@ export const actionAddProviderAddressSuccess = (payload) => ({
 
 export const actionAddProviderAddressFailed = () => ({
   type: ADD_PROVIDER_ADDRESS_FAILED,
+});
+
+export const actionGetProviderSalesStatistics = (payload) => ({
+  type: GET_PROVIDER_SALES_STATISTICS,
+  payload,
+});
+
+export const actionGetProviderSalesStatisticsSuccess = (payload) => ({
+  type: GET_PROVIDER_SALES_STATISTICS_SUCCESS,
+  payload,
+});
+
+export const actionGetProviderSalesStatisticsFailed = () => ({
+  type: GET_PROVIDER_SALES_STATISTICS_FAILED,
+});
+
+// GET_PROVIDER_QUANTITY_STATISTICS
+export const actionGetProviderQuantityStatistics = (payload) => ({
+  type: GET_PROVIDER_QUANTITY_STATISTICS,
+  payload,
+});
+
+export const actionGetProviderQuantityStatisticsSuccess = (payload) => ({
+  type: GET_PROVIDER_QUANTITY_STATISTICS_SUCCESS,
+  payload,
+});
+
+export const actionGetProviderQuantityStatisticsFailed = () => ({
+  type: GET_PROVIDER_QUANTITY_STATISTICS_FAILED,
 });

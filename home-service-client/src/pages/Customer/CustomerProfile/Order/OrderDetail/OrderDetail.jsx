@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Modal from 'react-modal';
 
 import PropTypes from 'prop-types';
+import { actionCustomerCancelBooking } from 'store/actions';
+import ReasonModal from './ReasonModal/ReasonModal';
 
 Modal.setAppElement('#root');
 
@@ -25,6 +28,23 @@ const customStyles = {
 };
 
 function OrderDetail({ orderDetail, isOpen, onClose }) {
+  const dispatch = useDispatch();
+
+  const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState('');
+
+  const handleCloseReasonModal = () => {
+    setIsReasonModalOpen(false);
+  };
+
+  const handleReasonChange = (event) => {
+    setCancellationReason(event.target.value);
+  };
+
+  const handleCancel = () => {
+    dispatch(actionCustomerCancelBooking({ bookingId: orderDetail.id, reason: cancellationReason }));
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -35,7 +55,7 @@ function OrderDetail({ orderDetail, isOpen, onClose }) {
         <div>
           <div className="row">
             <div className="col-xl-12">
-              <h2>Order Details</h2>
+              <h2>Booking Details</h2>
             </div>
             <div className="col-xl-6">
               <h3>Customer Information</h3>
@@ -251,10 +271,22 @@ function OrderDetail({ orderDetail, isOpen, onClose }) {
                 {' '}
                 {orderDetail?.status}
               </p>
+
+              {orderDetail?.status === 'BOOKED' && (
+                <button type="button" onClick={() => setIsReasonModalOpen(true)}>Cancel Order</button>
+              ) }
             </div>
           </div>
         </div>
       </div>
+
+      <ReasonModal
+        isOpen={isReasonModalOpen}
+        onClose={handleCloseReasonModal}
+        handleCancel={handleCancel}
+        handleReasonChange={handleReasonChange}
+        cancellationReason={cancellationReason}
+      />
     </Modal>
   );
 }

@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Pagination from './Pagination/Pagination';
 import OrderDetail from './OrderDetail/OrderDetail';
+import { formatPriceWithCommas } from 'utils';
+import { Link } from 'react-router-dom';
 
 function Order({ bookingState }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,11 +19,6 @@ function Order({ bookingState }) {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-  };
-
-  const openOrderDetailModal = (orderDetail) => {
-    setSelectedOrderDetail(orderDetail);
-    setOrderDetailModalOpen(true);
   };
 
   const closeModal = () => {
@@ -42,11 +39,11 @@ function Order({ bookingState }) {
             <table className="table table-striped">
               <tbody>
                 <tr className="t_header">
-                  <th>Order</th>
+                  <th>Booking</th>
                   <th>Date</th>
                   <th>Status</th>
                   <th>Amount</th>
-                  <th>Action'</th>
+                  <th>Action</th>
                 </tr>
                 {currentOrders && currentOrders.map((order) => (
                   <tr key={order.id}>
@@ -70,18 +67,17 @@ function Order({ bookingState }) {
                     </td>
                     <td>
                       <h5>
-                        {order.totalPrice}
+                        {formatPriceWithCommas(order.totalPrice || 0)}
                         đ
                       </h5>
                     </td>
                     <td>
-                      <a
-                        href="javascript:;"
+                      <Link
+                        to={`/booking/detail/${order.id}`}
                         className="view_invoice"
-                        onClick={() => openOrderDetailModal(order)}
                       >
                         View Details
-                      </a>
+                      </Link>
                     </td>
                   </tr>
                 ))}

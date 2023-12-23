@@ -11,9 +11,12 @@ import {
   CUSTOMER_CANCEL_BOOKING,
   GET_CUSTOMER_BOOKINGS,
   CREATE_BOOKING,
+  CREATE_BOOKING_CALC,
   GET_CUSTOMER_BOOKINGS_BY_STATUS,
   GET_PROVIDER_BOOKINGS,
   SET_SELECTED_WORKS,
+  GET_CUSTOMER_BOOKING,
+  GET_PROVIDER_BOOKING,
 } from './actionTypes';
 
 import {
@@ -27,12 +30,18 @@ import {
   actionGetCustomerBookingsFailed,
   actionCreateBookingSuccess,
   actionCreateBookingFailed,
+  actionCreateBookingCalcSuccess,
+  actionCreateBookingCalcFailed,
   actionGetCustomerBookingsByStatusSuccess,
   actionGetCustomerBookingsByStatusFailed,
   actionGetProviderBookingsSuccess,
   actionGetProviderBookingsFailed,
   actionSetSelectedWorksSuccess,
   actionSetSelectedWorksFailed,
+  actionGetProviderBookingSuccess,
+  actionGetProviderBookingFailed,
+  actionGetCustomerBookingSuccess,
+  actionGetCustomerBookingFailed,
 } from './actions';
 
 function* updateBookingStatus({ payload }) {
@@ -81,7 +90,7 @@ function* customerCancelBooking({ payload }) {
 
     const response = yield call(bookingAPI.customerCancelBooking, bookingId);
 
-    yield put(actionCustomerCancelBookingSuccess(response.data));
+    yield put(actionCustomerCancelBookingSuccess());
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -109,17 +118,35 @@ function* createBooking({ payload }) {
   try {
     const response = yield call(bookingAPI.createBooking, payload);
 
-    yield put(actionCreateBookingSuccess(response.data));
-
-    if (response.status === 'success') {
-      toast.success(response.message);
-    } else {
-      toast.error(response.message);
+    if (payload.paymentMethod === 'cash') {
+      yield put(actionCreateBookingSuccess(response.data));
+      if (response.status === 'success') {
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+    } else if (payload.paymentMethod === 'vnpay') {
+      if (response.status === 'success') {
+        window.location.href = response.data;
+      } else {
+        toast.error(response.message);
+        yield put(actionCreateBookingFailed());
+      }
     }
   } catch (error) {
     toast.error(error.response.data.message);
 
     yield put(actionCreateBookingFailed());
+  }
+}
+
+function* createBookingCalc({ payload }) {
+  try {
+    const response = yield call(bookingAPI.createBookingCalculate, payload);
+
+    yield put(actionCreateBookingCalcSuccess(response.data));
+  } catch (error) {
+    yield put(actionCreateBookingCalcFailed());
   }
 }
 
@@ -153,6 +180,33 @@ function* setSelectedWorks(action) {
   }
 }
 
+function* getProviderBooking({ payload }) {
+  try {
+    const { bookingId } = payload;
+
+    const response = yield call(bookingAPI.getProviderBooking, bookingId);
+
+    yield put(actionGetProviderBookingSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetProviderBookingFailed());
+  }
+}
+
+function* getCustomerBooking({ payload }) {
+  try {
+    const { bookingId } = payload;
+
+    const response = yield call(bookingAPI.getCustomerBooking, bookingId);
+
+    yield put(actionGetCustomerBookingSuccess(response.data));
+  } catch (error) {
+    const { callback } = payload;
+
+    callback();
+    yield put(actionGetCustomerBookingFailed());
+  }
+}
+
 export default function* bookingSaga() {
   yield takeLeading(UPDATE_BOOKING_STATUS, updateBookingStatus);
   yield takeLeading(PROVIDER_CANCEL_BOOKING, providerCancelBooking);
@@ -160,6 +214,9 @@ export default function* bookingSaga() {
   yield takeLeading(GET_CUSTOMER_BOOKINGS, getCustomerBookings);
   yield takeLeading(GET_PROVIDER_BOOKINGS, getProviderBookings);
   yield takeLeading(CREATE_BOOKING, createBooking);
+  yield takeLeading(CREATE_BOOKING_CALC, createBookingCalc);
   yield takeLeading(GET_CUSTOMER_BOOKINGS_BY_STATUS, getCustomerBookingsByStatus);
   yield takeLatest(SET_SELECTED_WORKS, setSelectedWorks);
+  yield takeLeading(GET_PROVIDER_BOOKING, getProviderBooking);
+  yield takeLeading(GET_CUSTOMER_BOOKING, getCustomerBooking);
 }

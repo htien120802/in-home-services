@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-modal';
 import PropTypes from 'prop-types';
-import { actionImageUpload, actionUpdateProviderService } from 'store/actions';
+import { actionUpdateProviderService } from 'store/actions';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { v4 as uuidv4 } from 'uuid';
@@ -62,11 +62,14 @@ function EditServiceModal({ isOpen, onClose, serviceDetails }) {
       ],
       openTime: serviceDetails.openTime || '',
       closeTime: serviceDetails.closeTime || '',
-      category: serviceDetails.category || '',
+      category: serviceDetails.category?.id || '',
     },
     validationSchema,
     onSubmit: (values) => {
-      dispatch(actionUpdateProviderService({ id: serviceDetails.id, values }));
+      const selectedCategory = categories.find((category) => category.id === values.category);
+      dispatch(actionUpdateProviderService({ ...values, id: serviceDetails.id, category: selectedCategory }));
+
+      onClose();
     },
   });
 
@@ -84,19 +87,9 @@ function EditServiceModal({ isOpen, onClose, serviceDetails }) {
       ],
       openTime: serviceDetails.openTime || '',
       closeTime: serviceDetails.closeTime || '',
-      category: serviceDetails.category || '',
+      category: serviceDetails.category?.id || '',
     });
   }, [serviceDetails]);
-
-  const handleImageUpload = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      dispatch(actionImageUpload(file))
-        .then((response) => {
-          formik.setFieldValue('thumbnail', response.url);
-        });
-    }
-  };
 
   return (
     <Modal
@@ -274,9 +267,12 @@ function EditServiceModal({ isOpen, onClose, serviceDetails }) {
                 <div className="form-group">
                   <label>Thumbnail</label>
                   <input
-                    type="file"
-                    className="form-control-file"
-                    onChange={handleImageUpload}
+                    type="text"
+                    className="form-control"
+                    name="thumbnail"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.thumbnail}
                   />
                   {formik.touched.thumbnail && formik.errors.thumbnail && (
                   <div className="text-danger">{formik.errors.thumbnail}</div>
@@ -316,27 +312,12 @@ EditServiceModal.propTypes = {
     closeTime: PropTypes.string,
     category: PropTypes.shape({
       id: PropTypes.string.isRequired,
-      name: PropTypes.string,
+      categoryName: PropTypes.string,
+      slug: PropTypes.string,
       thumbnail: PropTypes.string,
-      openTime: PropTypes.string,
-      closeTime: PropTypes.string,
-      works: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          description: PropTypes.string,
-          unit: PropTypes.string,
-          pricePerUnit: PropTypes.number,
-        }),
-      ),
-      category: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        categoryName: PropTypes.string,
-        slug: PropTypes.string,
-        thumbnail: PropTypes.string,
-      }),
-      avgRating: PropTypes.number,
-      distance: PropTypes.number,
     }),
+    avgRating: PropTypes.number,
+    distance: PropTypes.number,
   }),
 };
 
@@ -357,27 +338,12 @@ EditServiceModal.defaultProps = {
     closeTime: '',
     category: {
       id: '',
-      name: '',
+      categoryName: '',
+      slug: '',
       thumbnail: '',
-      openTime: '',
-      closeTime: '',
-      works: [
-        {
-          id: '',
-          description: '',
-          unit: '',
-          pricePerUnit: 0,
-        },
-      ],
-      category: {
-        id: '',
-        categoryName: '',
-        slug: '',
-        thumbnail: '',
-      },
-      avgRating: 0,
-      distance: 0,
     },
+    avgRating: 0,
+    distance: 0,
   },
 };
 

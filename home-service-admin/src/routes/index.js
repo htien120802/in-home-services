@@ -29,7 +29,11 @@ const routes = [
     component: Charts,
   },
   {
-    path: '/service',
+    path: '/service/public',
+    component: Product,
+  },
+  {
+    path: '/service/provider',
     component: Product,
   },
   {

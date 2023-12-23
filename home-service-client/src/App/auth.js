@@ -7,7 +7,7 @@ import { decodeJWT } from 'utils';
 
 const checkAuth = () => {
   const TOKEN = localStorage.getItem('accessToken');
-  const PUBLIC_ROUTES = ['login', 'forgot-password', 'register', 'about', 'contact', 'service'];
+  const PUBLIC_ROUTES = ['login', 'forgot-password', 'register', 'about', 'contact', 'services'];
 
   const currentPath = window.location.pathname.substring(1);
 
@@ -16,23 +16,21 @@ const checkAuth = () => {
 
   const isPublicPage = PUBLIC_ROUTES.includes(currentPath);
 
-  const token = decodeJWT(TOKEN);
+  if (!isPublicPage && !isHomePage) {
+    const token = decodeJWT(TOKEN);
 
-  if (token) {
+    if (!token) {
+      window.location.href = '/login';
+      return null;
+    }
+
     const currentTime = Date.now();
     const bufferTime = 5 * 60 * 1000;
 
     if (token.exp * 1000 - currentTime < bufferTime) {
       handleRefreshToken();
     }
-  }
 
-  if (!token && !isPublicPage && !isHomePage) {
-    window.location.href = '/login';
-    return null;
-  }
-
-  if (!isPublicPage && !isHomePage) {
     axiosClient.defaults.headers.Authorization = `Bearer ${TOKEN}`;
   }
 

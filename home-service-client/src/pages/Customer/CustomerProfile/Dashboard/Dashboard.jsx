@@ -36,7 +36,7 @@ function Dashboard({ customerState, bookingState }) {
               style={{ background: "url('/assets/images/dash_ifo_bg.jpg')" }}
             >
               <span><FontAwesomeIcon icon={faShoppingBag} /></span>
-              <h5>Order Active</h5>
+              <h5>Booking Active</h5>
               <h2>
                 {calculateOrders('BOOKED')
                 + calculateOrders('ACCEPTED')
@@ -51,7 +51,7 @@ function Dashboard({ customerState, bookingState }) {
               style={{ background: "url('/assets/images/dash_ifo_bg.jpg')" }}
             >
               <span><FontAwesomeIcon icon={faBox} /></span>
-              <h5>Order Completed</h5>
+              <h5>Booking Completed</h5>
               <h2>{calculateOrders('DONE')}</h2>
             </div>
           </div>
@@ -61,7 +61,7 @@ function Dashboard({ customerState, bookingState }) {
               style={{ background: "url('/assets/images/dash_ifo_bg.jpg')" }}
             >
               <span><FontAwesomeIcon icon={faClipboardCheck} /></span>
-              <h5>Total Order</h5>
+              <h5>Total Booking</h5>
               <h2>{bookingState.bookings?.content?.length}</h2>
             </div>
           </div>

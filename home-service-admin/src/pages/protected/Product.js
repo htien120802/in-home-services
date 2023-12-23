@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { actionDeleteService, actionGetAllServices } from 'store/actions';
@@ -7,10 +7,21 @@ import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
 import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
+import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
     const dispatch = useDispatch();
     const products = useSelector((state) => state.Admin.services);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const indexOfLastItem = currentPage * 5;
+    const indexOfFirstItem = indexOfLastItem - 5;
+    const currentData = products.content?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     const handleUpdateProduct = (couponId) => {
         const selectedProduct = products.content.find((product) => product._id === couponId);
@@ -55,8 +66,7 @@ function InternalPage(){
             <table className="table w-full mt-4">
             <thead>
                 <tr>
-                <th style={{ position: 'static', left: 'auto' }}>ID</th>
-                <th>Name</th>
+                <th style={{ position: 'static', left: 'auto' }}>Name</th>
                 <th>Thumbnail</th>
                 <th>Open Time</th>
                 <th>Close Time</th>
@@ -66,10 +76,9 @@ function InternalPage(){
                 </tr>
             </thead>
             <tbody>
-                {products && products.content ? (
-                products.content.map((product) => (
+                {currentData ? (
+                currentData.map((product) => (
                     <tr key={product.id}>
-                        <td>{product.id}</td>
                         <td>{product.name}</td>
                         <td>
                         <img src={product.thumbnail} alt={`Product ${product.name}`} style={{ width: '50px', height: '50px' }} />
@@ -104,6 +113,12 @@ function InternalPage(){
                 )}
             </tbody>
             </table>
+
+            <Pagination
+            totalItems={products?.content?.length}
+            onPageChange={handlePageChange}
+            currentPage={currentPage}
+          />
         </div>
         </div>
     </div>

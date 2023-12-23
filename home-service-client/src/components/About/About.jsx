@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function About() {
   return (
@@ -38,7 +39,7 @@ function About() {
                 <li>Search Engine Optimization (SEO)</li>
               </ul>
 
-              <a href="https://demo.websolutionus.com/aabcserv/contact-us" className="common_btn">Contact Us</a>
+              <Link to="/contact" className="common_btn">Contact Us</Link>
             </div>
           </div>
         </div>

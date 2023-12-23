@@ -40,7 +40,7 @@ function Services() {
       name: initialName,
       categorySlug: initialCategorySlug,
     }));
-  }, [location]);
+  }, [location.pathname]);
 
   return (
     <>

@@ -2,13 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetAllProviderServices, actionGetProviderBookings, actionGetProviderProfile } from 'store/actions';
+import {
+  actionGetAllProviderServices, actionGetProviderBookings, actionGetProviderProfile, actionGetProviderQuantityStatistics, actionGetProviderSalesStatistics,
+} from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 import EditProfileModal from './EditProfile/EditProfile';
 import ChangePassword from './ChangePasswordModal/ChangePasswordModal';
 import ProviderReviewModal from './ProviderReviewModal/ProviderReviewModal';
 import AddServiceModal from './AddServiceModal/AddServiceModal';
+import LineChart from './LineChart/LineChart';
+import MonthYearPicker from './DatePicker/DatePicker';
 
 function ProviderProfilePage() {
   const dispatch = useDispatch();
@@ -19,6 +23,7 @@ function ProviderProfilePage() {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [isAddServiceModalOpen, setAddServiceModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const closeReviewModal = () => {
     setReviewModalOpen(false);
@@ -32,16 +37,34 @@ function ProviderProfilePage() {
     setAddServiceModalOpen(false);
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
   useEffect(() => {
     dispatch(actionGetProviderProfile());
     dispatch(actionGetProviderBookings());
     dispatch(actionGetAllProviderServices());
-  }, []);
+    dispatch(actionGetProviderQuantityStatistics({ month: selectedDate.getMonth() + 1, year: selectedDate.getFullYear() }));
+    dispatch(actionGetProviderSalesStatistics({ month: selectedDate.getMonth() + 1, year: selectedDate.getFullYear() }));
+  }, [dispatch, selectedDate]);
 
   return (
     <div className="main-content">
       <section className="section">
         <BannerSlider title="Profile" />
+
+        <MonthYearPicker selectedDate={selectedDate} onDateChange={handleDateChange} />
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6">
+              <LineChart data={providerState.salesStatistics} title="Sales" />
+            </div>
+            <div className="col-md-6">
+              <LineChart data={providerState.quantityStatistics} title="Quantity" />
+            </div>
+          </div>
+        </div>
 
         <div className="section-body p-3">
           <div className="row mt-5">
@@ -137,7 +160,7 @@ function ProviderProfilePage() {
                     <div className="card-body text-center">
                       <div className="row">
                         <div className="col-12">
-                          <a href="javascript:;" onClick={() => setReviewModalOpen(true)} className="btn btn-primary btn-block btn-lg my-2">My Reviews</a>
+                          <Link to="/provider/services" className="btn btn-primary btn-block btn-lg my-2">Yours Service</Link>
                         </div>
 
                         <div className="col-12">

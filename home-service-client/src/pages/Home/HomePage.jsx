@@ -79,7 +79,7 @@ function Home() {
           <div className="row">
             <div className="col-md-12">
               <div className="full heading_s1">
-                <h3>Featured Services</h3>
+                <h3>Services</h3>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit..</p>
               </div>
             </div>

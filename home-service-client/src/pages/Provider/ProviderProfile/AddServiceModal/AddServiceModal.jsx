@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-modal';
 
 import PropTypes from 'prop-types';
 
-import { actionImageUpload, actionRegisterProviderService } from 'store/actions';
+import { actionGetAllCategory, actionRegisterProviderService } from 'store/actions';
 
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -37,9 +37,10 @@ const customStyles = {
 function AddServiceModal({ isOpen, onClose }) {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.Category.categories);
+  const loading = useSelector((state) => state.Services.loading);
 
   const validationSchema = Yup.object({
-    thumbnail: Yup.string().required('Thumbnail is required'),
+    thumbnail: Yup.mixed().required('Thumbnail is required'),
     name: Yup.string().required('Service Name is required'),
     openTime: Yup.string().required('Open Time is required'),
     closeTime: Yup.string().required('Close Time is required'),
@@ -55,13 +56,13 @@ function AddServiceModal({ isOpen, onClose }) {
 
   const formik = useFormik({
     initialValues: {
-      thumbnail: '',
+      thumbnail: null,
       name: '',
       works: [
         {
           description: '',
           unit: '',
-          pricePerUnit: '',
+          pricePerUnit: 0,
         },
       ],
       openTime: '',
@@ -69,20 +70,58 @@ function AddServiceModal({ isOpen, onClose }) {
       category: '',
     },
     validationSchema,
-    onSubmit: (values) => {
-      dispatch(actionRegisterProviderService({ values }));
+    onSubmit: async (values) => {
+      dispatch(actionRegisterProviderService({
+        thumbnail: values.thumbnail,
+        service: JSON.stringify({
+          name: values.name,
+          works: values.works,
+          openTime: values.openTime,
+          closeTime: values.closeTime,
+          category: values.category,
+        }),
+      }));
+
+      setIsSubmitting(true);
     },
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleImageUpload = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      dispatch(actionImageUpload(file))
-        .then((response) => {
-          formik.setFieldValue('thumbnail', response.url);
-        });
-    }
+    formik.setFieldValue('thumbnail', event.target.files[0]);
   };
+
+  const handleDescriptionChange = (e, index) => {
+    const newWorks = [...formik.values.works];
+    newWorks[index].description = e.target.value;
+    formik.setFieldValue('works', newWorks);
+  };
+
+  const handleUnitChange = (e, index) => {
+    const newWorks = [...formik.values.works];
+    newWorks[index].unit = e.target.value;
+    formik.setFieldValue('works', newWorks);
+  };
+
+  const handlePricePerUnitChange = (e, index) => {
+    const newWorks = [...formik.values.works];
+    newWorks[index].pricePerUnit = e.target.value;
+    formik.setFieldValue('works', newWorks);
+  };
+
+  useEffect(() => {
+    dispatch(actionGetAllCategory());
+  }, []);
+
+  useEffect(() => {
+    if (isSubmitting && !loading) {
+      onClose();
+
+      setIsSubmitting(false);
+      formik.resetForm();
+    }
+  }, [loading, isSubmitting, onClose]);
 
   return (
     <Modal
@@ -188,7 +227,7 @@ function AddServiceModal({ isOpen, onClose }) {
                         className="form-control"
                         name={`works[${index}].description`}
                         value={work.description}
-                        onChange={formik.handleChange}
+                        onChange={(e) => handleDescriptionChange(e, index)}
                         onBlur={formik.handleBlur}
                       />
                       {formik.touched.works && formik.touched.works[index] && formik.errors.works && formik.errors.works[index] && (
@@ -203,7 +242,7 @@ function AddServiceModal({ isOpen, onClose }) {
                         className="form-control"
                         name={`works[${index}].unit`}
                         value={work.unit}
-                        onChange={formik.handleChange}
+                        onChange={(e) => handleUnitChange(e, index)}
                         onBlur={formik.handleBlur}
                       />
                       {formik.touched.works && formik.touched.works[index] && formik.errors.works && formik.errors.works[index] && (
@@ -218,7 +257,7 @@ function AddServiceModal({ isOpen, onClose }) {
                         className="form-control"
                         name={`works[${index}].pricePerUnit`}
                         value={work.pricePerUnit}
-                        onChange={formik.handleChange}
+                        onChange={(e) => handlePricePerUnitChange(e, index)}
                         onBlur={formik.handleBlur}
                       />
                       {formik.touched.works && formik.touched.works[index] && formik.errors.works && formik.errors.works[index] && (
@@ -259,10 +298,17 @@ function AddServiceModal({ isOpen, onClose }) {
               <div className="card-body">
                 <div className="form-group">
                   <label>Thumbnail</label>
+                  {formik.values.thumbnail && (
+                  <img
+                    src={URL.createObjectURL(formik.values.thumbnail)}
+                    alt="Avatar Preview"
+                    style={{ width: '100px', height: '100px' }}
+                  />
+                  )}
                   <input
                     type="file"
                     className="form-control-file"
-                    onChange={handleImageUpload}
+                    onChange={(e) => handleImageUpload(e)}
                   />
                   {formik.touched.thumbnail && formik.errors.thumbnail && (
                   <div className="text-danger">{formik.errors.thumbnail}</div>
@@ -273,8 +319,12 @@ function AddServiceModal({ isOpen, onClose }) {
           </div>
 
           <div className="section-body">
-            <button type="submit" className="btn btn-primary">
-              Create Service
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? (
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden text-white">Loading...</span>
+                </div>
+              ) : 'Create Service'}
             </button>
           </div>
         </form>

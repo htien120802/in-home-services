@@ -20,8 +20,9 @@ import {
 } from './actionTypes';
 
 // GET_CUSTOMER_PROFILE
-export const actionGetCustomerProfile = () => ({
+export const actionGetCustomerProfile = (payload) => ({
   type: GET_CUSTOMER_PROFILE,
+  payload,
 });
 
 export const actionGetCustomerProfileSuccess = (payload) => ({

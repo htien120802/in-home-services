@@ -33,7 +33,7 @@ function Categories({ categoriesState }) {
         <div className="row">
           <div className="col-lg-6 m-auto">
             <div className="wsus__section_heading text-center mb_45">
-              <h2>Our Categories</h2>
+              <h2>Categories</h2>
               <p>There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration</p>
             </div>
           </div>
@@ -42,7 +42,7 @@ function Categories({ categoriesState }) {
         <div className="row category_slider slick-initialized slick-slider slick-dotted">
           <Slider {...sliderSettings}>
             {categories.map((category, index) => (
-              <div onClick={() => handleCategoryClick(category.slug)}>
+              <div key={category.id} onClick={() => handleCategoryClick(category.slug)}>
                 <CategoryCard key={category.id} slickIndex={index} {...category} />
               </div>
             ))}

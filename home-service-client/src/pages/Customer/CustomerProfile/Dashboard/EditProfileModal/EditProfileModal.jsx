@@ -140,7 +140,7 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
             </div>
 
             <div className="col-xl-12">
-              <fieldset>
+              <fieldset className="p-2">
                 <legend>Address*</legend>
                 {Object.keys(validation.values.address).map((field) => (
                   field.toLowerCase() !== 'id' && (

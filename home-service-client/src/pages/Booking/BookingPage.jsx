@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetCustomerProfile, actionGetServiceById } from 'store/actions';
+import { actionGetCustomerProfile, actionGetServiceById, actionSetSelectedWorks } from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 
@@ -11,71 +11,60 @@ import { formatPriceWithCommas } from 'utils';
 function BookingPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const selectedWorks = useSelector((state) => state.Booking.works);
   const totalPrice = useSelector((state) => state.Booking.totalPrice);
   const customerProfile = useSelector((state) => state.Customer.customer);
-  const servicesDetails = useSelector((state) => state.Services.serviceDetails);
-
-  console.log(selectedWorks);
-
-  const [selectedSchedule, setSelectedSchedule] = useState('');
-
-  const handleScheduleSelect = (selectedValue) => {
-    setSelectedSchedule(selectedValue);
-  };
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: '',
-    orderNote: '',
+    address: {
+      number: '',
+      street: '',
+      ward: '',
+      district: '',
+      city: '',
+    },
+    note: '',
   });
 
-  const handleInputChange = (e) => {
-    const {
-      name, value, type, checked,
-    } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
+  const handleAddressInputChange = (field, value) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      address: {
+        ...prevFormData.address,
+        [field]: value,
+      },
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
+  const handleNoteChange = (event) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      note: event.target.value,
+    }));
   };
 
-  const generateTimeOptions = (start, end) => {
-    const timeOptions = [];
-    let currentTime = start;
+  const handleSave = () => {
+    const addressChanged = JSON.stringify(formData.address)
+    !== JSON.stringify(customerProfile.addresses[0]);
+    const noteChanged = formData.note !== customerProfile.note;
 
-    while (currentTime <= end) {
-      timeOptions.push(
-        <option key={currentTime} value={currentTime}>
-          {currentTime}
-        </option>,
-      );
-
-      currentTime = addTime(currentTime, 60);
+    if (addressChanged || noteChanged) {
+      sessionStorage.setItem('address', JSON.stringify(formData.address));
+      sessionStorage.setItem('note', JSON.stringify(formData.note));
     }
-
-    return timeOptions;
   };
 
-  const addTime = (time, minutes) => {
-    const [hours, mins] = time.split(':').map(Number);
-    const newTime = new Date(0, 0, 0, hours, mins + minutes);
-    const newHours = newTime.getHours();
-    const newMinutes = newTime.getMinutes();
-
-    return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}:00`;
-  };
+  const callbackLoginSuccess = useCallback(() => {
+    navigate('/login');
+  }, [navigate]);
 
   useEffect(() => {
-    dispatch(actionGetCustomerProfile());
+    dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
     dispatch(actionGetServiceById({ id }));
   }, []);
 
@@ -86,11 +75,27 @@ function BookingPage() {
         name: `${customerProfile.firstName || ''} ${customerProfile.lastName || ''}`,
         email: customerProfile.email || '',
         phone: customerProfile.phone || '',
-        address: `${customerProfile.addresses[0]?.number || ''} ${customerProfile.addresses[0]?.street || ''}, ${customerProfile.addresses[0]?.ward || ''}, ${customerProfile.addresses[0]?.district || ''}, ${customerProfile.addresses[0]?.city || ''}`,
+        address: customerProfile.addresses[0] || {
+          number: '',
+          street: '',
+          ward: '',
+          district: '',
+          city: '',
+        },
         orderNote: '',
       }));
     }
   }, [customerProfile]);
+
+  useEffect(() => {
+    const savedSelectedWorks = JSON.parse(sessionStorage.getItem('selectedWorks')) || [];
+    const savedTotalPrice = JSON.parse(sessionStorage.getItem('totalPrice')) || 0;
+
+    dispatch(actionSetSelectedWorks({
+      selectedWorks: savedSelectedWorks,
+      totalPrice: savedTotalPrice,
+    }));
+  }, []);
 
   return (
     <>
@@ -116,17 +121,17 @@ function BookingPage() {
                   </li>
                 </ul>
                 <div className="wsus__review_input mt_30 p-0 border-0">
-                  <form id="customer_info_form" onSubmit={handleSubmit}>
+                  <form id="customer_info_form">
                     <h3>Booking Information</h3>
                     <div className="row">
                       <div className="col-xl-6">
                         <fieldset>
-                          <legend>Name*</legend>
+                          <legend>Name</legend>
                           <input
                             type="text"
                             name="name"
                             value={formData.name}
-                            onChange={handleInputChange}
+                            readOnly
                           />
                         </fieldset>
                       </div>
@@ -138,51 +143,93 @@ function BookingPage() {
                             type="text"
                             name="email"
                             value={formData.email}
-                            onChange={handleInputChange}
+                            readOnly
                           />
                         </fieldset>
                       </div>
 
                       <div className="col-xl-6">
                         <fieldset>
-                          <legend>Phone*</legend>
+                          <legend>Phone</legend>
                           <input
                             type="text"
                             name="phone"
                             value={formData.phone}
-                            onChange={handleInputChange}
+                            readOnly
                           />
                         </fieldset>
                       </div>
 
                       <div className="col-xl-12">
-                        <fieldset>
+                        <fieldset className="p-2">
                           <legend>Your Address*</legend>
-                          <input
-                            type="text"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                          />
+                          <div>
+                            <label>Number*:</label>
+                            <input
+                              type="text"
+                              name="number"
+                              value={formData.address.number}
+                              onChange={(e) => handleAddressInputChange('number', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label>Street*:</label>
+                            <input
+                              type="text"
+                              name="street"
+                              value={formData.address.street}
+                              onChange={(e) => handleAddressInputChange('street', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label>Ward*:</label>
+                            <input
+                              type="text"
+                              name="ward"
+                              value={formData.address.ward}
+                              onChange={(e) => handleAddressInputChange('ward', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label>District*:</label>
+                            <input
+                              type="text"
+                              name="district"
+                              value={formData.address.district}
+                              onChange={(e) => handleAddressInputChange('district', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label>City*:</label>
+                            <input
+                              type="text"
+                              name="city"
+                              value={formData.address.city}
+                              onChange={(e) => handleAddressInputChange('city', e.target.value)}
+                            />
+                          </div>
                         </fieldset>
                       </div>
 
                       <div className="col-xl-12">
                         <fieldset>
-                          <legend>Order Note</legend>
+                          <legend>Booking Note</legend>
                           <textarea
                             rows="5"
-                            name="orderNote"
-                            value={formData.orderNote}
-                            onChange={handleInputChange}
-                            placeholder="Write an order note"
+                            name="note"
+                            value={formData.note}
+                            onChange={handleNoteChange}
+                            placeholder="Write an booking note"
                           />
                         </fieldset>
                       </div>
-
-                      <input type="hidden" name="extras" value="YOUR_EXTRAS_DATA" />
                     </div>
-                    <Link to={`/checkout/${id}`} id="customer_info_btn" className="common_btn">
+                    <Link
+                      to={`/checkout/${id}`}
+                      id="customer_info_btn"
+                      className="common_btn mt-2"
+                      onClick={handleSave}
+                    >
                       Next
                     </Link>
                   </form>
@@ -222,14 +269,6 @@ function BookingPage() {
                       </span>
                     </p>
                   </div>
-                </div>
-
-                <div className="wsus__booking_pic_up mt_25">
-                  <h3>Select Schedule</h3>
-                  <select id="schedule_box" onChange={(e) => handleScheduleSelect(e.target.value)}>
-                    <option value={selectedSchedule}>Select</option>
-                    {generateTimeOptions(servicesDetails?.openTime, servicesDetails?.closeTime)}
-                  </select>
                 </div>
               </div>
             </div>

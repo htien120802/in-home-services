@@ -33,6 +33,7 @@ function ChangePassword() {
     onSubmit: (values) => {
       dispatch(actionUpdateCustomerPassword({
         newPassword: {
+          currentPassword: values.currentPassword,
           password: values.newPassword,
           passwordConfirm: values.confirmNewPassword,
         },

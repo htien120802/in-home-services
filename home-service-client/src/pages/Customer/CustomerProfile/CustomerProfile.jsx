@@ -30,12 +30,16 @@ function CustomerProfile() {
     setEditAvatarModalOpen(false);
   };
 
+  const callbackLoginSuccess = useCallback(() => {
+    navigate('/login');
+  }, [navigate]);
+
   const tabs = [
     {
       id: 'dashboard', icon: 'fas fa-user', label: 'Dashboard', content: <Dashboard customerState={customerState} bookingState={bookingState} />,
     },
     {
-      id: 'order', icon: faShoppingBag, label: 'Order', content: <Order bookingState={bookingState} />,
+      id: 'order', icon: faShoppingBag, label: 'Booking', content: <Order bookingState={bookingState} />,
     },
     {
       id: 'changePassword', icon: 'fas fa-user-lock', label: 'Change Password', content: <ChangePassword />,
@@ -68,7 +72,7 @@ function CustomerProfile() {
   };
 
   useEffect(() => {
-    dispatch(actionGetCustomerProfile());
+    dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
     dispatch(actionGetCustomerBookings());
   }, []);
 

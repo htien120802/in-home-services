@@ -10,6 +10,8 @@ import {
   UPDATE_PROVIDER_AVATAR,
   UPDATE_PROVIDER_ADDRESS,
   ADD_PROVIDER_ADDRESS,
+  GET_PROVIDER_SALES_STATISTICS,
+  GET_PROVIDER_QUANTITY_STATISTICS,
 } from './actionTypes';
 
 import {
@@ -25,6 +27,10 @@ import {
   actionUpdateProviderAddressFailed,
   actionAddProviderAddressSuccess,
   actionAddProviderAddressFailed,
+  actionGetProviderSalesStatisticsSuccess,
+  actionGetProviderSalesStatisticsFailed,
+  actionGetProviderQuantityStatisticsSuccess,
+  actionGetProviderQuantityStatisticsFailed,
 } from './actions';
 
 function* getProviderProfile() {
@@ -133,6 +139,30 @@ function* addProviderAddress({ payload }) {
   }
 }
 
+function* getProviderSalesStatistics({ payload }) {
+  try {
+    const response = yield call(providerAPI.getProviderSalesStatistics, payload);
+
+    yield put(actionGetProviderSalesStatisticsSuccess(response.data));
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionGetProviderSalesStatisticsFailed());
+  }
+}
+
+function* getProviderQuantityStatistics({ payload }) {
+  try {
+    const response = yield call(providerAPI.getProviderQuantityStatistics, payload);
+
+    yield put(actionGetProviderQuantityStatisticsSuccess(response.data));
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionGetProviderQuantityStatisticsFailed());
+  }
+}
+
 export default function* providerSaga() {
   yield takeLeading(GET_PROVIDER_PROFILE, getProviderProfile);
   yield takeLeading(UPDATE_PROVIDER_PROFILE, updateProviderProfile);
@@ -140,4 +170,6 @@ export default function* providerSaga() {
   yield takeLeading(UPDATE_PROVIDER_AVATAR, updateProviderAvatar);
   yield takeLeading(UPDATE_PROVIDER_ADDRESS, updateProviderAddress);
   yield takeLeading(ADD_PROVIDER_ADDRESS, addProviderAddress);
+  yield takeLeading(GET_PROVIDER_SALES_STATISTICS, getProviderSalesStatistics);
+  yield takeLeading(GET_PROVIDER_QUANTITY_STATISTICS, getProviderQuantityStatistics);
 }

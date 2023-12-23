@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { actionDeleteProvider, actionGetAllProviders } from 'store/actions'
@@ -7,10 +7,21 @@ import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
+import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
     const dispatch = useDispatch()
     const providers = useSelector((state) => state.Admin.providers);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const indexOfLastItem = currentPage * 5;
+    const indexOfFirstItem = indexOfLastItem - 5;
+    const currentData = providers.content?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     const handleUpdateProduct = (couponId) => {
         const selectedProduct = providers.content.find((product) => product.id === couponId);
@@ -51,8 +62,8 @@ function InternalPage(){
                             </tr>
                         </thead>
                         <tbody>
-                            {providers && providers.content ? (
-                                providers.content.map((provider) => (
+                            {currentData ? (
+                                currentData.map((provider) => (
                                     <tr key={provider.email}>
                                     <td>{provider.firstName}</td>
                                     <td>{provider.lastName}</td>
@@ -89,6 +100,12 @@ function InternalPage(){
                             )}
                         </tbody>
                     </table>
+
+                    <Pagination
+                        totalItems={providers?.content?.length}
+                        onPageChange={handlePageChange}
+                        currentPage={currentPage}
+                    />
                 </div>
             </div>
         </div>

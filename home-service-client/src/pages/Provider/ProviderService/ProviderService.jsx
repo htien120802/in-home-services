@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
-import { actionDeleteProviderService, actionGetAllProviderServices } from 'store/actions';
+import { actionDeleteProviderService, actionEnableOrDisableProviderService, actionGetAllProviderServices } from 'store/actions';
 import AddServiceModal from '../ProviderProfile/AddServiceModal/AddServiceModal';
 import EditServiceModal from '../ProviderProfile/EditServiceModal/EditServiceModal';
 
@@ -32,6 +32,14 @@ function ProviderDashboard() {
     dispatch(actionDeleteProviderService({ id }));
   };
 
+  const disableService = (id) => {
+    dispatch(actionEnableOrDisableProviderService({ serviceId: id, actionType: 'disable' }));
+  };
+
+  const enableService = (id) => {
+    dispatch(actionEnableOrDisableProviderService({ serviceId: id, actionType: 'enable' }));
+  };
+
   useEffect(() => {
     dispatch(actionGetAllProviderServices());
   }, []);
@@ -58,7 +66,7 @@ function ProviderDashboard() {
                 <div key={service.id} className="col-12">
                   <div className="card service_card">
                     <div className="card-body d-flex flex-wrap justify-content-between align-items-center">
-                      <img className="service_image" src={service.thumbnail} alt={service.name} />
+                      <img className="service_image" src={service.thumbnail} alt={service.name} style={{ height: '300px', width: '300px' }} />
                       <div className="service_detail">
                         <h4>{service.name}</h4>
                         <h6>
@@ -97,31 +105,50 @@ function ProviderDashboard() {
                           Edit
                         </a>
 
-                        {service.totalOrder === 0 ? (
-                          <a
-                            href="javascript:;"
-                            onClick={() => deleteService(service.id)}
-                            data-toggle="modal"
-                            data-target="#deleteModal"
-                            className="btn btn-danger btn-sm"
-                          >
-                            <i className="fas fa-trash" />
-                            {' '}
-                            Remove
-                          </a>
-                        ) : (
-                          <a href="javascript:;" data-toggle="modal" data-target="#canNotDeleteModal" className="btn btn-danger btn-sm" disabled>
-                            <i className="fa fa-trash" aria-hidden="true" />
-                            {' '}
-                            Remove
-                          </a>
+                        <a
+                          href="javascript:;"
+                          onClick={() => deleteService(service.id)}
+                          className="btn btn-danger btn-sm ml-2"
+                        >
+                          <i className="fas fa-trash" />
+                          {' '}
+                          Remove
+                        </a>
+
+                        {service.status === 'APPROVING' && (
+                        <a
+                          href="javascript:;"
+                          className="btn btn-warning btn-sm ml-2"
+                        >
+                          <i className="fas fa-clock" />
+                          {' '}
+                          Approving
+                        </a>
                         )}
 
-                        <a href="javascript:;" className="btn btn-success btn-sm" rel="noreferrer">
+                        {service.status === 'APPROVED' && (
+                        <a
+                          href="javascript:;"
+                          className="btn btn-success btn-sm ml-2"
+                          onClick={() => disableService(service.id)}
+                        >
                           <i className="fas fa-eye" />
                           {' '}
                           Disable
                         </a>
+                        )}
+
+                        {service.status === 'DISABLE' && (
+                        <a
+                          href="javascript:;"
+                          className="btn btn-secondary btn-sm ml-2"
+                          onClick={() => enableService(service.id)}
+                        >
+                          <i className="fas fa-eye-slash" />
+                          {' '}
+                          Enable
+                        </a>
+                        )}
                       </div>
                     </div>
                   </div>

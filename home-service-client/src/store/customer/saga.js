@@ -27,13 +27,18 @@ import {
   actionAddCustomerAddressFailed,
 } from './actions';
 
-function* getCustomerProfile() {
+function* getCustomerProfile({ payload }) {
   try {
     const response = yield call(customerAPI.getCustomerProfile);
 
     yield put(actionGetCustomerProfileSuccess(response.data));
   } catch (error) {
-    yield put(actionGetCustomerProfileFailed());
+    if (error.response && error.response.status === 403) {
+      payload.callback();
+      put(actionGetCustomerProfileFailed());
+    } else {
+      yield put(actionGetCustomerProfileFailed());
+    }
   }
 }
 

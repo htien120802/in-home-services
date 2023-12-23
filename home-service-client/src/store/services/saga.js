@@ -48,9 +48,7 @@ function* getAllProviderServices() {
 
 function* updateProviderService({ payload }) {
   try {
-    const { serviceData } = payload;
-
-    const response = yield call(serviceAPI.updateProviderService, serviceData);
+    const response = yield call(serviceAPI.updateProviderService, payload);
 
     yield put(actionUpdateProviderServiceSuccess(response.data));
 
@@ -68,9 +66,7 @@ function* updateProviderService({ payload }) {
 
 function* registerProviderService({ payload }) {
   try {
-    const { serviceData } = payload;
-
-    const response = yield call(serviceAPI.registerToProvideService, serviceData);
+    const response = yield call(serviceAPI.registerToProvideService, payload);
 
     yield put(actionRegisterProviderServiceSuccess(response.data));
 
@@ -92,7 +88,7 @@ function* enableOrDisableProviderService({ payload }) {
 
     const response = yield call(serviceAPI.enableOrDisableService, serviceId, actionType);
 
-    yield put(actionEnableOrDisableProviderServiceSuccess(response.data));
+    yield put(actionEnableOrDisableProviderServiceSuccess({ serviceId, actionType }));
 
     if (response.status === 'success') {
       toast.success(response.message);
@@ -162,11 +158,9 @@ function* getProviderServicesByStatus({ payload }) {
 
 function* deleteProviderService({ payload }) {
   try {
-    const { serviceId } = payload;
+    const response = yield call(serviceAPI.deleteProviderService, payload.id);
 
-    const response = yield call(serviceAPI.deleteProviderService, serviceId);
-
-    yield put(actionDeleteProviderServiceSuccess(serviceId));
+    yield put(actionDeleteProviderServiceSuccess(payload.id));
 
     if (response.status === 'success') {
       toast.success(response.message);

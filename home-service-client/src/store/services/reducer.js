@@ -53,14 +53,38 @@ const serviceReducer = (state = initialState, action) => {
       };
 
     case GET_ALL_PROVIDER_SERVICES_SUCCESS:
-    case UPDATE_PROVIDER_SERVICE_SUCCESS:
-    case REGISTER_PROVIDER_SERVICE_SUCCESS:
-    case ENABLE_OR_DISABLE_PROVIDER_SERVICE_SUCCESS:
     case APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS:
       return {
         ...state,
         loading: false,
         providerServices: action.payload,
+      };
+
+    case UPDATE_PROVIDER_SERVICE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        providerServices: state.providerServices.map((service) => (service.id === action.payload.id ? { ...service, ...action.payload } : service)),
+      };
+
+    case ENABLE_OR_DISABLE_PROVIDER_SERVICE_SUCCESS:
+    {
+      const updatedServices = state.providerServices.map((service) => (service.id === action.payload.serviceId
+        ? { ...service, status: action.payload.actionType === 'disable' ? 'DISABLE' : 'APPROVED' }
+        : service));
+
+      return {
+        ...state,
+        loading: false,
+        providerServices: updatedServices,
+      };
+    }
+
+    case REGISTER_PROVIDER_SERVICE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        providerServices: [...state.providerServices, action.payload],
       };
 
     case GET_ALL_PUBLIC_SERVICES_SUCCESS:
@@ -89,7 +113,7 @@ const serviceReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         providerServices: state.providerServices.filter(
-          (service) => service.id !== action.payload.serviceId,
+          (service) => service.id !== action.payload,
         ),
       };
 

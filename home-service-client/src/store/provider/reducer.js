@@ -17,12 +17,19 @@ import {
   ADD_PROVIDER_ADDRESS,
   ADD_PROVIDER_ADDRESS_SUCCESS,
   ADD_PROVIDER_ADDRESS_FAILED,
+  GET_PROVIDER_SALES_STATISTICS,
+  GET_PROVIDER_SALES_STATISTICS_SUCCESS,
+  GET_PROVIDER_SALES_STATISTICS_FAILED,
+  GET_PROVIDER_QUANTITY_STATISTICS,
+  GET_PROVIDER_QUANTITY_STATISTICS_SUCCESS,
+  GET_PROVIDER_QUANTITY_STATISTICS_FAILED,
 } from './actionTypes';
 
 const initialState = {
   loading: false,
   provider: null,
-  addresses: [],
+  salesStatistics: [],
+  quantityStatistics: [],
 };
 
 const providerReducer = (state = initialState, action) => {
@@ -34,6 +41,8 @@ const providerReducer = (state = initialState, action) => {
     case UPDATE_PROVIDER_AVATAR:
     case UPDATE_PROVIDER_ADDRESS:
     case ADD_PROVIDER_ADDRESS:
+    case GET_PROVIDER_SALES_STATISTICS:
+    case GET_PROVIDER_QUANTITY_STATISTICS:
       return {
         ...state,
         loading: true,
@@ -43,18 +52,26 @@ const providerReducer = (state = initialState, action) => {
     case UPDATE_PROVIDER_PROFILE_SUCCESS:
     case UPDATE_PROVIDER_PASSWORD_SUCCESS:
     case UPDATE_PROVIDER_AVATAR_SUCCESS:
+    case UPDATE_PROVIDER_ADDRESS_SUCCESS:
+    case ADD_PROVIDER_ADDRESS_SUCCESS:
       return {
         ...state,
         loading: false,
         provider: action.payload,
       };
 
-    case UPDATE_PROVIDER_ADDRESS_SUCCESS:
-    case ADD_PROVIDER_ADDRESS_SUCCESS:
+    case GET_PROVIDER_SALES_STATISTICS_SUCCESS:
       return {
         ...state,
         loading: false,
-        addresses: action.payload,
+        salesStatistics: action.payload,
+      };
+
+    case GET_PROVIDER_QUANTITY_STATISTICS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        quantityStatistics: action.payload,
       };
 
     case GET_PROVIDER_PROFILE_FAILED:
@@ -63,6 +80,8 @@ const providerReducer = (state = initialState, action) => {
     case UPDATE_PROVIDER_AVATAR_FAILED:
     case UPDATE_PROVIDER_ADDRESS_FAILED:
     case ADD_PROVIDER_ADDRESS_FAILED:
+    case GET_PROVIDER_SALES_STATISTICS_FAILED:
+    case GET_PROVIDER_QUANTITY_STATISTICS_FAILED:
       return {
         ...state,
         loading: false,

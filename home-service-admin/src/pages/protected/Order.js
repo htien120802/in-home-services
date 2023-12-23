@@ -1,14 +1,25 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { actionDeleteBooking, actionGetAllBookings } from 'store/actions';
 
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
+import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
 
     const dispatch = useDispatch();
     const bookings = useSelector((state) => state.Admin.bookings);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const indexOfLastItem = currentPage * 5;
+    const indexOfFirstItem = indexOfLastItem - 5;
+    const currentData = bookings.content?.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     const handleDeleteBooking = (couponId) => {
         dispatch(actionDeleteBooking({id: couponId}))
@@ -26,8 +37,7 @@ function InternalPage(){
                 <table className="table w-full mt-4">
                 <thead>
                     <tr>
-                    <th style={{ position: 'static', left: 'auto' }}>ID</th>
-                    <th>Customer</th>
+                    <th style={{ position: 'static', left: 'auto' }}>Customer</th>
                     <th>Provider</th>
                     <th>Service</th>
                     <th>Booking Items</th>
@@ -43,10 +53,9 @@ function InternalPage(){
                     </tr>
                 </thead>
                 <tbody>
-                    {bookings && bookings.content ? (
-                    bookings.content.map((booking) => (
+                    {currentData ? (
+                    currentData.map((booking) => (
                         <tr key={booking.id}>
-                            <td>{booking.id}</td>
                             <td>{`${booking.customer.firstName} ${booking.customer.lastName}`}</td>
                             <td>{`${booking.provider.firstName} ${booking.provider.lastName}`}</td>
                             <td>{booking.service.name}</td>
@@ -80,6 +89,12 @@ function InternalPage(){
                     )}
                 </tbody>
                 </table>
+
+                <Pagination
+                    totalItems={bookings?.content?.length}
+                    onPageChange={handlePageChange}
+                    currentPage={currentPage}
+                />
             </div>
             </div>
         </div>

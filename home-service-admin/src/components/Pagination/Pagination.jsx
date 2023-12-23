@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 function Pagination({
   totalItems,
-  itemsPerPage,
+  itemsPerPage = 5,
   onPageChange,
   currentPage,
   visiblePages = 5, // Number of visible page buttons
@@ -20,25 +20,33 @@ function Pagination({
     const pageNumbers = [];
     const startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
     const endPage = Math.min(totalPages, startPage + visiblePages - 1);
-
+  
     for (let i = startPage; i <= endPage; i += 1) {
       pageNumbers.push(
-        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
-          <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
+        <li key={i}>
+          <button
+            type="button"
+            className={`page-link btn ${currentPage === i ? 'btn-primary' : ''}`}
+            onClick={() => handlePageChange(i)}
+          >
             {i}
           </button>
         </li>,
       );
     }
-
-    return pageNumbers;
+  
+    return (
+      <div>
+        <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0 }}>
+          {pageNumbers}
+        </ul>
+    </div>
+    );
   };
-
+  
   return (
-    <div className="row">
-      <ul className="pagination">
+    <div>
         {generatePageNumbers()}
-      </ul>
     </div>
   );
 }

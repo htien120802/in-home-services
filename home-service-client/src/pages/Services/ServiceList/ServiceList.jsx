@@ -48,7 +48,7 @@ function ServiceList({ queryParams }) {
     return groupedServices.map((serviceGroup) => (
       <div key={uuidv4()} className="row">
         {serviceGroup.map((service) => (
-          <div key={service.id} className="col-md-4 d-flex">
+          <Link to={`/services/${service.id}`} key={service.id} className="col-md-4 d-flex">
             <div className="full decorate_blog flex-column">
               <img
                 src={service.thumbnail}
@@ -60,26 +60,31 @@ function ServiceList({ queryParams }) {
                 {service.name}
               </Link>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     ));
   };
 
   useEffect(() => {
-    if (pageNumber === undefined || Number.isNaN(Number(pageNumber))) {
+    if (
+      pageNumber === undefined
+      || Number.isNaN(Number(pageNumber))
+      || pageNumber < 0
+      || (publicServices.totalPages > 0 && pageNumber >= publicServices.totalPages)
+    ) {
       navigate('/services/page/0');
     } else {
       dispatch(actionGetAllPublicServices({
         pageNumber: parseInt(pageNumber, 10),
-        size: 20,
+        size: 9,
         sortBy: queryParams.sortBy,
         sortDirection: queryParams.sortDirection,
         name: queryParams.name,
         categorySlug: queryParams.categorySlug,
       }));
     }
-  }, [dispatch, pageNumber, navigate, queryParams]);
+  }, [dispatch, pageNumber, navigate, queryParams, publicServices.totalPages]);
 
   return (
     <div className="container">
@@ -90,7 +95,8 @@ function ServiceList({ queryParams }) {
           <div className="wsus__pagination">
             <nav aria-label="Page navigation example">
               <ul className="pagination">
-                <li className={`page-item ${pageNumber === 0 ? 'disabled' : ''}`}>
+                {pageNumber > 0 && (
+                <li className="page-item">
                   <Link
                     className="page-link"
                     to={`/services/page/${parseInt(pageNumber, 10) - 1}`}
@@ -102,8 +108,12 @@ function ServiceList({ queryParams }) {
                     <FontAwesomeIcon icon={faAngleLeft} />
                   </Link>
                 </li>
+                )}
+
                 {renderPaginationLinks()}
-                <li className={`page-item ${pageNumber === publicServices.totalPages - 1 ? 'disabled' : ''}`}>
+
+                {pageNumber < publicServices.totalPages - 1 && (
+                <li className="page-item">
                   <Link
                     className="page-link"
                     to={`/services/page/${parseInt(pageNumber, 10) + 1}`}
@@ -115,6 +125,7 @@ function ServiceList({ queryParams }) {
                     <FontAwesomeIcon icon={faAngleRight} />
                   </Link>
                 </li>
+                )}
               </ul>
             </nav>
           </div>
@@ -127,8 +138,8 @@ function ServiceList({ queryParams }) {
 ServiceList.propTypes = {
   queryParams: PropTypes.shape({
     name: PropTypes.string,
-    sortBy: PropTypes.oneOf(['distance', 'avgRating']),
-    sortDirection: PropTypes.oneOf(['ASC', 'DESC']),
+    sortBy: PropTypes.oneOf(['distance', 'avgRating', '']),
+    sortDirection: PropTypes.oneOf(['ASC', 'DESC', '']),
     categorySlug: PropTypes.string,
   }).isRequired,
 };

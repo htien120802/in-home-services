@@ -7,8 +7,8 @@ import {
 } from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
-import ServicesRelated from './ServicesRelated/ServicesRelated';
 
+import { v4 as uuidv4 } from 'uuid';
 import { formatPriceWithCommas } from 'utils';
 
 import './index.module.css';
@@ -25,7 +25,6 @@ function ServiceDetails() {
   const {
     name,
     descriptions,
-    category,
     thumbnail,
     openTime,
     closeTime,
@@ -102,6 +101,8 @@ function ServiceDetails() {
     const tp = calculateTotalPrice();
 
     dispatch(actionSetSelectedWorks({ selectedWorks: updatedSelectedWorks, totalPrice: tp }));
+    sessionStorage.setItem('selectedWorks', JSON.stringify(updatedSelectedWorks));
+    sessionStorage.setItem('totalPrice', JSON.stringify(tp));
   };
 
   const handleTabClick = (tab) => {
@@ -128,6 +129,16 @@ function ServiceDetails() {
   useEffect(() => {
     dispatch(actionGetServiceById({ id }));
     dispatch(actionGetAllServiceReviews({ id }));
+  }, []);
+
+  useEffect(() => {
+    const savedSelectedWorks = JSON.parse(sessionStorage.getItem('selectedWorks')) || [];
+    const savedTotalPrice = JSON.parse(sessionStorage.getItem('totalPrice')) || 0;
+
+    dispatch(actionSetSelectedWorks({
+      selectedWorks: savedSelectedWorks,
+      totalPrice: savedTotalPrice,
+    }));
   }, []);
 
   return (
@@ -190,10 +201,10 @@ function ServiceDetails() {
                                   <label htmlFor={`work_${work.id}`}>
                                     {work.description}
                                     {' '}
-                                    - $
-                                    {work.pricePerUnit}
+                                    -
                                     {' '}
-                                    per unit
+                                    {work.pricePerUnit}
+                                    đ
                                   </label>
 
                                   <div className="align-items-center">
@@ -238,17 +249,15 @@ function ServiceDetails() {
                     <div className={`tab-pane fade ${activeTab === 'availability' ? 'show active' : ''}`} role="tabpanel">
                       <h4>Service Availability  </h4>
                       <ul className="details_time">
-                        {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
-                          <li key={day}>
-                            <span>{day}</span>
-                            {' '}
-                            {openTime}
-                            {' '}
-                            -
-                            {' '}
-                            {closeTime}
-                          </li>
-                        ))}
+                        <li>
+                          <span>Every Day</span>
+                          {' '}
+                          {openTime}
+                          {' '}
+                          -
+                          {' '}
+                          {closeTime}
+                        </li>
                       </ul>
                     </div>
 
@@ -263,32 +272,40 @@ function ServiceDetails() {
 
                       <div className="other-reviews">
                         <h4>Other Reviews</h4>
-                        <ul>
+                        <ul className="list-unstyled">
                           {reviews && reviews.content && reviews.content.map((review) => (
-                            <li key={review.id}>
-                              <div>
-                                <strong>{`${review.customer.firstName} ${review.customer.lastName}`}</strong>
-                                <img
-                                  src={review.customer.avatar}
-                                  alt={`Avatar of ${review.customer.firstName}`}
-                                  style={{
-                                    width: '50px',
-                                    height: '50px',
-                                    borderRadius: '50%',
-                                    marginRight: '10px',
-                                  }}
-                                />
-                                <p>
-                                  Rating:
-                                  {' '}
-                                  {review.rating}
-                                </p>
-                                <p>{review.comment}</p>
-                                <p>
-                                  Date:
-                                  {' '}
-                                  {new Date(review.date).toLocaleDateString()}
-                                </p>
+                            <li key={review.id} className="card mb-3" style={{ borderColor: '#fcbf49' }}>
+                              <div className="card-body">
+                                <div className="row">
+                                  <div className="col-md-1">
+                                    <img
+                                      src={review.customer.avatar}
+                                      alt={`Avatar of ${review.customer.firstName}`}
+                                      className="rounded-circle"
+                                      style={{ width: '50px', height: '50px' }}
+                                    />
+                                  </div>
+                                  <div className="col-md-10">
+                                    <strong>{`${review.customer.firstName} ${review.customer.lastName}`}</strong>
+                                    <p className="mb-2">
+                                      {[1, 2, 3, 4, 5].map((value) => (
+                                        <i
+                                          key={value}
+                                          className={`fa${value <= review.rating ? 's' : 'r'} fa-star ml-1`}
+                                          onClick={() => handleUserRating(value)}
+                                          aria-hidden="true"
+                                          style={{ color: '#fcbf49' }}
+                                        />
+                                      ))}
+                                      {' '}
+                                      <span style={{ fontSize: '12px' }}>
+                                        {new Date(review.date).toLocaleDateString()}
+                                      </span>
+                                    </p>
+
+                                    <p className="mb-2 mt-2">{review.comment}</p>
+                                  </div>
+                                </div>
                               </div>
                             </li>
                           ))}
@@ -351,32 +368,12 @@ function ServiceDetails() {
                 }}
               >
                 <div className="row">
-                  <div className="col-12 col-md-6 col-lg-12">
-                    <div className="wsus__package">
-                      <p>My Package</p>
-                      <h2>
-                        {formatPriceWithCommas(totalPrice || 0)}
-                        đ
-                      </h2>
-                      <ul>
-                        {selectedWorks.map((selectedWork) => (
-                          <li key={selectedWork.description}>
-                            {selectedWork.work.description}
-                            :
-                            {' '}
-                            {selectedWork.quantity}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link to={`/booking/${id}`}>Book Now</Link>
-                    </div>
-                  </div>
                   <div id="providerInfo" className="col-12 col-md-6 col-lg-12">
-                    <div className="wsus__service_provider mt_25">
+                    <div className="wsus__service_provider">
                       <img id="providerAvatar" src={provider?.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=200&d=mp'} alt="service provider" className="img-fluid w-100" />
                       <h3><a id="providerLink" href="#">{`${provider?.firstName} ${provider?.lastName}`}</a></h3>
                       <div className="info">
-                        <p>
+                        {/* <p>
                           Order Complete
                           <span id="orderComplete">0</span>
                         </p>
@@ -391,7 +388,7 @@ function ServiceDetails() {
                             <span id="providerRating">(0)</span>
                           </b>
                         </p>
-                        <hr />
+                        <hr /> */}
 
                         <a id="providerPhone" href="tel:">
                           <i className="fas fa-phone-alt" aria-hidden="true" />
@@ -407,14 +404,33 @@ function ServiceDetails() {
                       </div>
                     </div>
                   </div>
+
+                  <div className="col-12 col-md-6 col-lg-12">
+                    <div className="wsus__package mt_25">
+                      <p>My Package</p>
+                      <h2>
+                        {formatPriceWithCommas(totalPrice || 0)}
+                        đ
+                      </h2>
+                      <ul>
+                        {selectedWorks.map((selectedWork) => (
+                          <li key={uuidv4()}>
+                            {selectedWork.work.description}
+                            :
+                            {' '}
+                            {selectedWork.quantity}
+                          </li>
+                        ))}
+                      </ul>
+                      <Link to={`/booking/${id}`}>Book Now</Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      <ServicesRelated category={category} />
     </>
   );
 }
