@@ -49,11 +49,11 @@ public class BookingController {
         return bookingService.getBookingOfCustomer(bookingId, request);
     }
 
-    @Operation(summary = "Get all bookings of customer by status")
-    @GetMapping("/customer/booking/{status}")
-    public ResponseEntity<?> getAllBookingOfCustomerByStatus(@PathVariable String status, HttpServletRequest request){
-        return bookingService.getAllBookingOfCustomerByStatus(status, request);
-    }
+//    @Operation(summary = "Get all bookings of customer by status")
+//    @GetMapping("/customer/booking/{status}")
+//    public ResponseEntity<?> getAllBookingOfCustomerByStatus(@PathVariable String status, HttpServletRequest request){
+//        return bookingService.getAllBookingOfCustomerByStatus(status, request);
+//    }
 
     @Operation(summary = "Customer cancel booking")
     @PutMapping("/customer/booking/{bookingId}/cancel")

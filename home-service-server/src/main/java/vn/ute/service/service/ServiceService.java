@@ -17,6 +17,7 @@ import vn.ute.service.dto.WorkDto;
 import vn.ute.service.dto.request.ApproveRegisterServiceRequest;
 import vn.ute.service.dto.request.RegisterServiceRequest;
 import vn.ute.service.dto.response.ResponseDto;
+import vn.ute.service.dto.response.ServiceResponse;
 import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.ServiceStatus;
 import vn.ute.service.exception.ImageUploadException;
@@ -25,6 +26,7 @@ import vn.ute.service.repository.*;
 import vn.ute.service.repository.criteria.ServiceCriteriaRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ServiceService {
@@ -166,7 +168,7 @@ public class ServiceService {
 
     public ResponseEntity<ResponseDto<?>> getServiceByProvider(HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
-        List<ServiceDto> services = mapper.map(serviceRepository.findAllByProvider_Account_Username(username),new TypeToken<List<ServiceDto>>() {}.getType());
+        List<ServiceResponse> services = serviceRepository.findAllByProvider_Account_Username(username).stream().map(service -> mapper.map(service, ServiceResponse.class)).collect(Collectors.toList());
 
         return ResponseEntity.status(200).body(new ResponseDto<>("success","Get services by provider successfully!",services));
     }
@@ -280,10 +282,13 @@ public class ServiceService {
                         serviceDtos.sort(Comparator.comparingDouble(ServiceDto::getAvgRating).reversed().thenComparingDouble(ServiceDto::getDistance));
                     }
                 }
+                int startIndex = pageNumber * size;
+                int endIndex = Math.min(startIndex + size, serviceDtos.size());
+                List<ServiceDto> results = serviceDtos.subList(startIndex, endIndex);
 
                 Sort sort = Sort.by(sortDirection, sortBy);
                 Pageable pageable = PageRequest.of(pageNumber,size, sort);
-                Page<ServiceDto> page = new PageImpl<>(serviceDtos,pageable,serviceDtos.size());
+                Page<ServiceDto> page = new PageImpl<>(results,pageable,serviceDtos.size());
                 return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all services successfully!",page));
             }
         }

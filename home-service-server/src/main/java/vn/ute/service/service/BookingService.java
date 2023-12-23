@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -111,8 +112,8 @@ public class BookingService {
         CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(provider.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
         CoordinatesDto coordinates2;
         if (bookingRequest.getAddress() != null){
-            booking.setAddress(booking.getAddress());
-            coordinates2 = bingMapsService.getLocation(booking.getAddress());
+            booking.setAddress(bookingRequest.getAddress());
+            coordinates2 = bingMapsService.getLocation(bookingRequest.getAddress());
         } else {
             AddressEntity temp = new ArrayList<>(customer.getAddresses()).get(0);
             booking.setAddress(temp.toString());
@@ -259,7 +260,7 @@ public class BookingService {
                 booking.setStatus(BookingStatus.DONE);
                 if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){
                     booking.getPayment().setPaymentStatus(PaymentStatus.PAID);
-                    booking.getPayment().setPaymentDate(String.valueOf(new Date(System.currentTimeMillis())));
+                    booking.getPayment().setPaymentDate(new Timestamp(System.currentTimeMillis()));
                 }
 
             } else {
@@ -377,8 +378,8 @@ public class BookingService {
         CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(provider.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
         CoordinatesDto coordinates2;
         if (bookingRequest.getAddress() != null){
-            booking.setAddress(booking.getAddress());
-            coordinates2 = bingMapsService.getLocation(booking.getAddress());
+            booking.setAddress(bookingRequest.getAddress());
+            coordinates2 = bingMapsService.getLocation(bookingRequest.getAddress());
         } else {
             AddressEntity temp = new ArrayList<>(customer.getAddresses()).get(0);
             booking.setAddress(temp.toString());
