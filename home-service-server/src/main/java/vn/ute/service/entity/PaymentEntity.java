@@ -31,7 +31,7 @@ public class PaymentEntity {
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
 
-    private Integer amount;
+    private long amount;
 
     private String paymentDate;
 

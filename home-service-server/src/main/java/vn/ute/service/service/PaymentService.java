@@ -147,7 +147,7 @@ public class PaymentService {
         String vnp_TransactionType = "02" ;
         String vnp_TxnRef = String.valueOf(booking.getId());
         // response từ query trả về từ vnpay ko cần *100, nó đã sẵn nhân 100 rồi
-        int amount = booking.getTotalPrice() ;//Integer.parseInt(req.getParameter("amount"))*100;//150000 * 100;10000000
+        long amount = booking.getTotalPrice() ;//Integer.parseInt(req.getParameter("amount"))*100;//150000 * 100;10000000
         String vnp_Amount = String.valueOf(amount);
         String vnp_OrderInfo = "Hoan tien GD " + vnp_TxnRef + ":";
         String vnp_TransactionNo = booking.getPayment().getTransactionNo();

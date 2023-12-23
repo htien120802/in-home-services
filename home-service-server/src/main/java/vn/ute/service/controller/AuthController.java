@@ -3,10 +3,8 @@ package vn.ute.service.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import vn.ute.service.dto.request.ResetPasswordRequest;
 import vn.ute.service.dto.request.SignInRequest;
 import vn.ute.service.dto.request.SignUpRequest;
 import vn.ute.service.dto.response.ResponseDto;
@@ -43,6 +41,17 @@ public class AuthController {
     public  ResponseEntity<ResponseDto<?>> refreshToken(HttpServletRequest request){
      return authService.refreshToken(request);
     }
+
+    @GetMapping("/resetpasswordtoken")
+    public ResponseEntity<?> generateResetPasswordToken(@RequestParam("loginName") String loginName){
+        return authService.generateResetPasswordToken(loginName);
+    }
+
+    @PostMapping("/resetpassword")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest){
+        return authService.resetPassword(resetPasswordRequest);
+    }
+
 
 
 }

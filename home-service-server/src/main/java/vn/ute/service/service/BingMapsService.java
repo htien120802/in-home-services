@@ -9,9 +9,7 @@ import vn.ute.service.dto.CoordinatesDto;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 
 @Service
@@ -118,4 +116,40 @@ public class BingMapsService {
         return distanceMt / 1000;
     }
 
+    public double calcMovingTime(CoordinatesDto coordinatesDto1, CoordinatesDto coordinatesDto2) throws IOException {
+        double startLat = coordinatesDto1.getLat();
+        double startLng = coordinatesDto1.getLng();
+        double endLat = coordinatesDto2.getLat();
+        double endLng = coordinatesDto2.getLng();
+        String apiUrl = "https://dev.virtualearth.net/REST/V1/Routes/Driving?o=xml&wp.0="
+                + startLat + "," + startLng + "&wp.1=" + endLat + "," + endLng + "&key=" + bingMapsApiKey;
+        URL url = new URL(apiUrl);
+
+        // Open the connection
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        // Read the response
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+
+        // Close the reader and connection
+        reader.close();
+        connection.disconnect();
+
+        // Parse the XML response to extract driving time
+        String xmlResponse = response.toString();
+        int index = xmlResponse.indexOf("<TravelDurationTraffic>");
+        int startIndex = xmlResponse.indexOf(">", index) + 1;
+        int endIndex = xmlResponse.indexOf("<", startIndex);
+        String durationString = xmlResponse.substring(startIndex, endIndex);
+
+        // Convert the duration to minutes
+        return Double.parseDouble(durationString);
+    }
 }

@@ -17,6 +17,7 @@ import vn.ute.service.entity.AccountEntity;
 import vn.ute.service.entity.AddressEntity;
 import vn.ute.service.entity.CoordinatesEntity;
 import vn.ute.service.entity.CustomerEntity;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.AccountRepository;
 import vn.ute.service.repository.AddressRepository;
@@ -55,17 +56,22 @@ public class CustomerService {
     }
 
     @Transactional
-    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> updateProfile(ProfileRequest customerProfile, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         Optional<CustomerEntity> customer = customerRepository.findByAccount_Username(username);
         if (customer.isPresent()){
             CustomerEntity temp = customer.get();
             mapper.map(customerProfile,temp);
+            AddressEntity addressEntity = addressRepository.findById(customerProfile.getAddress().getId()).get();
+            mapper.map(customerProfile.getAddress(), addressEntity);
+            CoordinatesDto coordinatesDto = bingMapsService.getLocation(addressEntity.toString());
+            mapper.map(coordinatesDto,addressEntity.getCoordinates());
+            addressRepository.save(addressEntity);
             temp = customerRepository.save(temp);
-            return ResponseEntity.ok(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, CustomerDto.class)));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Update profile successfully!", mapper.map(temp, CustomerDto.class)));
         }
         else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","Customer not found!",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
         }
     }
     @Transactional
@@ -75,26 +81,31 @@ public class CustomerService {
 
         Optional<CustomerEntity> customerEntity = customerRepository.findByAccount_Username(username);
         if (customerEntity.isPresent()){
+
+            if (customerEntity.get().getAddresses().size() == 1)
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","You have already added address!", null));
+
             addressEntity.setCustomer(customerEntity.get());
             CoordinatesDto coordinatesDto = bingMapsService.getLocation(addressEntity.toString());
             CoordinatesEntity coordinates = mapper.map(coordinatesDto,CoordinatesEntity.class);
             coordinates.setAddress(addressEntity);
             addressEntity.setCoordinates(coordinates);
-            addressEntity = addressRepository.save(addressEntity);
+            addressEntity.setCustomer(customerEntity.get());
+            addressRepository.save(addressEntity);
 
-            customerEntity.get().getAddresses().add(addressEntity);
+//            customerEntity.get().getAddresses().add(addressEntity);
 //            customerRepository.save(customerEntity.get());
-            CustomerDto customerDto = mapper.map(customerEntity.get(),CustomerDto.class);
-            return ResponseEntity.ok(new ResponseDto<>("success","Add address successfully",customerDto));
+//            CustomerDto customerDto = mapper.map(customerEntity.get(),CustomerDto.class);
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Add address successfully",mapper.map(addressEntity, AddressDto.class)));
         }else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","Can not find customer",null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Can not find customer",null));
         }
     }
 
     public ResponseEntity<ResponseDto<CustomerDto>> getProfile(HttpServletRequest request) {
         String username = jwtService.getUsernameFromRequest(request);
         Optional<CustomerEntity> customerEntity = customerRepository.findByAccount_Username(username);
-        return customerEntity.map(entity -> ResponseEntity.ok(new ResponseDto<>("success", "Get profile successfully", mapper.map(entity, CustomerDto.class)))).orElseGet(() -> ResponseEntity.ok(new ResponseDto<>("fail", "Can not find customer", null)));
+        return customerEntity.map(entity -> ResponseEntity.status(200).body(new ResponseDto<>("success", "Get profile successfully", mapper.map(entity, CustomerDto.class)))).orElseGet(() -> ResponseEntity.status(404).body(new ResponseDto<>("fail", "Can not find customer", null)));
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> updateAddress(AddressDto addressDto, HttpServletRequest request) throws IOException {
@@ -105,15 +116,15 @@ public class CustomerService {
             mapper.map(addressDto, address);
             CoordinatesDto coordinatesDto = bingMapsService.getLocation(address.toString());
             mapper.map(coordinatesDto,address.getCoordinates());
-            return ResponseEntity.ok(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success", "Update address successfully", mapper.map(addressRepository.save(address),AddressDto.class)));
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail","You are not allowed",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You are not allowed",null));
         }
     }
     @Transactional
     public ResponseEntity<ResponseDto<?>> updatePassword(UpdatePasswordRequest updatePasswordRequest, HttpServletRequest request) {
         if (!updatePasswordRequest.getPassword().equals(updatePasswordRequest.getPasswordConfirm())){
-            return ResponseEntity.ok(new ResponseDto<>("fail","Password and password confirm don't matching!",null));
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","Password and password confirm don't matching!",null));
         }
         String username = jwtService.getUsernameFromRequest(request);
         AccountEntity account = accountRepository.findByUsername(username).orElse(null);
@@ -121,32 +132,32 @@ public class CustomerService {
             // String passwordUpdate = passwordEncoder.encode(updatePasswordRequest.getPassword());
             String passwordUpdate = updatePasswordRequest.getPassword();
             if (passwordEncoder.matches(passwordUpdate, account.getPassword())){
-                return ResponseEntity.ok(new ResponseDto<>("fail","This password and current password are the same. Please change!", null));
+                return ResponseEntity.status(400).body(new ResponseDto<>("fail","This password and current password are the same. Please change!", null));
             } else {
                 account.setPassword(passwordEncoder.encode(passwordUpdate));
                 accountRepository.save(account);
-                return ResponseEntity.ok(new ResponseDto<>("success","Update password successfully!",null));
+                return ResponseEntity.status(200).body(new ResponseDto<>("success","Update password successfully!",null));
             }
         } else {
-            return ResponseEntity.ok(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
         }
     }
     @Transactional
-    public ResponseEntity<ResponseDto<?>> updateAvatar(MultipartFile avatar, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto<?>> updateAvatar(MultipartFile avatar, HttpServletRequest request) throws ImageUploadException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
 
         if (customer == null)
-            return ResponseEntity.ok(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Not found customer with user " + username + "!", null));
 
         String url = imageService.uploadImage(avatar);
         if (url == null)
-            return ResponseEntity.ok(new ResponseDto<>("fail", "Fail to upload image!", null));
+            return ResponseEntity.status(500).body(new ResponseDto<>("fail", "Fail to upload image!", null));
 
         customer.setAvatar(url);
         customer = customerRepository.save(customer);
 
-        return ResponseEntity.ok(new ResponseDto<>("success","Update avatar successfully!",mapper.map(customer,CustomerDto.class)));
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Update avatar successfully!",mapper.map(customer,CustomerDto.class)));
 
     }
 }

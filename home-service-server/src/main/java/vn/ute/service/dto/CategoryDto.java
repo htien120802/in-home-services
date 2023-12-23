@@ -11,5 +11,6 @@ import java.util.UUID;
 public class CategoryDto {
     private UUID id;
     private String categoryName;
-    private String description;
+    private String slug;
+    private String thumbnail;
 }

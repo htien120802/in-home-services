@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,12 @@ public class JwtService {
 
     public long getRefreshExpiration() {
         return refreshExpiration;
+    }
+
+    public boolean checkHaveToken(HttpServletRequest request){
+        if (request.getHeader("Authorization") == null)
+            return false;
+        return true;
     }
 
     public String getUsernameFromRequest(HttpServletRequest request){
@@ -49,7 +56,9 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> map = new HashMap<>();
+        map.put("role", new ArrayList<>(userDetails.getAuthorities()).get(0).getAuthority());
+        return generateToken(map, userDetails);
     }
 
     public String generateToken(

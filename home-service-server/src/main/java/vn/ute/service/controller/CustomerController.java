@@ -12,6 +12,7 @@ import vn.ute.service.dto.CustomerDto;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.request.UpdatePasswordRequest;
 import vn.ute.service.dto.response.ResponseDto;
+import vn.ute.service.exception.ImageUploadException;
 import vn.ute.service.service.CustomerService;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class CustomerController {
     }
     @Operation(summary = "Update profile of customer")
     @PutMapping(value = "/customer/profile")
-    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest customerProfile, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<?>> updateProfile(@RequestBody ProfileRequest customerProfile, HttpServletRequest request) throws IOException {
         return customerService.updateProfile(customerProfile,request);
     }
     @Operation(summary = "Add new address for customer")
@@ -52,7 +53,7 @@ public class CustomerController {
     }
     @Operation(summary = "Update password of customer")
     @PutMapping(value = "/customer/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto<?>> updateAvatar(@RequestPart MultipartFile avatar, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<?>> updateAvatar(@RequestPart MultipartFile avatar, HttpServletRequest request) throws ImageUploadException {
         return customerService.updateAvatar(avatar, request);
     }
 }
