@@ -22,7 +22,7 @@ function* refreshToken() {
 
     axiosClient.defaults.headers.Authorization = `Bearer ${response.data.accessToken}`;
   } catch (error) {
-    toast.error(error.response.data);
+    toast.error(error.response.data.message);
 
     yield put(actionRefreshTokenFailed());
   }

@@ -4,9 +4,23 @@ export const LOCATION = {
   ABOUT: '/about',
   SERVICES: '/services',
   CONTACT: '/contact',
-  REVIEWS: '/reviews',
   LOGIN: '/login',
   REGISTER: '/register',
+
+  PROFILE: '/profile',
+  BOOKING: '/booking',
+  CHECKOUT: '/checkout',
+
+  STATISTIC: '/provider/statistic',
+  PROVIDERSERVICE: '/provider/services',
+  PROVIDERPROFILE: '/provider/profile',
+
+  ADMINBOOKINGMANAGER: '/admin/booking-manager',
+  ADMINPROVIDERMANAGER: '/admin/provider',
+  ADMINCUSTOMERMANAGER: '/admin/customer',
+  ADMINSERVICEMANAGER: '/admin/services',
+  ADMINSTATISTIC: '/admin/statistic',
+  ADMINREVIEWMANAGER: '/admin/review',
 };
 
 export const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:+\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

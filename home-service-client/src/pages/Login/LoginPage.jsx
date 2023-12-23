@@ -19,7 +19,7 @@ import styles from './index.module.css';
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const loading = useSelector((state) => state.Login.loading);
+  const loading = useSelector((state) => state.Auth.loading);
 
   const [showPassword, setShowPassword] = useState(false);
 

@@ -33,7 +33,6 @@ function Footer() {
                         <li><a href={LOCATION.HOME}>Home</a></li>
                         <li><a href={LOCATION.ABOUT}>About</a></li>
                         <li><a href={LOCATION.SERVICES}>Services</a></li>
-                        <li><a href={LOCATION.REVIEWS}>Reviews</a></li>
                         <li><a href={LOCATION.CONTACT}>Contact us</a></li>
                       </ul>
                     </div>
