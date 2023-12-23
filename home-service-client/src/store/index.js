@@ -6,31 +6,42 @@ import { actionRefreshToken, actionLogout } from 'store/actions';
 import rootReducer from './reducers';
 import rootSaga from './sagas';
 
-import { getRefreshTokenFromCookie } from 'utils';
+import axiosClient from 'utils/axios';
+
+import { decodeJWT } from 'utils';
 
 const sagaMiddleware = createSagaMiddleware();
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const tokenMiddleware = () => (next) => (action) => {
   const accessToken = localStorage.getItem('accessToken');
-  const accessTokenExpirationTime = localStorage.getItem('accessTokenExpirationTime');
-  const refreshToken = getRefreshTokenFromCookie();
 
-  if (action.requiresAuth) {
-    const currentTime = Date.now();
+  if (accessToken) {
+    const decodedToken = decodeJWT(accessToken);
 
-    if (accessToken
-      && accessTokenExpirationTime
-      && accessTokenExpirationTime < currentTime + 60000) {
-      store.dispatch(actionRefreshToken());
-    }
+    if (decodedToken) {
+      const currentTime = Date.now();
+      const bufferTime = 5 * 60 * 1000;
 
-    if (!refreshToken) {
-      store.dispatch(actionLogout());
+      if (decodedToken.exp * 1000 - currentTime < bufferTime) {
+        handleRefreshToken();
+      } else {
+        axiosClient.defaults.headers.Authorization = `Bearer ${accessToken}`;
+      }
     }
   }
 
   return next(action);
 };
+
+async function handleRefreshToken() {
+  try {
+    await store.dispatch(actionRefreshToken());
+  } catch (error) {
+    if (error.response && error.response.status === 500) {
+      store.dispatch(actionLogout());
+    }
+  }
+}
 
 const store = createStore(
   rootReducer,

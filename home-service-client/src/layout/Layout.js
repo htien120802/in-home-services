@@ -5,12 +5,16 @@ import Header from './Header/Header';
 import Footer from './Footer/Footer';
 import Cpy from './Cpy/Cpy';
 
+import Map from 'components/Map/Map';
+
 function Layout() {
   return (
     <div>
       <Header />
 
       <Outlet />
+
+      <Map />
 
       <Footer />
 

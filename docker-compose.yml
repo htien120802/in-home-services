@@ -4,12 +4,7 @@ version: '1.0'
 services:
   # Database Service (Mysql)
   db:
-    build: 
-      context: home-service-database
-      dockerfile: Dockerfile
-      args:
-        MYSQL_ROOT_PASSWORD: 123456
-    image: huutien120802/home-service-database
+    image: mysql:8.0
     container_name: home-service-database-container
     ports:
       - 3307:3306
@@ -41,7 +36,7 @@ services:
       SPRING_DATASOURCE_DB_NAME: service_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
-      ORIGIN_URL: http://103.146.23.19  # Change host to public IP when deploy
+      ORIGIN_URL: http://localhost:3000  # Change host to public IP when deploy
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - app-network
 
