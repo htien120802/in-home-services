@@ -19,6 +19,7 @@ COPY . ./
 # Arguments
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ENV REACT_APP_BASE_URL=https://reqres.in/
 
 # Build the application
 RUN npm run build
@@ -34,6 +35,6 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 3000 to the Docker host, so we can access it 
 # from the outside.
-EXPOSE 80
+EXPOSE 81
 
 ENTRYPOINT ["nginx","-g","daemon off;"]
