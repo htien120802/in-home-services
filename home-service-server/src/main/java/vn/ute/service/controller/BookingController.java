@@ -24,13 +24,13 @@ public class BookingController {
 
     @Operation(summary = "Create booking")
     @PostMapping("/customer/booking/calc")
-    public ResponseEntity<?> calcPriceBooking(@RequestBody CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
+    public ResponseEntity<?> calcPriceBooking(@RequestBody CreateBookingRequest bookingRequest, HttpServletRequest request) throws IOException {
         return bookingService.calcPriceBooking(bookingRequest, request);
     }
 
     @Operation(summary = "Create booking")
     @PostMapping("/customer/booking")
-    public ResponseEntity<?> createBooking(@RequestBody CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
+    public ResponseEntity<?> createBooking(@RequestBody CreateBookingRequest bookingRequest, HttpServletRequest request) throws IOException {
         return bookingService.createBooking(bookingRequest, request);
     }
 
@@ -49,11 +49,11 @@ public class BookingController {
         return bookingService.getBookingOfCustomer(bookingId, request);
     }
 
-    @Operation(summary = "Get all bookings of customer by status")
-    @GetMapping("/customer/booking/{status}")
-    public ResponseEntity<?> getAllBookingOfCustomerByStatus(@PathVariable String status, HttpServletRequest request){
-        return bookingService.getAllBookingOfCustomerByStatus(status, request);
-    }
+//    @Operation(summary = "Get all bookings of customer by status")
+//    @GetMapping("/customer/booking/{status}")
+//    public ResponseEntity<?> getAllBookingOfCustomerByStatus(@PathVariable String status, HttpServletRequest request){
+//        return bookingService.getAllBookingOfCustomerByStatus(status, request);
+//    }
 
     @Operation(summary = "Customer cancel booking")
     @PutMapping("/customer/booking/{bookingId}/cancel")

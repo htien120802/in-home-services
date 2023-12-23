@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -58,7 +59,7 @@ public class BookingService {
     }
 
     @Transactional
-    public ResponseEntity<?> createBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) throws UnsupportedEncodingException {
+    public ResponseEntity<?> createBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
@@ -109,7 +110,15 @@ public class BookingService {
         booking.setService(objCompare);
 
         CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(provider.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
-        CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(customer.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+        CoordinatesDto coordinates2;
+        if (bookingRequest.getAddress() != null){
+            booking.setAddress(bookingRequest.getAddress());
+            coordinates2 = bingMapsService.getLocation(bookingRequest.getAddress());
+        } else {
+            AddressEntity temp = new ArrayList<>(customer.getAddresses()).get(0);
+            booking.setAddress(temp.toString());
+            coordinates2 = mapper.map(temp.getCoordinates(), CoordinatesDto.class);
+        }
         double distance = bingMapsService.calculateDistance(coordinates1,coordinates2);
         long movingFee = MovingFeeUtil.calcMovingFee(distance);
         booking.setMovingFee(movingFee);
@@ -121,10 +130,12 @@ public class BookingService {
         booking.setBookingItems(bookingItems);
         booking.calcTotalPrice();
 
+        booking.setNote(bookingRequest.getNote());
+
 
         PaymentEntity payment = new PaymentEntity();
         payment.setBooking(booking);
-        payment.setMethod(PaymentMethod.valueOf(bookingRequest.getPaymentMethoad().toUpperCase()));
+        payment.setMethod(PaymentMethod.valueOf(bookingRequest.getPaymentMethod().toUpperCase()));
         payment.setAmount(booking.getTotalPrice());
         booking.setPayment(payment);
         booking = bookingRepository.save(booking);
@@ -249,7 +260,7 @@ public class BookingService {
                 booking.setStatus(BookingStatus.DONE);
                 if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){
                     booking.getPayment().setPaymentStatus(PaymentStatus.PAID);
-                    booking.getPayment().setPaymentDate(String.valueOf(new Date(System.currentTimeMillis())));
+                    booking.getPayment().setPaymentDate(new Timestamp(System.currentTimeMillis()));
                 }
 
             } else {
@@ -314,7 +325,7 @@ public class BookingService {
 
     }
 
-    public ResponseEntity<?> calcPriceBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) {
+    public ResponseEntity<?> calcPriceBooking(CreateBookingRequest bookingRequest, HttpServletRequest request) throws IOException {
         String username = jwtService.getUsernameFromRequest(request);
         CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
         if (customer == null){
@@ -365,7 +376,16 @@ public class BookingService {
         booking.setService(objCompare);
 
         CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(provider.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
-        CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(customer.getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
+        CoordinatesDto coordinates2;
+        if (bookingRequest.getAddress() != null){
+            booking.setAddress(bookingRequest.getAddress());
+            coordinates2 = bingMapsService.getLocation(bookingRequest.getAddress());
+        } else {
+            AddressEntity temp = new ArrayList<>(customer.getAddresses()).get(0);
+            booking.setAddress(temp.toString());
+            coordinates2 = mapper.map(temp.getCoordinates(), CoordinatesDto.class);
+        }
+
         double distance = bingMapsService.calculateDistance(coordinates1,coordinates2);
         long movingFee = MovingFeeUtil.calcMovingFee(distance);
         booking.setMovingFee(movingFee);
@@ -376,6 +396,8 @@ public class BookingService {
 
         booking.setBookingItems(bookingItems);
         booking.calcTotalPrice();
+
+        booking.setNote(bookingRequest.getNote());
 
         JSONObject price = new JSONObject();
         price.put("movingFee", booking.getMovingFee());

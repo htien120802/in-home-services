@@ -26,6 +26,10 @@ public class BookingEntity {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    private String address;
+
+    private String note;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
