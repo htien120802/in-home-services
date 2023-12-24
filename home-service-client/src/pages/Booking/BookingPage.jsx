@@ -2,11 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetCustomerProfile, actionGetServiceById, actionSetSelectedWorks } from 'store/actions';
+import { v4 as uuidv4 } from 'uuid';
+
+import {
+  actionGetCustomerProfile, actionGetProviderProfile, actionGetServiceById, actionSetSelectedWorks,
+} from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 
-import { formatPriceWithCommas } from 'utils';
+import { determineUserRole, formatPriceWithCommas } from 'utils';
 
 function BookingPage() {
   const { id } = useParams();
@@ -16,6 +20,7 @@ function BookingPage() {
   const selectedWorks = useSelector((state) => state.Booking.works);
   const totalPrice = useSelector((state) => state.Booking.totalPrice);
   const customerProfile = useSelector((state) => state.Customer.customer);
+  const providerProfile = useSelector((state) => state.Provider.provider);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -50,8 +55,9 @@ function BookingPage() {
 
   const handleSave = () => {
     const addressChanged = JSON.stringify(formData.address)
-    !== JSON.stringify(customerProfile.addresses[0]);
-    const noteChanged = formData.note !== customerProfile.note;
+    !== JSON.stringify(customerProfile?.addresses[0]) || JSON.stringify(formData.address)
+    !== JSON.stringify(providerProfile?.addresses[0]);
+    const noteChanged = formData.note !== customerProfile?.note || formData.note !== providerProfile?.note;
 
     if (addressChanged || noteChanged) {
       sessionStorage.setItem('address', JSON.stringify(formData.address));
@@ -64,9 +70,15 @@ function BookingPage() {
   }, [navigate]);
 
   useEffect(() => {
-    dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
+    const userRole = determineUserRole();
+
+    if (userRole === 'ROLE_CUSTOMER') {
+      dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
+    } else if (userRole === 'ROLE_PROVIDER') {
+      dispatch(actionGetProviderProfile());
+    }
     dispatch(actionGetServiceById({ id }));
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (customerProfile) {
@@ -85,7 +97,24 @@ function BookingPage() {
         orderNote: '',
       }));
     }
-  }, [customerProfile]);
+
+    if (providerProfile) {
+      setFormData((prevData) => ({
+        ...prevData,
+        name: `${providerProfile.firstName || ''} ${providerProfile.lastName || ''}`,
+        email: providerProfile.email || '',
+        phone: providerProfile.phone || '',
+        address: providerProfile.addresses[0] || {
+          number: '',
+          street: '',
+          ward: '',
+          district: '',
+          city: '',
+        },
+        orderNote: '',
+      }));
+    }
+  }, [customerProfile, providerProfile]);
 
   useEffect(() => {
     const savedSelectedWorks = JSON.parse(sessionStorage.getItem('selectedWorks')) || [];
@@ -251,7 +280,7 @@ function BookingPage() {
                   <h3>Booking Summery</h3>
                   <ul>
                     {selectedWorks.map((selectedWork) => (
-                      <li key={selectedWork.description}>
+                      <li key={uuidv4()}>
                         {selectedWork.work.description}
                         :
                         {' '}

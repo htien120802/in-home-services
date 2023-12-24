@@ -94,7 +94,7 @@ function LoginPage() {
           <label htmlFor="password" className={styles.LabelContainer}>
             <div className={styles.Label}>PASSWORD</div>
 
-            <button type="button" className={styles.Label1}>Forgot password?</button>
+            <Link to="/forget-password" type="button" className={styles.Label1}>Forgot password?</Link>
           </label>
 
           <div className={styles.PasswordContainer}>

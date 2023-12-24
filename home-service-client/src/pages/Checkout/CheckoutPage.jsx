@@ -3,13 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  actionCreateBooking, actionCreateBookingCalc, actionGetCustomerProfile, actionGetServiceById, actionSetSelectedWorks,
+  actionCreateBooking, actionCreateBookingCalc, actionGetCustomerProfile, actionGetProviderProfile, actionGetServiceById, actionSetSelectedWorks,
 } from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 import PaymentMethods from './PaymentMethods/PaymentMethods';
 
-import { formatPriceWithCommas } from 'utils';
+import { determineUserRole, formatPriceWithCommas } from 'utils';
 
 function CheckoutPage() {
   const { id } = useParams();
@@ -21,6 +21,7 @@ function CheckoutPage() {
   const servicesDetails = useSelector((state) => state.Services.serviceDetails);
   const finalPrice = useSelector((state) => state.Booking.finalPrice);
   const bookingDetail = useSelector((state) => state.Booking.bookingDetail);
+  const providerProfile = useSelector((state) => state.Provider.provider);
 
   const [selectedMethod, setSelectedMethod] = useState('cash');
   const [customerNote, setCustomerNote] = useState('');
@@ -47,7 +48,14 @@ function CheckoutPage() {
   }, [navigate]);
 
   useEffect(() => {
-    dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
+    const userRole = determineUserRole();
+
+    if (userRole === 'ROLE_CUSTOMER') {
+      dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
+    } else if (userRole === 'ROLE_PROVIDER') {
+      dispatch(actionGetProviderProfile());
+    }
+
     dispatch(actionGetServiceById({ id }));
   }, []);
 
@@ -59,8 +67,9 @@ function CheckoutPage() {
 
     const savedAddressWithoutId = `${savedAddress?.number || ''} ${savedAddress?.street || ''}, ${savedAddress?.ward || ''}, ${savedAddress?.district || ''}, ${savedAddress?.city || ''}`;
     const customerProfileAddressWithoutId = `${customerProfile?.addresses[0]?.number || ''} ${customerProfile?.addresses[0]?.street || ''}, ${customerProfile?.addresses[0]?.ward || ''}, ${customerProfile?.addresses[0]?.district || ''}, ${customerProfile?.addresses[0]?.city || ''}`;
+    const providerProfileAddressWithoutId = `${providerProfile?.addresses[0]?.number || ''} ${providerProfile?.addresses[0]?.street || ''}, ${providerProfile?.addresses[0]?.ward || ''}, ${providerProfile?.addresses[0]?.district || ''}, ${providerProfile?.addresses[0]?.city || ''}`;
 
-    setCustomerAddress(savedAddressWithoutId || customerProfileAddressWithoutId);
+    setCustomerAddress(savedAddressWithoutId || customerProfileAddressWithoutId || providerProfileAddressWithoutId);
     setCustomerNote(savedNote);
 
     dispatch(actionSetSelectedWorks({
@@ -120,17 +129,20 @@ function CheckoutPage() {
                   <p>
                     <span>Name:</span>
                     {' '}
-                    {`${customerProfile?.firstName || ''} ${customerProfile?.lastName || ''}`}
+                    {customerProfile && `${customerProfile?.firstName || ''} ${customerProfile?.lastName || ''}`}
+                    {providerProfile && `${providerProfile?.firstName || ''} ${providerProfile?.lastName || ''}`}
                   </p>
                   <p>
                     <span>Email:</span>
                     {' '}
                     {customerProfile?.email || ''}
+                    {providerProfile?.email || ''}
                   </p>
                   <p>
                     <span>Phone:</span>
                     {' '}
                     {customerProfile?.phone || ''}
+                    {providerProfile?.phone || ''}
                   </p>
                   <p>
                     <span>Address:</span>

@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { actionDeleteReview, actionGetAllReviews } from 'store/actions';
-import { openModal } from 'features/common/modalSlice';
-import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
-import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
 import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
@@ -23,20 +20,8 @@ function InternalPage(){
         setCurrentPage(newPage);
     };
 
-    const handleUpdateReview = (couponId) => {
-        const selectedReview = reviews?.content.find((review) => review._id === couponId);
-
-        dispatch(
-            openModal({
-                title: 'Update Review',
-                bodyType: MODAL_BODY_TYPES.UPDATE_REVIEW,
-                extraObject: selectedReview,
-            })
-        );
-    };
-
     const handleDeleteReview = (couponId) => {
-        dispatch(actionDeleteReview({id: couponId}))
+        dispatch(actionDeleteReview({reviewId: couponId}))
     };
 
     useEffect(() => {
@@ -69,10 +54,6 @@ function InternalPage(){
                 <td><strong>Service:</strong> {review.service.name}</td>
                 <td>{review.comment}</td>
                 <td>
-                    {/* Add your update and delete handlers here */}
-                    <button className="icon-btn" onClick={() => handleUpdateReview(review.id)}>
-                    <ArrowPathIcon className="h-5 w-5" />
-                    </button>
                     <button className="icon-btn" onClick={() => handleDeleteReview(review.id)}>
                     <TrashIcon className="h-5 w-5" />
                     </button>

@@ -14,6 +14,7 @@ function InternalPage(){
     const products = useSelector((state) => state.Admin.services);
 
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState('');
 
     const indexOfLastItem = currentPage * 5;
     const indexOfFirstItem = indexOfLastItem - 5;
@@ -24,7 +25,7 @@ function InternalPage(){
     };
 
     const handleUpdateProduct = (couponId) => {
-        const selectedProduct = products.content.find((product) => product._id === couponId);
+        const selectedProduct = products.content.find((product) => product.id === couponId);
 
         dispatch(
             openModal({
@@ -37,7 +38,13 @@ function InternalPage(){
     };
 
     const handleDeleteService = (couponId) => {
-        dispatch(actionDeleteService({id: couponId}))
+        dispatch(actionDeleteService({serviceId: couponId}))
+    };
+
+    const handleStatusChange = (e) => {
+        const selectedValue = e.target.value;
+        setSelectedStatus(selectedValue);
+        dispatch(actionGetAllServices({ status: selectedValue }));
     };
 
     useEffect(() => {
@@ -46,13 +53,13 @@ function InternalPage(){
     }, [dispatch]);
 
     const handleOpenModal = () => {
-    dispatch(
-        openModal({
-        title: 'Add Service',
-        bodyType: MODAL_BODY_TYPES.ADD_PRODUCT,
-        size: 'lg',
-        })
-    );
+        dispatch(
+            openModal({
+            title: 'Add Service',
+            bodyType: MODAL_BODY_TYPES.ADD_PRODUCT,
+            size: 'lg',
+            })
+        );
     };
 
     return (
@@ -62,6 +69,21 @@ function InternalPage(){
             <button className="btn" onClick={handleOpenModal}>
                 Add Service
             </button>
+
+            <div >
+                <label className="label">Filter by Status:</label>
+                <select
+                    className="select select-bordered mb-4"
+                    value={selectedStatus}
+                    onChange={handleStatusChange}
+                >
+                    <option value="">All</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="APPROVING">Approving</option>
+                    <option value="UNAPPROVED">Unapproved</option>
+                    <option value="DISABLE">Disable</option>
+                </select>
+            </div>
 
             <table className="table w-full mt-4">
             <thead>

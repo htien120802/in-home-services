@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { actionCreateCategory } from 'store/actions';
 
 function AddCategoryModalBody({ closeModal }) {
   const dispatch = useDispatch();
   const [categoryName, setCategoryName] = useState('');
-  const [selectedRoomId, setSelectedRoomId] = useState('');
-  const rooms = useSelector((state) => state.Room.rooms);
+  const [thumbnail, setThumbnail] = useState(null);
 
   const handleAddCategory = async () => {
-    dispatch(actionCreateCategory({ nameCate: categoryName, roomId: selectedRoomId }));
+    dispatch(actionCreateCategory({newData: {
+      categoryName,
+      thumbnail,
+    }}));
 
     closeModal();
+  };
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0];
+    setThumbnail(file);
   };
 
   return (
@@ -29,32 +36,24 @@ function AddCategoryModalBody({ closeModal }) {
       </div>
 
       <div className="mb-4">
-        <label className="label">Select Room:</label>
-        <select
-          className="select select-bordered w-full"
-          value={selectedRoomId}
-          onChange={(e) => setSelectedRoomId(e.target.value)}
-        >
-          <option value="" disabled>
-            Select Room
-          </option>
-          {rooms.map((room) => (
-            <option key={room._id} value={room._id}>
-              {room.nameRoom}
-            </option>
-          ))}
-        </select>
+        <label className="label">Upload Thumbnail:</label>
+        <input
+          type="file"
+          accept="image/*"
+          className="input input-bordered w-full pt-2 pb-2"
+          onChange={handleThumbnailChange}
+        />
       </div>
 
       <div className="modal-action mt-4">
-          <button className="btn btn-outline" onClick={() => closeModal()}>
-            Cancel
-          </button>
-  
-          <button className="btn btn-primary w-36 ml-4" onClick={handleAddCategory}>
-            Add Category
-          </button>
-        </div>
+        <button className="btn btn-outline" onClick={() => closeModal()}>
+          Cancel
+        </button>
+
+        <button className="btn btn-primary w-36 ml-4" onClick={handleAddCategory}>
+          Add Category
+        </button>
+      </div>
     </>
   );  
 }

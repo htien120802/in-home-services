@@ -27,7 +27,7 @@ function RegisterPage() {
   };
 
   const callbackRegisterSuccess = useCallback(() => {
-    navigate(LOCATION.LOGIN);
+    navigate('/login');
   }, [navigate]);
 
   const validation = useFormik({
@@ -36,6 +36,7 @@ function RegisterPage() {
     initialValues: {
       email: '',
       password: '',
+      confirmPassword: '',
       username: '',
       firstName: '',
       lastName: '',
@@ -55,6 +56,8 @@ function RegisterPage() {
         .required('Password is required.')
         .min(TEXT_LENGTH_LIMIT.PASSWORD, 'Password must be at least 6 characters long')
         .max(TEXT_LENGTH_LIMIT.SHORT, `Password must not exceed ${TEXT_LENGTH_LIMIT.SHORT} characters`),
+      confirmPassword: Yup.string()
+        .required('Confirm Password is required.'),
       firstName: Yup.string().trim().required('First Name is required.'),
       lastName: Yup.string().trim().required('Last Name is required.'),
       roleName: Yup.string()
@@ -153,36 +156,59 @@ function RegisterPage() {
             </button>
           </div>
 
-          <label htmlFor="firstName" className={styles.Label}>FIRST NAME</label>
-          <div className={styles.EmailContainer}>
+          <label htmlFor="confirmPassword" className={styles.Label}>CONFIRM PASSWORD</label>
+          <div className={styles.PasswordContainer}>
             <input
-              type="text"
-              placeholder="First Name"
-              name="firstName"
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
               onChange={validation.handleChange}
               onBlur={validation.handleBlur}
-              value={validation.values.firstName || ''}
+              value={validation.values.confirmPassword || ''}
               className={styles.Input}
             />
-            {validation.touched.firstName && validation.errors.firstName
-              ? <div className={styles.Errors}>{validation.errors.firstName}</div>
+
+            {validation.touched.confirmPassword && validation.errors.confirmPassword
+              ? <div className={styles.Errors}>{validation.errors.confirmPassword}</div>
               : null}
           </div>
 
-          <label htmlFor="lastName" className={styles.Label}>LAST NAME</label>
-          <div className={styles.EmailContainer}>
-            <input
-              type="text"
-              placeholder="Last Name"
-              name="lastName"
-              onChange={validation.handleChange}
-              onBlur={validation.handleBlur}
-              value={validation.values.lastName || ''}
-              className={styles.Input}
-            />
-            {validation.touched.lastName && validation.errors.lastName
-              ? <div className={styles.Errors}>{validation.errors.lastName}</div>
-              : null}
+          <div className="row">
+            <div className="col-md-6">
+              <label htmlFor="firstName" className={styles.Label}>FIRST NAME</label>
+              <div className={styles.EmailContainer}>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  name="firstName"
+                  onChange={validation.handleChange}
+                  onBlur={validation.handleBlur}
+                  value={validation.values.firstName || ''}
+                  className={styles.Input}
+                />
+                {validation.touched.firstName && validation.errors.firstName
+                  ? <div className={styles.Errors}>{validation.errors.firstName}</div>
+                  : null}
+              </div>
+            </div>
+
+            <div className="col-md-6">
+              <label htmlFor="lastName" className={styles.Label}>LAST NAME</label>
+              <div className={styles.EmailContainer}>
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  name="lastName"
+                  onChange={validation.handleChange}
+                  onBlur={validation.handleBlur}
+                  value={validation.values.lastName || ''}
+                  className={styles.Input}
+                />
+                {validation.touched.lastName && validation.errors.lastName
+                  ? <div className={styles.Errors}>{validation.errors.lastName}</div>
+                  : null}
+              </div>
+            </div>
           </div>
 
           <label htmlFor="roleName" className={styles.Label}>ROLE</label>

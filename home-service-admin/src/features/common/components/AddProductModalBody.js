@@ -1,213 +1,208 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { actionCreateService, actionGetAllCategory } from 'store/actions';
 
 function AddProductModalBody({ closeModal }) {
   const dispatch = useDispatch();
-  const [productDetails, setProductDetails] = useState({
-    code: '',
+  const [serviceDetails, setServiceDetails] = useState({
+    thumbnail: '',
     name: '',
-    description: '',
-    shortDescription: '',
-    images: [],
+    works: [
+      {
+        description: '',
+        unit: '',
+        pricePerUnit: 0,
+      },
+    ],
+    openTime: '',
+    closeTime: '',
     category: '',
-    room: '',
-    specs: [{ k: '', v: '' }],
-    price: 0,
-    quantity: 0,
   });
 
   const categories = useSelector((state) => state.Category.categories);
-  const rooms = useSelector((state) => state.Room.rooms);
 
   useEffect(() => {
     dispatch(actionGetAllCategory());
   }, [dispatch]);
 
-  const handleAddProduct = async () => {
-    // Additional validation can be added based on your requirements
+  const handleAddService = async () => {
+    if (
+      serviceDetails.thumbnail === '' ||
+      serviceDetails.name.trim() === '' ||
+      serviceDetails.works.some((work) => work.description.trim() === '' || work.unit.trim() === '' || work.pricePerUnit <= 0) ||
+      serviceDetails.openTime.trim() === '' ||
+      serviceDetails.closeTime.trim() === '' ||
+      serviceDetails.category.trim() === ''
+    ) {
+      toast.error('Please fill in all the required fields.')
+      return;
+    }
 
-    dispatch(actionCreateService(productDetails));
+    dispatch(actionCreateService({newData: {
+      thumbnail: serviceDetails.thumbnail,
+      createServiceRequest: JSON.stringify({
+        name: serviceDetails.name,
+        works: serviceDetails.works,
+        openTime: serviceDetails.openTime,
+        closeTime: serviceDetails.closeTime,
+        category: serviceDetails.category,
+      })
+    }}));
     closeModal();
   };
 
   const handleChange = (field, value) => {
-    setProductDetails((prevDetails) => ({
+    setServiceDetails((prevDetails) => ({
       ...prevDetails,
       [field]: value,
     }));
   };
 
-  const handleSpecChange = (index, field, value) => {
-    const updatedSpecs = [...productDetails.specs];
-    updatedSpecs[index] = { ...updatedSpecs[index], [field]: value };
-    setProductDetails((prevDetails) => ({
+  const handleWorkChange = (index, field, value) => {
+    const updatedWorks = [...serviceDetails.works];
+    updatedWorks[index] = { ...updatedWorks[index], [field]: value };
+    setServiceDetails((prevDetails) => ({
       ...prevDetails,
-      specs: updatedSpecs,
-    }));
-  };
-  
-  const handleAddSpec = () => {
-    setProductDetails((prevDetails) => ({
-      ...prevDetails,
-      specs: [...prevDetails.specs, { k: '', v: '' }],
-    }));
-  };
-  
-  const handleRemoveSpec = (index) => {
-    const updatedSpecs = [...productDetails.specs];
-    updatedSpecs.splice(index, 1);
-    setProductDetails((prevDetails) => ({
-      ...prevDetails,
-      specs: updatedSpecs,
+      works: updatedWorks,
     }));
   };
 
+  const handleAddWork = () => {
+    setServiceDetails((prevDetails) => ({
+      ...prevDetails,
+      works: [...prevDetails.works, { description: '', unit: '', pricePerUnit: 0 }],
+    }));
+  };
+
+  const handleRemoveWork = (index) => {
+    const updatedWorks = [...serviceDetails.works];
+    updatedWorks.splice(index, 1);
+    setServiceDetails((prevDetails) => ({
+      ...prevDetails,
+      works: updatedWorks,
+    }));
+  };
+
+  useEffect(() => {
+    dispatch(actionGetAllCategory())
+  }, [dispatch])
+
   return (
     <>
-      <p className="text-xl mt-8 text-center">Enter the product details:</p>
+      <p className="text-xl mt-8 text-center">Enter the service details:</p>
+
       <div className="mb-4">
-        <label className="label">Code:</label>
+        <label className="label">Thumbnail:</label>
         <input
           type="text"
-          className="input input-bordered w-full mb-4"
-          placeholder="Product Code"
-          value={productDetails.code}
-          onChange={(e) => handleChange('code', e.target.value)}
-        />
-        <label className="label">Product Name:</label>
-        <input
-          type="text"
-          className="input input-bordered w-full mb-4"
-          placeholder="Product Name"
-          value={productDetails.name}
-          onChange={(e) => handleChange('name', e.target.value)}
-        />
-        <label className="label">Description:</label>
-        <textarea
-          className="textarea textarea-bordered w-full mb-4"
-          placeholder="Product Description"
-          value={productDetails.description}
-          onChange={(e) => handleChange('description', e.target.value)}
-        ></textarea>
-        <label className="label">Short Description:</label>
-        <input
-          type="text"
-          className="input input-bordered w-full mb-4"
-          placeholder="Short Description"
-          value={productDetails.shortDescription}
-          onChange={(e) => handleChange('shortDescription', e.target.value)}
+          className="input input-bordered w-full mb-4 pt-2 pb-2"
+          placeholder="Url"
+          onChange={(e) => handleChange('thumbnail', e.target.value)}
         />
       </div>
 
       <div className="mb-4">
-        <label className="label">Product Images:</label>
+        <label className="label">Service Name:</label>
         <input
           type="text"
-          className="input input-bordered w-full mb-2"
-          placeholder="Image URL"
-          value={productDetails.images}
-          onChange={(e) => handleChange('images', [e.target.value])}
+          className="input input-bordered w-full mb-4"
+          placeholder="Service Name"
+          value={serviceDetails.name}
+          onChange={(e) => handleChange('name', e.target.value)}
         />
-        <p className="text-xs text-gray-500 mb-2">Enter image URLs separated by commas</p>
+      </div>
+
+      <div className="mb-4">
+        <label className="label">Works:</label>
+        {serviceDetails.works.map((work, index) => (
+          <div key={index} className="mb-2">
+            <div className="flex items-center">
+              <input
+                type="text"
+                className="input input-bordered w-full mb-2"
+                placeholder="Description"
+                value={work.description}
+                onChange={(e) => handleWorkChange(index, 'description', e.target.value)}
+              />
+              {serviceDetails.works.length > 1 && (
+                <button
+                  className="btn btn-outline ml-2"
+                  onClick={() => handleRemoveWork(index)}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <div className="flex items-center">
+              <input
+                type="text"
+                className="input input-bordered w-full mb-2"
+                placeholder="Unit"
+                value={work.unit}
+                onChange={(e) => handleWorkChange(index, 'unit', e.target.value)}
+              />
+              <input
+                type="number"
+                className="input input-bordered w-full ml-2"
+                placeholder="Price per Unit"
+                value={work.pricePerUnit}
+                onChange={(e) => handleWorkChange(index, 'pricePerUnit', e.target.value)}
+              />
+            </div>
+          </div>
+        ))}
+        <button className="btn btn-outline" onClick={handleAddWork}>
+          Add Work
+        </button>
+      </div>
+
+      <div className="mb-4">
+        <label className="label">Open Time:</label>
+        <input
+          type="text"
+          className="input input-bordered w-full mb-4"
+          placeholder="Open Time"
+          value={serviceDetails.openTime}
+          onChange={(e) => handleChange('openTime', e.target.value)}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="label">Close Time:</label>
+        <input
+          type="text"
+          className="input input-bordered w-full mb-4"
+          placeholder="Close Time"
+          value={serviceDetails.closeTime}
+          onChange={(e) => handleChange('closeTime', e.target.value)}
+        />
       </div>
 
       <div className="mb-4">
         <label className="label">Select Category:</label>
         <select
-          className="select select-bordered w-full mb-2"
-          value={productDetails.category}
+          className="select select-bordered w-full mb-4"
+          value={serviceDetails.category}
           onChange={(e) => handleChange('category', e.target.value)}
         >
           <option value="" disabled>
             Select Category
           </option>
           {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.nameCate}
+            <option key={category.id} value={category.id}>
+              {category.categoryName}
             </option>
           ))}
         </select>
-      </div>
-
-      <div className="mb-4">
-        <label className="label">Select Room:</label>
-        <select
-          className="select select-bordered w-full mb-2"
-          value={productDetails.room}
-          onChange={(e) => handleChange('room', e.target.value)}
-        >
-          <option value="" disabled>
-            Select Room
-          </option>
-          {rooms.map((room) => (
-            <option key={room._id} value={room._id}>
-              {room.nameRoom}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
-        <label className="label">Specifications:</label>
-        {productDetails.specs.map((spec, index) => (
-          <div key={index} className="mb-2">
-            <div className="flex items-center">
-              <input
-                type="text"
-                className="input input-bordered w-full mb-2"
-                placeholder="Key"
-                value={spec.k}
-                onChange={(e) => handleSpecChange(index, 'k', e.target.value)}
-              />
-              {productDetails.specs.length > 1 && (
-                <button
-                  className="btn btn-outline btn-square ml-2"
-                  onClick={() => handleRemoveSpec(index)}
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              placeholder="Value"
-              value={spec.v}
-              onChange={(e) => handleSpecChange(index, 'v', e.target.value)}
-            />
-          </div>
-        ))}
-        <button className="btn btn-outline" onClick={handleAddSpec}>
-          Add Specification
-        </button>
-      </div>
-
-      <div className="mb-4">
-        <label className="label">Price:</label>
-        <input
-          type="number"
-          className="input input-bordered w-full mb-2"
-          placeholder="Product Price"
-          value={productDetails.price}
-          onChange={(e) => handleChange('price', e.target.value)}
-        />
-        <label className="label">Quantity:</label>
-        <input
-          type="number"
-          className="input input-bordered w-full"
-          placeholder="Product Quantity"
-          value={productDetails.quantity}
-          onChange={(e) => handleChange('quantity', e.target.value)}
-        />
       </div>
 
       <div className="modal-action mt-4">
         <button className="btn btn-outline" onClick={() => closeModal()}>
           Cancel
         </button>
-        <button className="btn btn-primary w-36 ml-4" onClick={handleAddProduct}>
-          Add Product
+        <button className="btn btn-primary w-36 ml-4" onClick={handleAddService}>
+          Add Service
         </button>
       </div>
     </>
