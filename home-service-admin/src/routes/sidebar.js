@@ -21,11 +21,6 @@ const routes = [
     name: 'Dashboard',
   },
   {
-    path: '/app/charts', // url
-    icon: <ChartBarIcon className={iconClasses}/>, // icon component
-    name: 'Analytics', // name that appear in Sidebar
-  },
-  {
     path: '', //no url needed as this has submenu
     icon: <DocumentDuplicateIcon className={`${iconClasses} inline` }/>, // icon component
     name: 'Pages', // name that appear in Sidebar

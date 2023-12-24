@@ -3,6 +3,42 @@ import axiosClient from 'utils/axios';
 const adminEndpoint = '/admin';
 
 export default {
+  // GET /admin/count
+  async getCount() {
+    const path = `${adminEndpoint}/count`;
+
+    const response = await axiosClient.get(path);
+
+    return response.data;
+  },
+
+  // GET /admin/statistics/booking/sales
+  async getSalesStatisticsByMonthYear(month, year) {
+    const path = `${adminEndpoint}/statistics/booking/sales`;
+
+    const response = await axiosClient.get(path, {
+      params: {
+        month,
+        year,
+      },
+    });
+
+    return response.data;
+  },
+
+  // GET /admin/statistics/booking/quantity
+  async getQuantityStatisticsByMonthYear(month, year) {
+    const path = `${adminEndpoint}/statistics/booking/quantity`;
+
+    const response = await axiosClient.get(path, {
+      params: {
+        month,
+        year,
+      },
+    });
+
+    return response.data;
+  },
   // GET /admin/service
   async getAllServices(payload) {
     const path = `${adminEndpoint}/service`;
@@ -145,28 +181,6 @@ export default {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    });
-
-    return response.data;
-  },
-
-  // GET /admin/statistics/booking/sales
-  async getSalesStatistics() {
-    const path = `${adminEndpoint}/statistics/booking/sales`;
-
-    const response = await axiosClient.get(path, {
-      withCredentials: true,
-    });
-
-    return response.data;
-  },
-
-  // GET /admin/statistics/booking/quantity
-  async getQuantityStatistics() {
-    const path = `${adminEndpoint}/statistics/booking/quantity`;
-
-    const response = await axiosClient.get(path, {
-      withCredentials: true,
     });
 
     return response.data;
