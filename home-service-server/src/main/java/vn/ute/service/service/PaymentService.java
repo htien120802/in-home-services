@@ -27,12 +27,11 @@ import java.util.*;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
-    @Value("${payment.url.success}")
-    private String urlSuccess;
+    @Value("${payment.url.result}")
+    private String urlResult;
     @Value("${payment.url.fail}")
     private String urlFail;
-    @Value("${payment.url.error}")
-    private String urlError;
+
 
     public PaymentService(PaymentRepository paymentRepository, BookingRepository bookingRepository) {
         this.paymentRepository = paymentRepository;
@@ -119,10 +118,10 @@ public class PaymentService {
                     payment.setPaymentStatus(PaymentStatus.PAID);
                     payment.setPaymentDate(new Timestamp(System.currentTimeMillis()));
                     paymentRepository.save(payment);
-                    response.sendRedirect(urlSuccess);
+                    response.sendRedirect(urlResult.replace("id",payment.getBooking().getId().toString()));
                 }
                 else {
-                    response.sendRedirect(urlError);
+                    response.sendRedirect(urlFail);
                 }
 
             } else {
@@ -132,7 +131,7 @@ public class PaymentService {
                     response.sendRedirect(urlFail);
                 }
                 else {
-                    response.sendRedirect(urlError);
+                    response.sendRedirect(urlFail);
                 }
             }
         }
