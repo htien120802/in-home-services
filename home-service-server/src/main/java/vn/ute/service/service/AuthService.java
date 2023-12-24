@@ -6,7 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,30 +28,38 @@ import vn.ute.service.entity.ProviderEntity;
 import vn.ute.service.entity.TokenEntity;
 import vn.ute.service.jwt.JwtService;
 import vn.ute.service.repository.*;
+import vn.ute.service.utils.ResetPasswordTokenUtil;
 import vn.ute.service.utils.UUIDUtil;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class AuthService {
+    @Value("${client.host}")
+    private String host;
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
     private final ProviderRepository providerRepository;
     private final TokenRepository tokenRepository;
     private final RoleRepository roleRepository;
+
+    private final JavaMailSender javaMailSender;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
-    public AuthService(AccountRepository accountRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, TokenRepository tokenRepository, RoleRepository roleRepository, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+    public AuthService(AccountRepository accountRepository, CustomerRepository customerRepository, ProviderRepository providerRepository, TokenRepository tokenRepository, RoleRepository roleRepository, JavaMailSender javaMailSender, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ModelMapper mapper) {
         this.accountRepository = accountRepository;
         this.customerRepository = customerRepository;
         this.providerRepository = providerRepository;
         this.tokenRepository = tokenRepository;
         this.roleRepository = roleRepository;
+        this.javaMailSender = javaMailSender;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
@@ -198,15 +210,31 @@ public class AuthService {
         if (account.isEmpty())
             return ResponseEntity.status(404).body(new ResponseDto<>("fail","Not found account with this login name!", null));
 
-        String resetToken = UUIDUtil.getUuid();
+        String email = null;
+        if (account.get().getCustomer() != null && account.get().getCustomer().getEmail() != null)
+            email = account.get().getCustomer().getEmail();
+
+        if (account.get().getProvider() != null && account.get().getProvider().getEmail() != null)
+            email = account.get().getProvider().getEmail();
+
+        if (email == null){
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","This account haven't add email yet!",null));
+        }
+
+        String resetToken = ResetPasswordTokenUtil.generateResetPasswordToken();
         account.get().setResetPasswordToken(resetToken);
         accountRepository.save(account.get());
 
-        JSONObject object = new JSONObject();
-        object.put("success",true);
-        object.put("email",account.get().getCustomer().getEmail() != null ? account.get().getCustomer().getEmail() : account.get().getProvider().getEmail());
-        object.put("resetToken", resetToken);
-        return ResponseEntity.status(200).body(object.toString(3));
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Reset Password");
+        message.setText("Reset password link: " + host + "/forget-password?token=" + ResetPasswordTokenUtil.splitToken(resetToken)[0]);
+
+        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+        emailExecutor.execute(() -> sendEmail(message));
+        emailExecutor.shutdown();
+
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Link reset password has been sent to your email",null));
     }
 
     public ResponseEntity<?> resetPassword(ResetPasswordRequest resetPasswordRequest){
@@ -218,7 +246,7 @@ public class AuthService {
         account.setResetPasswordToken(null);
         account = accountRepository.save(account);
 
-        if (resetToken != null && resetToken.equals(resetPasswordRequest.getResetToken())){
+        if (resetToken != null && resetToken.startsWith(resetPasswordRequest.getResetToken()) && ResetPasswordTokenUtil.validResetPasswordToken(resetToken)){
             if (!resetPasswordRequest.getPassword().equals(resetPasswordRequest.getPasswordConfirm()))
                 return ResponseEntity.status(400).body(new ResponseDto<>("fail","Password and password confirm don't match!", null));
 
@@ -229,5 +257,8 @@ public class AuthService {
         }
 
         return ResponseEntity.status(400).body(new ResponseDto<>("fail","Reset token is invalid!", null));
+    }
+    public void sendEmail(SimpleMailMessage message){
+        javaMailSender.send(message);
     }
 }

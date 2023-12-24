@@ -36,7 +36,7 @@ services:
       SPRING_DATASOURCE_DB_NAME: service_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
-      ORIGIN_URL: http://localhost:3000  # Change host to public IP when deploy
+      CLIENT_HOST: http://103.14.226.91
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - app-network
 

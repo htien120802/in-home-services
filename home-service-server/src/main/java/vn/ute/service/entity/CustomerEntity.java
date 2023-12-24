@@ -50,7 +50,7 @@ public class CustomerEntity {
     @JoinColumn(name = "account_id")
     private AccountEntity account;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private Set<AddressEntity> addresses = new HashSet<>();
 
 //    @OneToOne

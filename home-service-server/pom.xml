@@ -151,14 +151,14 @@
             <version>5.0.0</version>
             <classifier>jakarta</classifier>
         </dependency>
-        <!--  https://mvnrepository.com/artifact/com.querydsl/querydsl-apt  -->
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
         <dependency>
-            <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-apt</artifactId>
-            <version>5.0.0</version>
-            <classifier>jakarta</classifier>
-            <scope>provided</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>3.2.1</version>
         </dependency>
+
 
     </dependencies>
 

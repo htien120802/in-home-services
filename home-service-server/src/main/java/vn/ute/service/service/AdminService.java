@@ -365,13 +365,15 @@ public class AdminService {
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId).orElse(null);
         if (reviewEntity == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Review not found",null));
-
+        ServiceEntity service = reviewEntity.getService();
+        service.getReviews().remove(reviewEntity);
         reviewRepository.delete(reviewEntity);
-        ServiceEntity service = serviceRepository.findById(reviewEntity.getService().getId()).get();
+
+
         service.calcAvgRating();
         serviceRepository.save(service);
 
-        ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
+        ProviderEntity provider = service.getProvider();
         List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
         double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
         provider.setAvgRating(avg);

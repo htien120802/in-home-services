@@ -112,7 +112,7 @@ public class AdminController {
                                             @RequestParam(defaultValue = "9") int size,
                                             @RequestParam(defaultValue = "avgRating") String sortBy,
                                             @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection,
-                                            @RequestParam(defaultValue = "APPROVED") ServiceStatus status,
+                                            @RequestParam(required = false) ServiceStatus status,
                                             @RequestParam(required = false) String providerName,
                                             @RequestParam(required = false) String name,
                                             @RequestParam(required = false) String categorySlug,
@@ -121,8 +121,8 @@ public class AdminController {
     }
 
     @Operation(summary = "Create a service")
-    @PostMapping("/service")
-    public ResponseEntity<?> createService(@RequestPart MultipartFile thumbnail, @RequestPart String createServiceRequest) throws JsonProcessingException, ImageUploadException {
+    @PostMapping(value = "/service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createService(@RequestPart(required = false) MultipartFile thumbnail, @RequestPart String createServiceRequest) throws JsonProcessingException, ImageUploadException {
         return adminService.createService(thumbnail, createServiceRequest);
     }
 

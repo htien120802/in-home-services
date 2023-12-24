@@ -68,8 +68,11 @@ public class ServiceCriteriaRepository {
         }
 
         if (providerName != null){
+            List<Predicate> temp = new ArrayList<>();
             Join<ServiceEntity, ProviderEntity> provider = serviceRoot.join("provider");
-            predicates.add(criteriaBuilder.like(provider.get("name"),"%" + providerName + "%"));
+            temp.add(criteriaBuilder.like(provider.get("firstName"),"%" + providerName + "%"));
+            temp.add(criteriaBuilder.like(provider.get("lastName"),"%" + providerName + "%"));
+            predicates.add(criteriaBuilder.or(temp.toArray(new Predicate[0])));
         }
 
         if (name != null){

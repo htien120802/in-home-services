@@ -1,16 +1,22 @@
 package vn.ute.service;
 
+import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import vn.ute.service.repository.*;
 import vn.ute.service.service.BingMapsService;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 @SpringBootApplication
 @EnableTransactionManagement
+@EnableAsync
 public class ServiceApplication {
     @Autowired
     ServiceRepository serviceRepository;
@@ -46,6 +52,12 @@ public class ServiceApplication {
     private ModelMapper mapper;
 
     public static void main(String[] args) {
+        // Set default locale to Vietnam
+        Locale.setDefault(new Locale("vi", "VN"));
+
+        // Set default time zone to Vietnam (Indochina Time - ICT, UTC+7)
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+
         SpringApplication.run(ServiceApplication.class, args);
     }
 
