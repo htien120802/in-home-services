@@ -202,9 +202,20 @@ public class AuthService {
         account.get().setResetPasswordToken(resetToken);
         accountRepository.save(account.get());
 
+        String email = null;
+        if (account.get().getCustomer() != null && account.get().getCustomer().getEmail() != null)
+            email = account.get().getCustomer().getEmail();
+
+        if (account.get().getProvider() != null && account.get().getProvider().getEmail() != null)
+            email = account.get().getProvider().getEmail();
+
+        if (email == null){
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","This account haven't add email yet!",null));
+        }
+
         JSONObject object = new JSONObject();
         object.put("success",true);
-        object.put("email",account.get().getCustomer().getEmail() != null ? account.get().getCustomer().getEmail() : account.get().getProvider().getEmail());
+        object.put("email",email);
         object.put("resetToken", resetToken);
         return ResponseEntity.status(200).body(object.toString(3));
     }
