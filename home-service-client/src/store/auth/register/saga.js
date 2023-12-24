@@ -17,6 +17,7 @@ function* register({ payload }) {
         username,
         email,
         password,
+        confirmPassword,
         firstName,
         lastName,
         roleName,
@@ -29,6 +30,7 @@ function* register({ payload }) {
       username,
       email,
       password,
+      confirmPassword,
       firstName,
       lastName,
       roleName,
@@ -36,18 +38,13 @@ function* register({ payload }) {
 
     const response = yield call(authAPI.register, newData);
 
-    const { accessToken, refreshToken } = response.data;
-
-    document.cookie = `refreshToken=${refreshToken}; path=/; secure; HttpOnly`;
-    localStorage.setItem('accessToken', accessToken);
-
-    yield put(actionRegisterSuccess({ accessToken, refreshToken }));
+    yield put(actionRegisterSuccess());
 
     toast.success(response.message);
 
     callback();
   } catch (error) {
-    toast.error(error.response.data);
+    toast.error(error.response.data.message);
 
     yield put(actionRegisterFailed());
   }

@@ -66,7 +66,7 @@ function InternalPage() {
                     currentData.map((category) => (
                     <tr key={category.id}>
                         <td>{category.categoryName}</td>
-                        <td>{category.numberService}</td>
+                        <td>{category.numberService || 0}</td>
                         <td>
                             <img src={category.thumbnail} alt={`Category ${category.categoryName}`} style={{ width: '50px', height: '50px' }} />
                         </td>

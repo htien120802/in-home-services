@@ -4,11 +4,11 @@ const adminEndpoint = '/admin';
 
 export default {
   // GET /admin/service
-  async getAllServices() {
+  async getAllServices(payload) {
     const path = `${adminEndpoint}/service`;
 
     const response = await axiosClient.get(path, {
-      withCredentials: true,
+      params: payload,
     });
 
     return response.data;
@@ -29,9 +29,7 @@ export default {
   async createService(payload) {
     const path = `${adminEndpoint}/service`;
 
-    const response = await axiosClient.post(path, payload, {
-      withCredentials: true,
-    });
+    const response = await axiosClient.post(path, payload);
 
     return response.data;
   },
@@ -129,7 +127,9 @@ export default {
     const path = `${adminEndpoint}/category`;
 
     const response = await axiosClient.post(path, payload, {
-      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
@@ -139,8 +139,10 @@ export default {
   async updateCategory(categoryId, payload) {
     const path = `${adminEndpoint}/category/${categoryId}`;
 
-    const response = await axiosClient.put(path, payload, {
-      withCredentials: true,
+    const response = await axiosClient.post(path, payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
@@ -264,6 +266,14 @@ export default {
       withCredentials: true,
     });
 
+    return response.data;
+  },
+
+  // PUT /admin/service
+  async approveOrUnapproveRegisterService(serviceData) {
+    const path = `${adminEndpoint}/service/approve`;
+
+    const response = await axiosClient.put(path, serviceData);
     return response.data;
   },
 };

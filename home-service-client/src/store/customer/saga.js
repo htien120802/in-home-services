@@ -120,9 +120,7 @@ function* updateCustomerAddress({ payload }) {
 
 function* addCustomerAddress({ payload }) {
   try {
-    const { newAddress } = payload;
-
-    const response = yield call(customerAPI.addCustomerAddress, newAddress);
+    const response = yield call(customerAPI.addCustomerAddress, payload);
 
     yield put(actionAddCustomerAddressSuccess(response.data));
 

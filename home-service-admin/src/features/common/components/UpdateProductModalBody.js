@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { actionGetAllCategory, actionUpdateService } from 'store/actions';
+import { toast } from 'react-toastify';
+import { actionUpdateService, actionGetAllCategory, actionApproveOrUnapproveRegisterService } from 'store/actions';
 
-function UpdateProductModalBody({ extraObject, closeModal }) {
+function UpdateServiceModalBody({ closeModal, extraObject }) {
   const dispatch = useDispatch();
-  const [updatedProductDetails, setUpdatedProductDetails] = useState({ ...extraObject });
+  const [serviceDetails, setServiceDetails] = useState({
+    thumbnail: extraObject?.thumbnail,
+    name: extraObject?.name,
+    works: extraObject?.works?.map((work) => ({ ...work })),
+    openTime: extraObject?.openTime,
+    closeTime: extraObject?.closeTime,
+    category: extraObject?.category,
+    status: extraObject?.status,
+  });
 
   const categories = useSelector((state) => state.Category.categories);
 
@@ -12,222 +21,201 @@ function UpdateProductModalBody({ extraObject, closeModal }) {
     dispatch(actionGetAllCategory());
   }, [dispatch]);
 
-  const handleUpdateProduct = async () => {
+  const handleUpdateService = async () => {
+    if (
+      serviceDetails.thumbnail === '' ||
+      serviceDetails.name.trim() === '' ||
+      serviceDetails.works.some((work) => work.description.trim() === '' || work.unit.trim() === '' || work.pricePerUnit <= 0) ||
+      serviceDetails.openTime.trim() === '' ||
+      serviceDetails.closeTime.trim() === ''
+    ) {
+      toast.error('Please fill in all the required fields.');
+      return;
+    }
 
-    dispatch(actionUpdateService(updatedProductDetails));
+    dispatch(actionUpdateService({ serviceId: extraObject.id, updatedData: serviceDetails }));
     closeModal();
   };
 
-  const handleImageChange = (index, value) => {
-    const updatedImages = [...updatedProductDetails.images];
-    updatedImages[index] = { ...updatedImages[index], url: value };
-    setUpdatedProductDetails((prevDetails) => ({
-      ...prevDetails,
-      images: updatedImages,
-    }));
-  };
-  
-  const handleAddImage = () => {
-    setUpdatedProductDetails((prevDetails) => ({
-      ...prevDetails,
-      images: [...prevDetails.images, { url: '' }],
-    }));
-  };
-  
-  const handleRemoveImage = (index) => {
-    const updatedImages = [...updatedProductDetails.images];
-    updatedImages.splice(index, 1);
-    setUpdatedProductDetails((prevDetails) => ({
-      ...prevDetails,
-      images: updatedImages,
-    }));
-  };
-  
-
-  const handleSpecChange = (index, field, value) => {
-    const updatedSpecs = [...updatedProductDetails.specs];
-    updatedSpecs[index] = { ...updatedSpecs[index], [field]: value };
-    setUpdatedProductDetails((prevDetails) => ({
-      ...prevDetails,
-      specs: updatedSpecs,
-    }));
-  };
-
-  const handleAddSpec = () => {
-    setUpdatedProductDetails((prevDetails) => ({
-      ...prevDetails,
-      specs: [...prevDetails.specs, { k: '', v: '' }],
-    }));
-  };
-
-  const handleRemoveSpec = (index) => {
-    const updatedSpecs = [...updatedProductDetails.specs];
-    updatedSpecs.splice(index, 1);
-    setUpdatedProductDetails((prevDetails) => ({
-      ...prevDetails,
-      specs: updatedSpecs,
-    }));
-  };
+  const handleApproveOrUnapproveService = () => {
+    dispatch(actionApproveOrUnapproveRegisterService({
+      serviceId: extraObject.id,
+      approve: !extraObject.approve,
+    }))
+  }
 
   const handleChange = (field, value) => {
-    setUpdatedProductDetails((prevDetails) => ({
+    setServiceDetails((prevDetails) => ({
       ...prevDetails,
       [field]: value,
     }));
   };
 
+  const handleWorkChange = (index, field, value) => {
+    const updatedWorks = [...serviceDetails.works];
+    updatedWorks[index] = { ...updatedWorks[index], [field]: value };
+    setServiceDetails((prevDetails) => ({
+      ...prevDetails,
+      works: updatedWorks,
+    }));
+  };
+
+  const handleAddWork = () => {
+    setServiceDetails((prevDetails) => ({
+      ...prevDetails,
+      works: [...prevDetails.works, { description: '', unit: '', pricePerUnit: 0 }],
+    }));
+  };
+
+  const handleRemoveWork = (index) => {
+    const updatedWorks = [...serviceDetails.works];
+    updatedWorks.splice(index, 1);
+    setServiceDetails((prevDetails) => ({
+      ...prevDetails,
+      works: updatedWorks,
+    }));
+  };
+
+  useEffect(() => {
+    dispatch(actionGetAllCategory());
+  }, [dispatch]);
+
   return (
     <>
-      <p className="text-xl mt-8 text-center">Update the product details:</p>
+      <p className="text-xl mt-8 text-center">Update the service details:</p>
 
       <div className="mb-4">
-        <label className="label">Code:</label>
+        <label className="label">Thumbnail:</label>
         <input
           type="text"
-          className="input input-bordered w-full mb-4"
-          placeholder="Product Code"
-          value={updatedProductDetails.code}
-          onChange={(e) => handleChange('code', e.target.value)}
-        />
-        <label className="label">Product Name:</label>
-        <input
-          type="text"
-          className="input input-bordered w-full mb-4"
-          placeholder="Product Name"
-          value={updatedProductDetails.name}
-          onChange={(e) => handleChange('name', e.target.value)}
-        />
-        <label className="label">Description:</label>
-        <textarea
-          className="textarea textarea-bordered w-full mb-4"
-          placeholder="Product Description"
-          value={updatedProductDetails.description}
-          onChange={(e) => handleChange('description', e.target.value)}
-        ></textarea>
-        <label className="label">Short Description:</label>
-        <input
-          type="text"
-          className="input input-bordered w-full mb-4"
-          placeholder="Short Description"
-          value={updatedProductDetails.shortDescription}
-          onChange={(e) => handleChange('shortDescription', e.target.value)}
+          className="input input-bordered w-full mb-4 pt-2 pb-2"
+          placeholder="Url"
+          value={serviceDetails.thumbnail}
+          onChange={(e) => handleChange('thumbnail', e.target.value)}
         />
       </div>
 
       <div className="mb-4">
-        <label className="label">Product Images:</label>
-        {updatedProductDetails.images.map((image, index) => (
+        <label className="label">Service Name:</label>
+        <input
+          type="text"
+          className="input input-bordered w-full mb-4"
+          placeholder="Service Name"
+          value={serviceDetails.name}
+          onChange={(e) => handleChange('name', e.target.value)}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="label">Works:</label>
+        {serviceDetails.works?.map((work, index) => (
           <div key={index} className="mb-2">
-            <input
-              type="text"
-              className="input input-bordered w-full mb-2"
-              placeholder="Image URL"
-              value={image.url}
-              onChange={(e) => handleImageChange(index, e.target.value)}
-            />
-            <button
-              className="btn btn-outline btn-sm ml-2"
-              onClick={() => handleRemoveImage(index)}
-            >
-              Remove
-            </button>
+            <div className="flex items-center">
+              <input
+                type="text"
+                className="input input-bordered w-full mb-2"
+                placeholder="Description"
+                value={work.description}
+                onChange={(e) => handleWorkChange(index, 'description', e.target.value)}
+              />
+              {serviceDetails.works.length > 1 && (
+                <button
+                  className="btn btn-outline ml-2"
+                  onClick={() => handleRemoveWork(index)}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <div className="flex items-center">
+              <input
+                type="text"
+                className="input input-bordered w-full mb-2"
+                placeholder="Unit"
+                value={work.unit}
+                onChange={(e) => handleWorkChange(index, 'unit', e.target.value)}
+              />
+              <input
+                type="number"
+                className="input input-bordered w-full ml-2"
+                placeholder="Price per Unit"
+                value={work.pricePerUnit}
+                onChange={(e) => handleWorkChange(index, 'pricePerUnit', e.target.value)}
+              />
+            </div>
           </div>
         ))}
-        <button className="btn btn-primary btn-sm" onClick={handleAddImage}>
-          Add Image
+        <button className="btn btn-outline" onClick={handleAddWork}>
+          Add Work
         </button>
-        <p className="text-xs text-gray-500 mb-2">Enter image URLs</p>
+      </div>
+
+      <div className="mb-4">
+        <label className="label">Open Time:</label>
+        <input
+          type="text"
+          className="input input-bordered w-full mb-4"
+          placeholder="Open Time"
+          value={serviceDetails.openTime}
+          onChange={(e) => handleChange('openTime', e.target.value)}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="label">Close Time:</label>
+        <input
+          type="text"
+          className="input input-bordered w-full mb-4"
+          placeholder="Close Time"
+          value={serviceDetails.closeTime}
+          onChange={(e) => handleChange('closeTime', e.target.value)}
+        />
       </div>
 
       <div className="mb-4">
         <label className="label">Select Category:</label>
         <select
-          className="select select-bordered w-full mb-2"
-          value={updatedProductDetails.category}
+          className="select select-bordered w-full mb-4"
+          value={serviceDetails.category.id}
           onChange={(e) => handleChange('category', e.target.value)}
         >
           <option value="" disabled>
             Select Category
           </option>
           {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.nameCate}
+            <option key={category.id} value={category.id}>
+              {category.categoryName}
             </option>
           ))}
         </select>
       </div>
 
       <div className="mb-4">
-        <label className="label">Specifications:</label>
-        {updatedProductDetails.specs.map((spec, index) => (
-          <div key={index} className="mb-2">
-            <input
-              type="text"
-              className="input input-bordered w-full mb-2"
-              placeholder="Key"
-              value={spec.k}
-              onChange={(e) => handleSpecChange(index, 'k', e.target.value)}
-            />
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              placeholder="Value"
-              value={spec.v}
-              onChange={(e) => handleSpecChange(index, 'v', e.target.value)}
-            />
-            <button
-              className="btn btn-outline btn-sm ml-2"
-              onClick={() => handleRemoveSpec(index)}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <button className="btn btn-primary btn-sm" onClick={handleAddSpec}>
-          Add Specification
-        </button>
-      </div>
-
-      <div className="mb-4">
-        <label className="label">Price:</label>
-        <input
-          type="number"
-          className="input input-bordered w-full mb-2"
-          placeholder="Product Price"
-          value={updatedProductDetails.price}
-          onChange={(e) => handleChange('price', e.target.value)}
-        />
-        <label className="label">Quantity:</label>
-        <input
-          type="number"
-          className="input input-bordered w-full"
-          placeholder="Product Quantity"
-          value={updatedProductDetails.quantity}
-          onChange={(e) => handleChange('quantity', e.target.value)}
-        />
-      </div>
-      <div className="mb-4">
-        <label className="label">Select Order Status:</label>
-        <select
-          className="select select-bordered w-full"
-          value={updatedProductDetails.enable}
-          onChange={(e) => handleChange('enable', e.target.value)}
-        >
-          <option value="Enable">Enable</option>
-          <option value="Unable">Unable</option>
-        </select>
+        <label className="label">Status:</label>
+        <div>{serviceDetails.status}</div>
       </div>
 
       <div className="modal-action mt-4">
         <button className="btn btn-outline" onClick={() => closeModal()}>
           Cancel
         </button>
-        <button className="btn btn-primary w-36 ml-4" onClick={handleUpdateProduct}>
-          Update Product
+        <button className="btn btn-primary w-36 ml-4" onClick={handleUpdateService}>
+          Update Service
         </button>
+
+        {(serviceDetails.status === 'UNAPPROVED' || serviceDetails.status === 'APPROVING') && (
+          <button className="btn btn-success w-36 ml-4" onClick={handleApproveOrUnapproveService}>
+            Approve
+          </button>
+        )}
+        {serviceDetails.status === 'APPROVED' && (
+          <button className="btn btn-warning w-36 ml-4" onClick={handleApproveOrUnapproveService}>
+            Unapprove
+          </button>
+        )}
       </div>
     </>
   );
 }
 
-export default UpdateProductModalBody;
+export default UpdateServiceModalBody;

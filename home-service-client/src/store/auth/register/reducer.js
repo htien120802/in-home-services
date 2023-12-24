@@ -6,8 +6,6 @@ import {
 
 const initialState = {
   loading: false,
-  accessToken: localStorage.getItem('accessToken') || null,
-  refreshToken: null,
 };
 
 const register = (state = initialState, action) => {
@@ -23,7 +21,6 @@ const register = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        accessToken: action.payload.accessToken,
       };
 
     case REGISTER_FAILED:

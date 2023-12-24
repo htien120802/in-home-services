@@ -14,8 +14,6 @@ import { GET_ALL_SERVICES,
   CREATE_PROVIDER,
   GET_ALL_CUSTOMERS,
   CREATE_CUSTOMER,
-  CREATE_CATEGORY,
-  UPDATE_CATEGORY,
   GET_SALES_STATISTICS,
   GET_QUANTITY_STATISTICS,
   GET_ALL_REVIEWS,
@@ -27,6 +25,7 @@ import { GET_ALL_SERVICES,
   DELETE_BOOKING,
   DELETE_SERVICE,
   DELETE_ADDRESS,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
 } from './actionTypes';
 
 import {
@@ -52,10 +51,6 @@ import {
   actionGetAllCustomersFailed,
   actionCreateCustomerSuccess,
   actionCreateCustomerFailed,
-  actionCreateCategorySuccess,
-  actionCreateCategoryFailed,
-  actionUpdateCategorySuccess,
-  actionUpdateCategoryFailed,
   actionGetSalesStatisticsSuccess,
   actionGetSalesStatisticsFailed,
   actionGetQuantityStatisticsSuccess,
@@ -78,11 +73,13 @@ import {
   actionDeleteServiceFailed,
   actionDeleteAddressSuccess,
   actionDeleteAddressFailed,
+  actionApproveOrUnapproveRegisterServiceSuccess,
+  actionApproveOrUnapproveRegisterServiceFailed,
 } from './actions';
 
-function* getAllServices() {
+function* getAllServices({ payload }) {
   try {
-    const response = yield call(adminAPI.getAllServices);
+    const response = yield call(adminAPI.getAllServices, payload);
 
     yield put(actionGetAllServicesSuccess(response.data));
   } catch (error) {
@@ -249,40 +246,6 @@ function* createCustomer({ payload }) {
   }
 }
 
-function* createCategory({ payload }) {
-  try {
-    const { newData, callback } = payload;
-    const response = yield call(adminAPI.createCategory, newData);
-
-    yield put(actionCreateCategorySuccess(response.data));
-    toast.success(response.message);
-
-    if (callback) {
-      callback();
-    }
-  } catch (error) {
-    yield put(actionCreateCategoryFailed());
-    toast.error(error.response.data.message);
-  }
-}
-
-function* updateCategory({ payload }) {
-  try {
-    const { categoryId, updatedData, callback } = payload;
-    const response = yield call(adminAPI.updateCategory, categoryId, updatedData);
-
-    yield put(actionUpdateCategorySuccess(response.data));
-    toast.success(response.message);
-
-    if (callback) {
-      callback();
-    }
-  } catch (error) {
-    yield put(actionUpdateCategoryFailed());
-    toast.error(error.response.data.message);
-  }
-}
-
 function* getSalesStatistics() {
   try {
     const response = yield call(adminAPI.getSalesStatistics);
@@ -333,7 +296,7 @@ function* deleteReview({ payload }) {
     const { reviewId, callback } = payload;
     const response = yield call(adminAPI.deleteReview, reviewId);
 
-    yield put(actionDeleteReviewSuccess(response.data));
+    yield put(actionDeleteReviewSuccess(reviewId));
     toast.success(response.message);
 
     if (callback) {
@@ -384,7 +347,7 @@ function* deleteBooking({ payload }) {
     const { bookingId, callback } = payload;
     const response = yield call(adminAPI.deleteBooking, bookingId);
 
-    yield put(actionDeleteBookingSuccess(response.data));
+    yield put(actionDeleteBookingSuccess(bookingId));
     toast.success(response.message);
 
     if (callback) {
@@ -430,6 +393,24 @@ function* deleteAddress({ payload }) {
   }
 }
 
+function* approveOrUnapproveRegisterService({ payload }) {
+  try {
+    const response = yield call(adminAPI.approveOrUnapproveRegisterService, payload);
+
+    yield put(actionApproveOrUnapproveRegisterServiceSuccess(response.data));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionApproveOrUnapproveRegisterServiceFailed());
+  }
+}
+
 export default function* loginSaga() {
   yield takeLeading(GET_ALL_SERVICES, getAllServices);
   yield takeLeading(UPDATE_SERVICE, updateService);
@@ -442,8 +423,6 @@ export default function* loginSaga() {
   yield takeLeading(CREATE_PROVIDER, createProvider);
   yield takeLeading(GET_ALL_CUSTOMERS, getAllCustomers);
   yield takeLeading(CREATE_CUSTOMER, createCustomer);
-  yield takeLeading(CREATE_CATEGORY, createCategory);
-  yield takeLeading(UPDATE_CATEGORY, updateCategory);
   yield takeLeading(GET_SALES_STATISTICS, getSalesStatistics);
   yield takeLeading(GET_QUANTITY_STATISTICS, getQuantityStatistics);
   yield takeLeading(GET_ALL_REVIEWS, getAllReviews);
@@ -455,4 +434,5 @@ export default function* loginSaga() {
   yield takeLeading(DELETE_BOOKING, deleteBooking);
   yield takeLeading(DELETE_SERVICE, deleteService);
   yield takeLeading(DELETE_ADDRESS, deleteAddress);
+  yield takeLeading(APPROVE_OR_UNAPPROVE_REGISTER_SERVICE, approveOrUnapproveRegisterService);
 }

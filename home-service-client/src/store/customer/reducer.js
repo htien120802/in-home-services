@@ -53,7 +53,10 @@ const customerReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        addresses: action.payload,
+        customer: {
+          ...state.customer,
+          addresses: [action.payload],
+        },
       };
 
     case GET_CUSTOMER_PROFILE_FAILED:
