@@ -5,13 +5,22 @@ import authAPI from 'apis/auth/authAPI';
 import { removeSpacesWithTrim } from 'utils';
 import axiosClient from 'utils/axios';
 
-import { LOGIN, LOGOUT } from './actionTypes';
+import {
+  LOGIN, LOGOUT, REFRESH_TOKEN,
+  RESET_PASSWORD_TOKEN,
+} from './actionTypes';
 import {
   actionLoginSuccess,
   actionLoginFailed,
 
   actionLogoutSuccess,
   actionLogoutFailed,
+
+  actionResetPasswordSuccess,
+  actionResetPasswordFailed,
+
+  actionResetPasswordTokenSuccess,
+  actionResetPasswordTokenFailed,
 } from './actions';
 
 function* login({ payload }) {
@@ -76,7 +85,37 @@ function* logout({ payload }) {
   }
 }
 
+function* resetPassword({ payload }) {
+  try {
+    const response = yield call(authAPI.resetPassword, payload);
+
+    yield put(actionResetPasswordSuccess());
+
+    toast.success(response.data);
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionResetPasswordFailed());
+  }
+}
+
+function* resetPasswordToken({ payload }) {
+  try {
+    yield call(authAPI.getResetPasswordToken, payload);
+
+    toast.success('Please check your email');
+
+    yield put(actionResetPasswordTokenSuccess());
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionResetPasswordTokenFailed());
+  }
+}
+
 export default function* loginSaga() {
   yield takeLeading(LOGIN, login);
   yield takeLeading(LOGOUT, logout);
+  yield takeLeading(REFRESH_TOKEN, resetPassword);
+  yield takeLeading(RESET_PASSWORD_TOKEN, resetPasswordToken);
 }

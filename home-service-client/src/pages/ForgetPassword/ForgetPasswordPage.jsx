@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import styles from './index.module.css';
+import { actionResetPassword, actionResetPasswordToken } from 'store/actions';
 
 function ForgetPasswordPage() {
+  const { token } = useParams();
+  const dispatch = useDispatch();
+
   const [resetPasswordMode, setResetPasswordMode] = useState(false);
 
   const validation = useFormik({
@@ -32,15 +38,19 @@ function ForgetPasswordPage() {
         .oneOf([Yup.ref('password'), null], 'Passwords must match'),
     }),
     onSubmit: (values) => {
-      console.log('Form Submitted:', values);
-      // Add your logic for handling forget password and reset password submission
+      dispatch(actionResetPassword(values));
     },
   });
 
   const switchMode = () => {
-    setResetPasswordMode(!resetPasswordMode);
-    validation.resetForm();
+    dispatch(actionResetPasswordToken({ loginName: validation.values.username }));
   };
+
+  useEffect(() => {
+    if (token) {
+      setResetPasswordMode(true);
+    }
+  }, [token]);
 
   return (
     <div className={styles.Container}>

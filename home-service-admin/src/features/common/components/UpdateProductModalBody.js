@@ -33,7 +33,7 @@ function UpdateServiceModalBody({ closeModal, extraObject }) {
       return;
     }
 
-    dispatch(actionUpdateService({ serviceId: extraObject.id, updatedData: serviceDetails }));
+    dispatch(actionUpdateService({ serviceId: extraObject.id, updatedData: {...serviceDetails, id: extraObject.id} }));
     closeModal();
   };
 

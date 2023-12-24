@@ -7,6 +7,7 @@ import { MODAL_BODY_TYPES } from 'utils/globalConstantUtil';
 
 import ArrowPathIcon from '@heroicons/react/24/outline/ArrowPathIcon';
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
+import PlusIcon from '@heroicons/react/24/outline/PlusIcon'
 import Pagination from 'components/Pagination/Pagination';
 
 function InternalPage(){
@@ -14,10 +15,6 @@ function InternalPage(){
     const providers = useSelector((state) => state.Admin.providers);
 
     const [currentPage, setCurrentPage] = useState(1);
-
-    const indexOfLastItem = currentPage * 5;
-    const indexOfFirstItem = indexOfLastItem - 5;
-    const currentData = providers.content?.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
@@ -36,14 +33,25 @@ function InternalPage(){
         );
     };
 
+    const handleAddProduct = (id) => {
+        dispatch(
+            openModal({
+                title: 'Add Service',
+                bodyType: MODAL_BODY_TYPES.ADD_PRODUCT,
+                extraObject: id,
+                size: 'lg',
+            })
+        );
+    };
+
     const handleDeleteUser = (couponId) => {
-        dispatch(actionDeleteProvider({id: couponId}))
+        dispatch(actionDeleteProvider({providerId: couponId}))
     };
 
     useEffect(() => {
         dispatch(setPageTitle({ title : "Providers"}))
-        dispatch(actionGetAllProviders())
-    }, [dispatch])
+        dispatch(actionGetAllProviders({pageNumber: currentPage - 1, size: 5}))
+    }, [dispatch, currentPage])
     
     return(
         <div className="h-4/5 bg-base-200">
@@ -62,8 +70,8 @@ function InternalPage(){
                             </tr>
                         </thead>
                         <tbody>
-                            {currentData ? (
-                                currentData.map((provider) => (
+                            {providers && providers.content ? (
+                                providers.content.map((provider) => (
                                     <tr key={provider.email}>
                                     <td>{provider.firstName}</td>
                                     <td>{provider.lastName}</td>
@@ -84,9 +92,12 @@ function InternalPage(){
                                         ))}
                                     </td>
                                     <td>
-                                        <button className="icon-btn" onClick={() => handleUpdateProduct(provider.id)}>
-                                            <ArrowPathIcon className="h-5 w-5" />
+                                        <button className="icon-btn" onClick={() => handleAddProduct(provider.id)}>
+                                            <PlusIcon className="h-5 w-5" />
                                         </button>
+                                        {/* <button className="icon-btn" onClick={() => handleUpdateProduct(provider.id)}>
+                                            <ArrowPathIcon className="h-5 w-5" />
+                                        </button> */}
                                         <button className="icon-btn" onClick={() => handleDeleteUser(provider.id)}>
                                         <TrashIcon className="h-5 w-5" />
                                         </button>
@@ -102,7 +113,7 @@ function InternalPage(){
                     </table>
 
                     <Pagination
-                        totalItems={providers?.content?.length}
+                        totalItems={providers.totalElements}
                         onPageChange={handlePageChange}
                         currentPage={currentPage}
                     />

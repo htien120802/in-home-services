@@ -5,16 +5,20 @@ const customerEndpoint = '/customer/booking';
 
 export default {
   // PUT /provider/booking/{bookingId}/status
-  async updateBookingStatus(bookingId, newStatus) {
-    const path = `${providerEndpoint}/${bookingId}/status`;
-    const response = await axiosClient.put(path, { status: newStatus });
+  async updateBookingStatus(payload) {
+    const path = `${providerEndpoint}/${payload.bookingId}/status`;
+    const response = await axiosClient.put(path);
     return response.data;
   },
 
   // PUT /provider/booking/{bookingId}/cancel
-  async providerCancelBooking(bookingId) {
-    const path = `${providerEndpoint}/${bookingId}/cancel`;
-    const response = await axiosClient.put(path);
+  async providerCancelBooking(payload) {
+    const path = `${providerEndpoint}/${payload.bookingId}/cancel`;
+    const response = await axiosClient.put(path, null, {
+      params: {
+        reason: payload.reason,
+      },
+    });
     return response.data;
   },
 

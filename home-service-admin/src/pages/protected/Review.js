@@ -12,10 +12,6 @@ function InternalPage(){
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const indexOfLastItem = currentPage * 5;
-    const indexOfFirstItem = indexOfLastItem - 5;
-    const currentData = reviews.content?.slice(indexOfFirstItem, indexOfLastItem);
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -26,8 +22,8 @@ function InternalPage(){
 
     useEffect(() => {
     dispatch(setPageTitle({ title: 'Reviews' }));
-    dispatch(actionGetAllReviews());
-    }, [dispatch]);
+    dispatch(actionGetAllReviews({pageNumber: currentPage - 1, size: 5}));
+    }, [dispatch, currentPage]);
 
     return (
     <div className="h-4/5 bg-base-200">
@@ -44,8 +40,8 @@ function InternalPage(){
                 </tr>
             </thead>
             <tbody>
-            {currentData ? (
-            currentData.map((review) => (
+            {reviews && reviews.content ? (
+            reviews.content.map((review) => (
                 <tr key={review.id}>
                 <td>{review.rating}</td>
                 <td>
@@ -69,7 +65,7 @@ function InternalPage(){
             </table>
 
             <Pagination
-                totalItems={reviews?.content?.length}
+                totalItems={reviews.totalElements}
                 onPageChange={handlePageChange}
                 currentPage={currentPage}
             />

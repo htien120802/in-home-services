@@ -6,7 +6,7 @@ import BannerSlider from 'components/BannerSlider/BannerSlider';
 function ServerErrorPage() {
   return (
     <>
-      <BannerSlider title="500 Internal Server Error" />
+      <BannerSlider title="500 Error" />
 
       <section className="mt-5 mb-5">
         <div className="container">

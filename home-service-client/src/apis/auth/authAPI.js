@@ -42,4 +42,22 @@ export default {
 
     return response.data;
   },
+
+  async resetPassword(payload) {
+    const path = `${endpoint}/resetpassword`;
+
+    const response = await axiosClient.post(path, payload);
+
+    return response.data;
+  },
+
+  async getResetPasswordToken(payload) {
+    const path = `${endpoint}/resetpasswordtoken`;
+
+    const response = await axiosClient.get(path, {
+      params: payload,
+    });
+
+    return response.data;
+  },
 };

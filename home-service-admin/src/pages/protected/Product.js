@@ -16,10 +16,6 @@ function InternalPage(){
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedStatus, setSelectedStatus] = useState('');
 
-    const indexOfLastItem = currentPage * 5;
-    const indexOfFirstItem = indexOfLastItem - 5;
-    const currentData = products.content?.slice(indexOfFirstItem, indexOfLastItem);
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -49,27 +45,13 @@ function InternalPage(){
 
     useEffect(() => {
     dispatch(setPageTitle({ title: 'Services' }));
-    dispatch(actionGetAllServices());
-    }, [dispatch]);
-
-    const handleOpenModal = () => {
-        dispatch(
-            openModal({
-            title: 'Add Service',
-            bodyType: MODAL_BODY_TYPES.ADD_PRODUCT,
-            size: 'lg',
-            })
-        );
-    };
+    dispatch(actionGetAllServices({pageNumber: currentPage - 1, size: 5}));
+    }, [dispatch, currentPage]);
 
     return (
     <div className="h-4/5 bg-base-200">
         <div className="text-accent">
         <div className="max-w-md">
-            <button className="btn" onClick={handleOpenModal}>
-                Add Service
-            </button>
-
             <div >
                 <label className="label">Filter by Status:</label>
                 <select
@@ -98,8 +80,8 @@ function InternalPage(){
                 </tr>
             </thead>
             <tbody>
-                {currentData ? (
-                currentData.map((product) => (
+                {products && products.content ? (
+                products.content.map((product) => (
                     <tr key={product.id}>
                         <td>{product.name}</td>
                         <td>
@@ -137,7 +119,7 @@ function InternalPage(){
             </table>
 
             <Pagination
-            totalItems={products?.content?.length}
+            totalItems={products.totalElements}
             onPageChange={handlePageChange}
             currentPage={currentPage}
           />

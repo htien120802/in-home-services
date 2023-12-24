@@ -66,7 +66,12 @@ function ProviderDashboard() {
                 <div key={service.id} className="col-12">
                   <div className="card service_card">
                     <div className="card-body d-flex flex-wrap justify-content-between align-items-center">
-                      <img className="service_image" src={service.thumbnail} alt={service.name} style={{ height: '300px', width: '300px' }} />
+                      <img
+                        className="service_image"
+                        src={service.thumbnail}
+                        alt={service.name}
+                        style={{ height: '300px', width: '300px' }}
+                      />
                       <div className="service_detail">
                         <h4>{service.name}</h4>
                         <h6>
@@ -95,6 +100,12 @@ function ProviderDashboard() {
                           </ul>
                         </div>
 
+                        <p>
+                          Average Rating:
+                          {' '}
+                          {service.avgRating}
+                        </p>
+
                         <a
                           href="javascript:;"
                           onClick={() => openEditServiceModal(service)}
@@ -116,10 +127,7 @@ function ProviderDashboard() {
                         </a>
 
                         {service.status === 'APPROVING' && (
-                        <a
-                          href="javascript:;"
-                          className="btn btn-warning btn-sm ml-2"
-                        >
+                        <a href="javascript:;" className="btn btn-warning btn-sm ml-2">
                           <i className="fas fa-clock" />
                           {' '}
                           Approving

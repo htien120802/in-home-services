@@ -6,6 +6,14 @@ import {
   LOGOUT,
   LOGOUT_SUCCESS,
   LOGOUT_FAILED,
+
+  REFRESH_TOKEN,
+  REFRESH_TOKEN_SUCCESS,
+  REFRESH_TOKEN_FAILED,
+
+  RESET_PASSWORD_TOKEN,
+  RESET_PASSWORD_TOKEN_SUCCESS,
+  RESET_PASSWORD_TOKEN_FAILED,
 } from './actionTypes';
 
 const initialState = {
@@ -51,6 +59,43 @@ const login = (state = initialState, action) => {
       };
 
     case LOGOUT_FAILED:
+      return {
+        ...state,
+        loading: false,
+      };
+
+      // REFRESH TOKEN
+    case REFRESH_TOKEN:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case REFRESH_TOKEN_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case REFRESH_TOKEN_FAILED:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case RESET_PASSWORD_TOKEN:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case RESET_PASSWORD_TOKEN_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case RESET_PASSWORD_TOKEN_FAILED:
       return {
         ...state,
         loading: false,

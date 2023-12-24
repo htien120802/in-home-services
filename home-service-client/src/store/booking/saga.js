@@ -46,11 +46,11 @@ import {
 
 function* updateBookingStatus({ payload }) {
   try {
-    const { bookingId, status } = payload;
+    const { bookingId } = payload;
 
-    const response = yield call(bookingAPI.updateBookingStatus, bookingId, status);
+    const response = yield call(bookingAPI.updateBookingStatus, bookingId);
 
-    yield put(actionUpdateBookingStatusSuccess(response.data));
+    yield put(actionUpdateBookingStatusSuccess(bookingId));
 
     if (response.status === 'success') {
       toast.success(response.message);
