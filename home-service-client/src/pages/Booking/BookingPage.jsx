@@ -11,6 +11,7 @@ import {
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 
 import { determineUserRole, formatPriceWithCommas } from 'utils';
+import { toast } from 'react-toastify';
 
 function BookingPage() {
   const { id } = useParams();
@@ -53,7 +54,13 @@ function BookingPage() {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = (event) => {
+    if (formData.phone.trim() === '') {
+      event.preventDefault();
+      toast.error('Please update phone number in profile');
+      return;
+    }
+
     const addressChanged = JSON.stringify(formData.address)
     !== JSON.stringify(customerProfile?.addresses[0]) || JSON.stringify(formData.address)
     !== JSON.stringify(providerProfile?.addresses[0]);
@@ -179,7 +186,7 @@ function BookingPage() {
 
                       <div className="col-xl-6">
                         <fieldset>
-                          <legend>Phone</legend>
+                          <legend>Phone*</legend>
                           <input
                             type="text"
                             name="phone"

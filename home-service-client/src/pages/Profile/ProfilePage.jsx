@@ -15,10 +15,10 @@ function ProfilePage() {
 
   return (
     <div>
-      {token.role === 'ROLE_PROVIDER'
+      {token?.role === 'ROLE_PROVIDER'
       && <ProviderProfilePage />}
 
-      {token.role === 'ROLE_CUSTOMER'
+      {token?.role === 'ROLE_CUSTOMER'
       && <CustomerProfile />}
     </div>
   );

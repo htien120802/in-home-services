@@ -63,6 +63,7 @@ function CustomerProfile() {
 
   const callbackLogoutSuccess = useCallback(() => {
     navigate('/');
+    window.location.reload();
   }, [navigate]);
 
   const handleLogout = () => {

@@ -16,11 +16,9 @@ export default {
 
   // PUT /admin/service
   async updateService(serviceId, payload) {
-    const path = `${adminEndpoint}/service/${serviceId}`;
+    const path = `${adminEndpoint}/service`;
 
-    const response = await axiosClient.put(path, payload, {
-      withCredentials: true,
-    });
+    const response = await axiosClient.put(path, payload);
 
     return response.data;
   },
@@ -29,7 +27,11 @@ export default {
   async createService(payload) {
     const path = `${adminEndpoint}/service`;
 
-    const response = await axiosClient.post(path, payload);
+    const response = await axiosClient.post(path, payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
     return response.data;
   },
@@ -79,11 +81,11 @@ export default {
   },
 
   // GET /admin/provider
-  async getAllProviders() {
+  async getAllProviders(payload) {
     const path = `${adminEndpoint}/provider`;
 
     const response = await axiosClient.get(path, {
-      withCredentials: true,
+      params: payload,
     });
 
     return response.data;
@@ -101,11 +103,11 @@ export default {
   },
 
   // GET /admin/customer
-  async getAllCustomers() {
+  async getAllCustomers(payload) {
     const path = `${adminEndpoint}/customer`;
 
     const response = await axiosClient.get(path, {
-      withCredentials: true,
+      params: payload,
     });
 
     return response.data;
@@ -171,11 +173,11 @@ export default {
   },
 
   // GET /admin/review
-  async getAllReviews() {
+  async getAllReviews(payload) {
     const path = `${adminEndpoint}/review`;
 
     const response = await axiosClient.get(path, {
-      withCredentials: true,
+      params: payload,
     });
 
     return response.data;
@@ -215,11 +217,11 @@ export default {
   },
 
   // GET /admin/booking
-  async getAllBookings() {
+  async getAllBookings(payload) {
     const path = `${adminEndpoint}/booking`;
 
     const response = await axiosClient.get(path, {
-      withCredentials: true,
+      params: payload,
     });
 
     return response.data;

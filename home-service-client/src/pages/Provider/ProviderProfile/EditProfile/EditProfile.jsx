@@ -72,11 +72,11 @@ function EditProfileModal({ providerState }) {
 
   const handleAddAddress = () => {
     dispatch(actionAddProviderAddress({
-      number: '',
-      street: '',
-      ward: '',
-      district: '',
-      city: '',
+      number: validation.values.address.number || '',
+      street: validation.values.address.street || '',
+      ward: validation.values.address.ward || '',
+      district: validation.values.address.district || '',
+      city: validation.values.address.city || '',
     }));
   };
 
@@ -191,7 +191,7 @@ function EditProfileModal({ providerState }) {
                   )
                 ))}
 
-                {!validation.values.address && (
+                {!providerState.provider?.addresses[0] && (
                   <>
                     <button
                       type="button"

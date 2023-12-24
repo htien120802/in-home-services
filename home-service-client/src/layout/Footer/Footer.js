@@ -31,9 +31,9 @@ function Footer() {
                     <div className="full">
                       <ul className="footer_link">
                         <li><a href={LOCATION.HOME}>Home</a></li>
-                        <li><a href={LOCATION.ABOUT}>About</a></li>
+                        {/* <li><a href={LOCATION.ABOUT}>About</a></li> */}
                         <li><a href={LOCATION.SERVICES}>Services</a></li>
-                        <li><a href={LOCATION.CONTACT}>Contact us</a></li>
+                        {/* <li><a href={LOCATION.CONTACT}>Contact us</a></li> */}
                       </ul>
                     </div>
                   </div>

@@ -144,7 +144,7 @@ function* deleteProvider({ payload }) {
     const { providerId, callback } = payload;
     const response = yield call(adminAPI.deleteProvider, providerId);
 
-    yield put(actionDeleteProviderSuccess(response.data));
+    yield put(actionDeleteProviderSuccess(providerId));
     toast.success(response.message);
 
     if (callback) {
@@ -178,7 +178,7 @@ function* deleteCustomer({ payload }) {
     const { customerId, callback } = payload;
     const response = yield call(adminAPI.deleteCustomer, customerId);
 
-    yield put(actionDeleteCustomerSuccess(response.data));
+    yield put(actionDeleteCustomerSuccess(customerId));
     toast.success(response.message);
 
     if (callback) {
@@ -190,9 +190,9 @@ function* deleteCustomer({ payload }) {
   }
 }
 
-function* getAllProviders() {
+function* getAllProviders({payload}) {
   try {
-    const response = yield call(adminAPI.getAllProviders);
+    const response = yield call(adminAPI.getAllProviders, payload);
 
     yield put(actionGetAllProvidersSuccess(response.data));
   } catch (error) {
@@ -218,9 +218,9 @@ function* createProvider({ payload }) {
   }
 }
 
-function* getAllCustomers() {
+function* getAllCustomers({payload}) {
   try {
-    const response = yield call(adminAPI.getAllCustomers);
+    const response = yield call(adminAPI.getAllCustomers, payload);
 
     yield put(actionGetAllCustomersSuccess(response.data));
   } catch (error) {
@@ -268,9 +268,9 @@ function* getQuantityStatistics() {
   }
 }
 
-function* getAllReviews() {
+function* getAllReviews({payload}) {
   try {
-    const response = yield call(adminAPI.getAllReviews);
+    const response = yield call(adminAPI.getAllReviews, payload);
 
     yield put(actionGetAllReviewsSuccess(response.data));
   } catch (error) {
@@ -319,9 +319,9 @@ function* getEntityCount() {
   }
 }
 
-function* getAllBookings() {
+function* getAllBookings({payload}) {
   try {
-    const response = yield call(adminAPI.getAllBookings);
+    const response = yield call(adminAPI.getAllBookings, payload);
 
     yield put(actionGetAllBookingsSuccess(response.data));
   } catch (error) {
@@ -364,7 +364,7 @@ function* deleteService({ payload }) {
     const { serviceId, callback } = payload;
     const response = yield call(adminAPI.deleteService, serviceId);
 
-    yield put(actionDeleteServiceSuccess(response.data));
+    yield put(actionDeleteServiceSuccess(serviceId));
     toast.success(response.message);
 
     if (callback) {
@@ -381,7 +381,7 @@ function* deleteAddress({ payload }) {
     const { addressId, callback } = payload;
     const response = yield call(adminAPI.deleteAddress, addressId);
 
-    yield put(actionDeleteAddressSuccess(response.data));
+    yield put(actionDeleteAddressSuccess(addressId));
     toast.success(response.message);
 
     if (callback) {

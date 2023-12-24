@@ -13,10 +13,6 @@ function InternalPage(){
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const indexOfLastItem = currentPage * 5;
-    const indexOfFirstItem = indexOfLastItem - 5;
-    const currentData = bookings.content?.slice(indexOfFirstItem, indexOfLastItem);
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -27,8 +23,8 @@ function InternalPage(){
 
     useEffect(() => {
     dispatch(setPageTitle({ title: 'Bookings' }));
-    dispatch(actionGetAllBookings());
-    }, [dispatch]);
+    dispatch(actionGetAllBookings({pageNumber: currentPage - 1, size: 5}));
+    }, [dispatch, currentPage]);
 
     return (
         <div className="h-4/5 bg-base-200">
@@ -53,8 +49,8 @@ function InternalPage(){
                     </tr>
                 </thead>
                 <tbody>
-                    {currentData ? (
-                    currentData.map((booking) => (
+                    {bookings && bookings.content ? (
+                    bookings.content.map((booking) => (
                         <tr key={booking.id}>
                             <td>{`${booking.customer.firstName} ${booking.customer.lastName}`}</td>
                             <td>{`${booking.provider.firstName} ${booking.provider.lastName}`}</td>
@@ -91,7 +87,7 @@ function InternalPage(){
                 </table>
 
                 <Pagination
-                    totalItems={bookings?.content?.length}
+                    totalItems={bookings.totalElements}
                     onPageChange={handlePageChange}
                     currentPage={currentPage}
                 />
