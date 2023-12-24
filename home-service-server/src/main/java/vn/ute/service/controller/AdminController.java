@@ -1,4 +1,4 @@
-package vn.ute.service.entity.controller;
+package vn.ute.service.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -121,8 +121,8 @@ public class AdminController {
     }
 
     @Operation(summary = "Create a service")
-    @PostMapping("/service")
-    public ResponseEntity<?> createService(@RequestPart MultipartFile thumbnail, @RequestPart String createServiceRequest) throws JsonProcessingException, ImageUploadException {
+    @PostMapping(value = "/service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createService(@RequestPart(required = false) MultipartFile thumbnail, @RequestPart String createServiceRequest) throws JsonProcessingException, ImageUploadException {
         return adminService.createService(thumbnail, createServiceRequest);
     }
 

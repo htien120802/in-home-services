@@ -1,4 +1,4 @@
-package vn.ute.service.entity.controller;
+package vn.ute.service.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

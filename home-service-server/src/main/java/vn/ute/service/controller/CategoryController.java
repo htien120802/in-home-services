@@ -1,4 +1,4 @@
-package vn.ute.service.entity.controller;
+package vn.ute.service.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;

@@ -52,7 +52,7 @@ public class ProviderEntity {
     @JoinColumn(name = "account_id")
     private AccountEntity account;
 
-    @OneToMany(mappedBy = "provider")
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     private Set<AddressEntity> addresses = new HashSet<>();
 //
 //    @OneToOne
