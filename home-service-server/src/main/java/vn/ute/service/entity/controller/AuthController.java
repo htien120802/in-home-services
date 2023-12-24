@@ -1,4 +1,4 @@
-package vn.ute.service.controller;
+package vn.ute.service.entity.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

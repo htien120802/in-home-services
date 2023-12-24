@@ -1,4 +1,4 @@
-package vn.ute.service.controller;
+package vn.ute.service.entity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

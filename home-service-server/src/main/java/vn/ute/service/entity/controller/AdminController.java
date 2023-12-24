@@ -1,4 +1,4 @@
-package vn.ute.service.controller;
+package vn.ute.service.entity.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;

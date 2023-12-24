@@ -1,4 +1,4 @@
-package vn.ute.service.controller;
+package vn.ute.service.entity.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
