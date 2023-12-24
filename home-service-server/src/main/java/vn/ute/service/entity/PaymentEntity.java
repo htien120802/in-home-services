@@ -10,6 +10,7 @@ import vn.ute.service.enumerate.PaymentMethod;
 import vn.ute.service.enumerate.PaymentStatus;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
@@ -33,9 +34,8 @@ public class PaymentEntity {
 
     private long amount;
 
-    private String paymentDate;
+    private Timestamp paymentDate;
 
-    private String transactionNo;
 
 //    @Column(columnDefinition = "enum ('PAID','UNPAID') default 'UNPAID'")
     @Enumerated(EnumType.STRING)

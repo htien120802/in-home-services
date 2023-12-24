@@ -17,6 +17,7 @@ import vn.ute.service.dto.request.CreateUserRequest;
 import vn.ute.service.dto.request.ProfileRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.dto.response.ReviewResponse;
+import vn.ute.service.dto.response.ServiceResponse;
 import vn.ute.service.entity.*;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.enumerate.ServiceStatus;
@@ -180,7 +181,7 @@ public class AdminService {
 
     public ResponseEntity<?> getAllServices(int pageNumber, int size, String sortBy, Sort.Direction sortDirection, ServiceStatus status, String providerName, String name, String categorySlug, String rating) {
         Page<ServiceEntity> serviceEntityPage = serviceCriteriaRepository.findAllWithFilters(pageNumber,size,sortDirection,sortBy,status,providerName,name,categorySlug,rating);
-        Page<ServiceDto> serviceDtoPage = serviceEntityPage.map(service -> mapper.map(service,ServiceDto.class));
+        Page<ServiceResponse> serviceDtoPage = serviceEntityPage.map(service -> mapper.map(service,ServiceResponse.class));
         return ResponseEntity.ok(new ResponseDto<>("success","Get all services successfully!",serviceDtoPage));
     }
     @Transactional

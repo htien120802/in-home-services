@@ -15,7 +15,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - backend  
+      - app-network
 
   # App backend service
   app-server:
@@ -38,8 +38,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: 123456
       ORIGIN_URL: http://localhost:3000  # Change host to public IP when deploy
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
-      - backend
-      - frontend
+      - app-network
 
   # Frontend Service 
   app-client:
@@ -47,7 +46,8 @@ services:
       context: home-service-client # Use an image built from the specified dockerfile in the `home-service-client` directory.
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: http://localhost:8080/api/v1 # Change host to public IP when deploy
+        REACT_APP_API_URL: http://103.14.226.91:8080/api/v1 # Change host to public IP when deploy
+        REACT_APP_TOMTOM_KEY: DamrokB8mzqAOVKuPFf7aazUHmh7bkfe
     image: huutien120802/home-service-client
     container_name: home-service-client-container
     ports:
@@ -56,7 +56,23 @@ services:
     depends_on:
       - app-server
     networks:
-      - frontend  
+      - app-network
+
+  app-admin:
+    build:
+      context: home-service-admin # Use an image built from the specified dockerfile in the `home-service-client` directory.
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://103.14.226.91:8080/api/v1 # Change host to public IP when deploy
+    image: huutien120802/home-service-admin
+    container_name: home-service-admin-container
+    ports:
+      - "81:81" # Forward the exposed port 80 on the container to port 80 on the host machine
+    restart: always
+    depends_on:
+      - app-server
+    networks:
+      - app-network
 
 # Volumes
 volumes:
@@ -64,5 +80,5 @@ volumes:
 
 # Networks to be created to facilitate communication between containers
 networks:
-  backend:
-  frontend:    
+  app-network:
+    driver: bridge

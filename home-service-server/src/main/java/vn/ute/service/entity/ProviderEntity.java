@@ -39,7 +39,7 @@ public class ProviderEntity {
 
 //    private String specialization;
 
-    private double rating;
+//    private double rating;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     private Set<BookingEntity> bookings;
