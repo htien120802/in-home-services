@@ -31,12 +31,13 @@ services:
     depends_on: 
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
+      TZ: Asia/Bangkok
       SPRING_DATASOURCE_HOST: db
       SPRING_DATASOURCE_PORT: 3306
       SPRING_DATASOURCE_DB_NAME: service_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 123456
-      CLIENT_DOMAIN: http://103.14.226.91
+      CLIENT_HOST: http://103.14.226.91
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - app-network
 

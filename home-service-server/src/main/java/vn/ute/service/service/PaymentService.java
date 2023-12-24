@@ -27,10 +27,9 @@ import java.util.*;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
-    @Value("${payment.url.result}")
-    private String urlResult;
-    @Value("${payment.url.fail}")
-    private String urlFail;
+    @Value("${client.host}")
+    private String host;
+
 
 
     public PaymentService(PaymentRepository paymentRepository, BookingRepository bookingRepository) {
@@ -118,20 +117,20 @@ public class PaymentService {
                     payment.setPaymentStatus(PaymentStatus.PAID);
                     payment.setPaymentDate(new Timestamp(System.currentTimeMillis()));
                     paymentRepository.save(payment);
-                    response.sendRedirect(urlResult.replace("id",payment.getBooking().getId().toString()));
+                    response.sendRedirect(host + "/booking/detail/" + payment.getBooking().getId());
                 }
                 else {
-                    response.sendRedirect(urlFail);
+                    response.sendRedirect(host + "/booking/null");
                 }
 
             } else {
                 if (payment != null){
                     paymentRepository.delete(payment);
                     bookingRepository.delete(payment.getBooking());
-                    response.sendRedirect(urlFail);
+                    response.sendRedirect(host + "/booking/failed");
                 }
                 else {
-                    response.sendRedirect(urlFail);
+                    response.sendRedirect(host + "/booking/null");
                 }
             }
         }
