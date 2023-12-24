@@ -112,7 +112,7 @@ public class AdminController {
                                             @RequestParam(defaultValue = "9") int size,
                                             @RequestParam(defaultValue = "avgRating") String sortBy,
                                             @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection,
-                                            @RequestParam(defaultValue = "APPROVED") ServiceStatus status,
+                                            @RequestParam(required = false) ServiceStatus status,
                                             @RequestParam(required = false) String providerName,
                                             @RequestParam(required = false) String name,
                                             @RequestParam(required = false) String categorySlug,

@@ -38,9 +38,6 @@ public class WebSecurityConfig {
     private final AccessDeniedHandlerImpl accessDeniedHandler;
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
 
-    @Value("${application.origin}")
-    private String origin;
-
     private static final String[] WHITELABEL = {
             "/auth/**",
             "/v2/api-docs",
