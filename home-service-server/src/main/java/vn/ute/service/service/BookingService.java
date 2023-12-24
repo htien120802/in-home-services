@@ -250,17 +250,17 @@ public class BookingService {
                 CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(booking.getCustomer().getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
                 CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(booking.getProvider().getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
                 Double time = bingMapsService.calcMovingTime(coordinates1,coordinates2);
-                booking.setArriveTime(new Time((long) (System.currentTimeMillis() + time)));
+                booking.setArriveTime(new Time((long) (System.currentTimeMillis() + time + 7 *60 * 60)));
             }
             else if (booking.getStatus().equals(BookingStatus.COMING)){
                 booking.setStatus(BookingStatus.DOING);
-                booking.setArriveTime(new Time(System.currentTimeMillis()));
+                booking.setArriveTime(new Time(System.currentTimeMillis() + 7 *60 * 60));
             }
             else if (booking.getStatus().equals(BookingStatus.DOING)) {
                 booking.setStatus(BookingStatus.DONE);
                 if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){
                     booking.getPayment().setPaymentStatus(PaymentStatus.PAID);
-                    booking.getPayment().setPaymentDate(new Timestamp(System.currentTimeMillis()));
+                    booking.getPayment().setPaymentDate(new Timestamp(System.currentTimeMillis() + 7 *60 * 60));
                 }
 
             } else {

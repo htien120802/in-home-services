@@ -66,7 +66,7 @@ public class PaymentService {
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-        cld.add(Calendar.HOUR, 7);
+//        cld.add(Calendar.HOUR, 7);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
@@ -115,7 +115,7 @@ public class PaymentService {
                 // Thực hiện các xử lý cần thiết, ví dụ: cập nhật CSDL
                 if (payment != null){
                     payment.setPaymentStatus(PaymentStatus.PAID);
-                    payment.setPaymentDate(new Timestamp(System.currentTimeMillis()));
+                    payment.setPaymentDate(new Timestamp(System.currentTimeMillis() + 7 *60 * 60));
                     paymentRepository.save(payment);
                     response.sendRedirect(host + "/booking/detail/" + payment.getBooking().getId());
                 }
