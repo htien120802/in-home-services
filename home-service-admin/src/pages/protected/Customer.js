@@ -15,10 +15,6 @@ function InternalPage(){
 
     const [currentPage, setCurrentPage] = useState(1);
 
-    const indexOfLastItem = currentPage * 5;
-    const indexOfFirstItem = indexOfLastItem - 5;
-    const currentData = customers.content?.slice(indexOfFirstItem, indexOfLastItem);
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -37,13 +33,13 @@ function InternalPage(){
     };
 
     const handleDeleteUser = (couponId) => {
-        dispatch(actionDeleteCustomer({id: couponId}))
+        dispatch(actionDeleteCustomer({customerId: couponId}))
     };
 
     useEffect(() => {
         dispatch(setPageTitle({ title : "Customer"}))
-        dispatch(actionGetAllCustomers())
-    }, [dispatch])
+        dispatch(actionGetAllCustomers({pageNumber: currentPage -1, size: 5}))
+    }, [dispatch, currentPage])
     
     return(
         <div className="h-4/5 bg-base-200">
@@ -62,8 +58,8 @@ function InternalPage(){
                             </tr>
                         </thead>
                         <tbody>
-                            {currentData ? (
-                                currentData.map((customer) => (
+                            {customers && customers.content ? (
+                                customers.content.map((customer) => (
                                 <tr key={customer.email}>
                                     <td>{customer.firstName}</td>
                                     <td>{customer.lastName}</td>
@@ -84,9 +80,9 @@ function InternalPage(){
                                         ))}
                                     </td>
                                     <td>
-                                        <button className="icon-btn" onClick={() => handleUpdateProduct(customer.id)}>
+                                        {/* <button className="icon-btn" onClick={() => handleUpdateProduct(customer.id)}>
                                             <ArrowPathIcon className="h-5 w-5" />
-                                        </button>
+                                        </button> */}
                                         <button className="icon-btn" onClick={() => handleDeleteUser(customer.id)}>
                                         <TrashIcon className="h-5 w-5" />
                                         </button>
@@ -102,10 +98,10 @@ function InternalPage(){
                     </table>
 
                     <Pagination
-                totalItems={customers?.content?.length}
-                onPageChange={handlePageChange}
-                currentPage={currentPage}
-            />
+                    totalItems={customers.totalElements}
+                    onPageChange={handlePageChange}
+                    currentPage={currentPage}
+                    />
                 </div>
             </div>
         </div>

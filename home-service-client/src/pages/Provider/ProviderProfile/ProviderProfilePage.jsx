@@ -54,55 +54,60 @@ function ProviderProfilePage() {
       <section className="section">
         <BannerSlider title="Profile" />
 
-        <MonthYearPicker selectedDate={selectedDate} onDateChange={handleDateChange} />
-        <div className="container">
-          <div className="row">
-            <div className="col-md-6">
-              <LineChart data={providerState.salesStatistics} title="Sales" />
+        <h2 className="text-center mt-5">Statistics</h2>
+
+        <div className="row mt-5">
+          <div className="col-md-3">
+            <div className="card card-statistic-1">
+              <div className="card-icon bg-primary">
+                <i className="fas fa-coins" />
+              </div>
+              <div className="card-wrap">
+                <div className="card-header">
+                  <h4>Total Service Sold</h4>
+                </div>
+                <div className="card-body">
+                  {bookingState?.bookings?.content?.filter((booking) => booking.status === 'DONE')
+                    .reduce((total) => total + 1, 0)}
+                </div>
+              </div>
             </div>
-            <div className="col-md-6">
-              <LineChart data={providerState.quantityStatistics} title="Quantity" />
+          </div>
+
+          <div className="col-md-3">
+            <Link to="/provider/services">
+              <div className="card card-statistic-1">
+                <div className="card-icon bg-success">
+                  <i className="fas fa-circle" />
+                </div>
+                <div className="card-wrap">
+                  <div className="card-header">
+                    <h4>Total Service</h4>
+                  </div>
+                  <div className="card-body">
+                    {serviceState?.providerServices?.length}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-2">
+          <MonthYearPicker selectedDate={selectedDate} onDateChange={handleDateChange} />
+          <div className="container">
+            <div className="row">
+              <div className="col-md-6">
+                <LineChart data={providerState.salesStatistics} title="Sales" />
+              </div>
+              <div className="col-md-6">
+                <LineChart data={providerState.quantityStatistics} title="Quantity" />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="section-body p-3">
-          <div className="row mt-5">
-            <div className="col-md-3">
-              <div className="card card-statistic-1">
-                <div className="card-icon bg-primary">
-                  <i className="fas fa-coins" />
-                </div>
-                <div className="card-wrap">
-                  <div className="card-header">
-                    <h4>Total Service Sold</h4>
-                  </div>
-                  <div className="card-body">
-                    {bookingState?.bookings?.content?.filter((booking) => booking.status === 'DONE')
-                      .reduce((total) => total + 1, 0)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-3">
-              <Link to="/provider/services">
-                <div className="card card-statistic-1">
-                  <div className="card-icon bg-success">
-                    <i className="fas fa-circle" />
-                  </div>
-                  <div className="card-wrap">
-                    <div className="card-header">
-                      <h4>Total Service</h4>
-                    </div>
-                    <div className="card-body">
-                      {serviceState?.providerServices?.length}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          </div>
           <div className="row mt-sm-4">
             <div className="col-12 col-md-12 col-lg-5">
               <div className="card profile-widget">
@@ -160,7 +165,11 @@ function ProviderProfilePage() {
                     <div className="card-body text-center">
                       <div className="row">
                         <div className="col-12">
-                          <Link to="/provider/services" className="btn btn-primary btn-block btn-lg my-2">Yours Service</Link>
+                          <Link to="/provider/services" className="btn btn-primary btn-block btn-lg my-2">My Service</Link>
+                        </div>
+
+                        <div className="col-12">
+                          <Link to="/provider/bookings" className="btn btn-primary btn-block btn-lg my-2">My Booking</Link>
                         </div>
 
                         <div className="col-12">

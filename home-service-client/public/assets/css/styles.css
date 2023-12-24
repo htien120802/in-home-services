@@ -1395,11 +1395,11 @@ section .social_icons {
 }
 
 .left_blog_top h3 {
-    font-size: 95px;
+    font-size: 90px;
     color: #4c4c4b;
     text-transform: uppercase;
     font-family: 'Righteous', cursive;
-    line-height: 95px;
+    line-height: 90px;
     font-weight: normal;
 }
 
@@ -1411,7 +1411,7 @@ section .social_icons {
     top: 0;
     left: 0;
     z-index: 9;
-    padding-top: 125px;
+    padding-top: 95px;
     float: left;
     margin-top: 221px;
 }

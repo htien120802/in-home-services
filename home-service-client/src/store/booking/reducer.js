@@ -61,11 +61,12 @@ const bookingReducer = (state = initialState, action) => {
       };
 
     case UPDATE_BOOKING_STATUS_SUCCESS:
-    case PROVIDER_CANCEL_BOOKING_SUCCESS:
       return {
         ...state,
         loading: false,
-        bookings: action.payload,
+        bookings: {
+          content: state.bookings.content.filter((booking) => booking.id !== action.payload),
+        },
       };
 
     case CREATE_BOOKING_SUCCESS:
@@ -111,7 +112,26 @@ const bookingReducer = (state = initialState, action) => {
         totalPrice: action.payload.totalPrice,
       };
 
+    case PROVIDER_CANCEL_BOOKING_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        bookingDetail: {
+          ...state.bookingDetail,
+          status: 'CANCEL_BY_PROVIDER',
+        },
+      };
+
     case CUSTOMER_CANCEL_BOOKING_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        bookingDetail: {
+          ...state.bookingDetail,
+          status: 'CANCEL_BY_CUSTOMER',
+        },
+      };
+
     case UPDATE_BOOKING_STATUS_FAILED:
     case PROVIDER_CANCEL_BOOKING_FAILED:
     case CUSTOMER_CANCEL_BOOKING_FAILED:

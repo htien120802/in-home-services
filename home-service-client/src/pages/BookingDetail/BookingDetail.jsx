@@ -2,12 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { actionGetCustomerBooking, actionGetCustomerProfile } from 'store/actions';
+import {
+  actionCustomerCancelBooking, actionGetCustomerBooking, actionGetCustomerProfile, actionGetProviderBooking, actionGetProviderProfile, actionProviderCancelBooking,
+} from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
 import ServerErrorPage from 'pages/Error500/Error500Page';
 
-import { formatPriceWithCommas } from 'utils';
+import { determineUserRole, formatPriceWithCommas } from 'utils';
+import ReasonModal from 'pages/Customer/CustomerProfile/Order/OrderDetail/ReasonModal/ReasonModal';
 
 function BookingDetailPage() {
   const { id } = useParams();
@@ -17,6 +20,28 @@ function BookingDetailPage() {
   const bookingDetail = useSelector((state) => state.Booking.bookingDetail);
 
   const [error, setError] = useState(false);
+  const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState('');
+
+  const handleCloseReasonModal = () => {
+    setIsReasonModalOpen(false);
+  };
+
+  const handleReasonChange = (event) => {
+    setCancellationReason(event.target.value);
+  };
+
+  const handleCancel = () => {
+    const userRole = determineUserRole();
+
+    if (userRole === 'ROLE_CUSTOMER') {
+      dispatch(actionCustomerCancelBooking({ bookingId: bookingDetail.id, reason: cancellationReason }));
+    } else if (userRole === 'ROLE_PROVIDER') {
+      dispatch(actionProviderCancelBooking({ bookingId: bookingDetail.id, reason: cancellationReason }));
+    }
+
+    setIsReasonModalOpen(false);
+  };
 
   const callbackLoginSuccess = useCallback(() => {
     navigate('/login');
@@ -27,8 +52,15 @@ function BookingDetailPage() {
   }, []);
 
   useEffect(() => {
-    dispatch(actionGetCustomerBooking({ bookingId: id, callback: callbackGetBookingDetailFailed }));
-    dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
+    const userRole = determineUserRole();
+
+    if (userRole === 'ROLE_CUSTOMER') {
+      dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
+      dispatch(actionGetCustomerBooking({ bookingId: id, callback: callbackGetBookingDetailFailed }));
+    } else if (userRole === 'ROLE_PROVIDER') {
+      dispatch(actionGetProviderProfile());
+      dispatch(actionGetProviderBooking({ bookingId: id, callback: callbackGetBookingDetailFailed }));
+    }
   }, [id, dispatch]);
 
   if (error) {
@@ -104,11 +136,6 @@ function BookingDetailPage() {
                         <h4 className="mt-0">Pyament Info</h4>
 
                         <p>
-                          <span>Status:</span>
-                          {' '}
-                          {bookingDetail.status}
-                        </p>
-                        <p>
                           <span>Payment Method:</span>
                           {' '}
                           {bookingDetail.payment?.method}
@@ -128,6 +155,23 @@ function BookingDetailPage() {
                           {' '}
                           {bookingDetail.date}
                         </p>
+
+                        <p>
+                          <span>Status:</span>
+                          {' '}
+                          {bookingDetail.status}
+                        </p>
+
+                        {bookingDetail.status === 'BOOKED' && (
+                        <button
+                          type="button"
+                          className="btn"
+                          style={{ color: 'orange' }}
+                          onClick={() => setIsReasonModalOpen(true)}
+                        >
+                          Cancel Order
+                        </button>
+                        ) }
                       </div>
                     </>
                   ) : (
@@ -201,6 +245,14 @@ function BookingDetailPage() {
             </div>
           </div>
         </div>
+
+        <ReasonModal
+          isOpen={isReasonModalOpen}
+          onClose={handleCloseReasonModal}
+          handleCancel={handleCancel}
+          handleReasonChange={handleReasonChange}
+          cancellationReason={cancellationReason}
+        />
       </section>
     </>
   );

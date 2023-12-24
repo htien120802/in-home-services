@@ -23,7 +23,7 @@ function Pagination({
 
     for (let i = startPage; i <= endPage; i += 1) {
       pageNumbers.push(
-        <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+        <li key={i} className={`page-item mt-2 mr-2 ${currentPage === i ? 'active' : ''}`}>
           <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
             {i}
           </button>

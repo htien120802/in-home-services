@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { actionCreateService, actionGetAllCategory } from 'store/actions';
 
-function AddProductModalBody({ closeModal }) {
+function AddProductModalBody({ extraObject, closeModal }) {
   const dispatch = useDispatch();
   const [serviceDetails, setServiceDetails] = useState({
-    thumbnail: '',
+    thumbnail: null,
     name: '',
     works: [
       {
@@ -18,6 +18,7 @@ function AddProductModalBody({ closeModal }) {
     openTime: '',
     closeTime: '',
     category: '',
+    provider: extraObject || '',
   });
 
   const categories = useSelector((state) => state.Category.categories);
@@ -26,15 +27,26 @@ function AddProductModalBody({ closeModal }) {
     dispatch(actionGetAllCategory());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (extraObject) {
+      setServiceDetails((prevServiceDetails) => ({
+        ...prevServiceDetails,
+        provider: extraObject,
+      }));
+    }
+  }, [extraObject]);
+
   const handleAddService = async () => {
     if (
-      serviceDetails.thumbnail === '' ||
+      serviceDetails.thumbnail === null ||
       serviceDetails.name.trim() === '' ||
       serviceDetails.works.some((work) => work.description.trim() === '' || work.unit.trim() === '' || work.pricePerUnit <= 0) ||
       serviceDetails.openTime.trim() === '' ||
       serviceDetails.closeTime.trim() === '' ||
-      serviceDetails.category.trim() === ''
+      serviceDetails.category.trim() === '' ||
+      serviceDetails.provider.trim() === ''
     ) {
+      console.log(serviceDetails)
       toast.error('Please fill in all the required fields.')
       return;
     }
@@ -47,6 +59,7 @@ function AddProductModalBody({ closeModal }) {
         openTime: serviceDetails.openTime,
         closeTime: serviceDetails.closeTime,
         category: serviceDetails.category,
+        provider: serviceDetails.provider,
       })
     }}));
     closeModal();
@@ -95,10 +108,10 @@ function AddProductModalBody({ closeModal }) {
       <div className="mb-4">
         <label className="label">Thumbnail:</label>
         <input
-          type="text"
+          type="file"
           className="input input-bordered w-full mb-4 pt-2 pb-2"
           placeholder="Url"
-          onChange={(e) => handleChange('thumbnail', e.target.value)}
+          onChange={(e) => handleChange('thumbnail', e.target.files[0])}
         />
       </div>
 

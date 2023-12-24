@@ -35,9 +35,9 @@ import {
 } from './actionTypes';
 
 // UPDATE_BOOKING_STATUS
-export const actionUpdateBookingStatus = (bookingId, newStatus) => ({
+export const actionUpdateBookingStatus = (bookingId) => ({
   type: UPDATE_BOOKING_STATUS,
-  payload: { bookingId, newStatus },
+  payload: { bookingId },
 });
 
 export const actionUpdateBookingStatusSuccess = (payload) => ({

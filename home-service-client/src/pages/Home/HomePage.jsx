@@ -24,38 +24,26 @@ function Home() {
           <div className="row">
             <div id="slider_main" className="carousel slide" data-ride="carousel">
               <div className="carousel-inner">
-                <div className="carousel-item active">
-                  <div className="full">
-                    <div className="left_blog_top">
-                      <h3>
-                        Decorate
-                        <br />
-                        Service
-                      </h3>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit..</p>
-                      <Link className="bt_main" to={LOCATION.CONTACT}>Contact Us</Link>
-                    </div>
-                    <div className="right_blog_top">
-                      <img src="assets/img/slide1_right.png" alt="#" />
-                    </div>
-                  </div>
-                </div>
-                <div className="carousel-item">
-                  <div className="full">
-                    <div className="left_blog_top">
-                      <h3>
-                        Decorate
-                        <br />
-                        Service
-                      </h3>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit..</p>
-                      <Link className="bt_main" to={LOCATION.CONTACT}>Contact Us</Link>
-                    </div>
-                    <div className="right_blog_top">
-                      <img src="assets/img/slide1_right.png" alt="#" />
+                {servicesState.publicServices?.content?.slice(0, 5).map((service, index) => (
+                  <div key={service.id} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
+                    <div className="full">
+                      <div className="left_blog_top">
+                        <h3>
+                          {service.name}
+                          <br />
+                          Service
+                        </h3>
+                        <p>{service.works[0].description}</p>
+                        <Link className="bt_main" to={`/services/${service.id}`}>
+                          Contact Us
+                        </Link>
+                      </div>
+                      <div className="right_blog_top">
+                        <img src={service.thumbnail} alt="#" style={{ width: '381px', height: '572px' }} />
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
               <div className="slide_arrow">
                 <span>
@@ -131,7 +119,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="layout_padding about_section">
+      {/* <section className="layout_padding about_section">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -165,7 +153,7 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section className="layout_padding design_layout">
         <div className="container">
@@ -192,7 +180,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="layout_padding">
+      {/* <section className="layout_padding">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -235,7 +223,7 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

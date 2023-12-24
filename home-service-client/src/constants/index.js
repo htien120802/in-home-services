@@ -14,6 +14,7 @@ export const LOCATION = {
 
   STATISTIC: '/provider/statistic',
   PROVIDERSERVICE: '/provider/services',
+  PROVIDERBOOKING: '/provider/bookings',
   PROVIDERPROFILE: '/provider/profile',
 
   ADMINBOOKINGMANAGER: '/admin/booking-manager',

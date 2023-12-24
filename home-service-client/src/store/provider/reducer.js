@@ -52,12 +52,21 @@ const providerReducer = (state = initialState, action) => {
     case UPDATE_PROVIDER_PROFILE_SUCCESS:
     case UPDATE_PROVIDER_PASSWORD_SUCCESS:
     case UPDATE_PROVIDER_AVATAR_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        provider: action.payload,
+      };
+
     case UPDATE_PROVIDER_ADDRESS_SUCCESS:
     case ADD_PROVIDER_ADDRESS_SUCCESS:
       return {
         ...state,
         loading: false,
-        provider: action.payload,
+        provider: {
+          ...state.provider,
+          addresses: [action.payload],
+        },
       };
 
     case GET_PROVIDER_SALES_STATISTICS_SUCCESS:

@@ -117,7 +117,7 @@ const admin = (state = initialState, action) => {
       };
 
     case UPDATE_SERVICE_SUCCESS:
-      const updatedServices = state.services.map((service) => {
+      const updatedServices = state.services.content.map((service) => {
         if (service.id === action.payload.id) {
           return action.payload;
         }
@@ -127,7 +127,10 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        services: updatedServices,
+        services: {
+          ...state.services,
+          content: updatedServices,
+        },
       };
 
     case UPDATE_SERVICE_FAILED:
@@ -191,7 +194,10 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        providers: state.providers.filter(provider => provider.id !== action.payload),
+        providers: {
+          ...state.providers,
+          content: state.providers.content.filter(review => review.id !== action.payload),
+        }
       };
 
     case DELETE_PROVIDER_FAILED:
@@ -231,7 +237,10 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        customers: state.customers.filter(customer => customer.id !== action.payload),
+        customers: {
+          ...state.customers,
+          content: state.customers.content.filter(review => review.id !== action.payload),
+        }
       };
 
     case DELETE_CUSTOMER_FAILED:

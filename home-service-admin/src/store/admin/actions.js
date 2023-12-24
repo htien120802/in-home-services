@@ -176,8 +176,9 @@ export const actionDeleteCustomerFailed = () => ({
 });
 
 // Get all providers
-export const actionGetAllProviders = () => ({
+export const actionGetAllProviders = (payload) => ({
   type: GET_ALL_PROVIDERS,
+  payload,
 });
 
 export const actionGetAllProvidersSuccess = (payload) => ({
@@ -205,8 +206,9 @@ export const actionCreateProviderFailed = () => ({
 });
 
 // Get all customers
-export const actionGetAllCustomers = () => ({
+export const actionGetAllCustomers = (payload) => ({
   type: GET_ALL_CUSTOMERS,
+  payload,
 });
 
 export const actionGetAllCustomersSuccess = (payload) => ({
@@ -262,8 +264,9 @@ export const actionGetQuantityStatisticsFailed = () => ({
 });
 
 // Get all reviews
-export const actionGetAllReviews = () => ({
+export const actionGetAllReviews = (payload) => ({
   type: GET_ALL_REVIEWS,
+  payload,
 });
 
 export const actionGetAllReviewsSuccess = (payload) => ({
@@ -320,8 +323,9 @@ export const actionGetEntityCountFailed = () => ({
 });
 
 // Get all bookings
-export const actionGetAllBookings = () => ({
+export const actionGetAllBookings = (payload) => ({
   type: GET_ALL_BOOKINGS,
+  payload,
 });
 
 export const actionGetAllBookingsSuccess = (payload) => ({

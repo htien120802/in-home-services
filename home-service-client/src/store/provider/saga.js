@@ -121,9 +121,7 @@ function* updateProviderAddress({ payload }) {
 
 function* addProviderAddress({ payload }) {
   try {
-    const { newAddress } = payload;
-
-    const response = yield call(providerAPI.addProviderAddress, newAddress);
+    const response = yield call(providerAPI.addProviderAddress, payload);
 
     yield put(actionAddProviderAddressSuccess(response.data));
 

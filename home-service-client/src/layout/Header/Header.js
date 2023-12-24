@@ -19,6 +19,7 @@ function Header() {
 
   const callbackLogoutSuccess = useCallback(() => {
     navigate('/');
+    window.location.reload();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -69,9 +70,9 @@ function Header() {
         <ul className="menu_sidebar">
           <li><button type="button" className="closebtn" onClick={closeNav}>&times;</button></li>
           <li><Link to={LOCATION.HOME} onClick={closeNav}>01. Home</Link></li>
-          <li><Link to={LOCATION.ABOUT} onClick={closeNav}>02. About</Link></li>
-          <li><Link to={LOCATION.SERVICES} onClick={closeNav}>03. Services</Link></li>
-          <li><Link to={LOCATION.CONTACT} onClick={closeNav}>04. Contact Us</Link></li>
+          {/* <li><Link to={LOCATION.ABOUT} onClick={closeNav}>02. About</Link></li> */}
+          <li><Link to={LOCATION.SERVICES} onClick={closeNav}>02. Services</Link></li>
+          {/* <li><Link to={LOCATION.CONTACT} onClick={closeNav}>04. Contact Us</Link></li> */}
         </ul>
       </div>
 
