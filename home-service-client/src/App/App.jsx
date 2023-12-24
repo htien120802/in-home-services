@@ -59,7 +59,6 @@ function App() {
         <Route path={LOCATION.LOGIN} element={<LoginPage />} />
         <Route path={LOCATION.REGISTER} element={<RegisterPage />} />
         <Route path={`${LOCATION.FORGETPASSWORD}`} element={<ForgetPasswordPage />} />
-        <Route path={`${LOCATION.FORGETPASSWORD}/:token`} element={<ForgetPasswordPage />} />
 
         <Route path="*" element={<Navigate to={token ? LOCATION.HOME : LOCATION.LOGIN} replace />} />
       </Routes>
