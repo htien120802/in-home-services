@@ -6,6 +6,7 @@ export const LOCATION = {
   CONTACT: '/contact',
   LOGIN: '/login',
   REGISTER: '/register',
+  FORGETPASSWORD: '/forget-password',
 
   PROFILE: '/profile',
   BOOKING: '/booking',

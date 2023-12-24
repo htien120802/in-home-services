@@ -84,11 +84,11 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
 
   const handleAddAddress = () => {
     dispatch(actionAddCustomerAddress({
-      number: '',
-      street: '',
-      ward: '',
-      district: '',
-      city: '',
+      number: validation.values.address.number || '',
+      street: validation.values.address.street || '',
+      ward: validation.values.address.ward || '',
+      district: validation.values.address.district || '',
+      city: validation.values.address.city || '',
     }));
   };
 
@@ -158,7 +158,7 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
                   )
                 ))}
 
-                {!validation.values.address && (
+                {!customerState.customer?.addresses[0] && (
                 <>
                   <button
                     type="button"
@@ -174,7 +174,11 @@ function EditProfileModal({ customerState, isOpen, onClose }) {
                 )}
               </fieldset>
 
-              <button type="submit" className="btn btn-primary mt_20">
+              <button
+                type="submit"
+                className="btn btn-primary mt_20"
+                disabled={!customerState.customer || !customerState.customer.addresses[0]}
+              >
                 Save Profile
               </button>
             </div>

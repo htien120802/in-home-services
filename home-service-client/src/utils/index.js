@@ -70,3 +70,10 @@ export const decodeJWT = (token) => {
 };
 
 export const formatPriceWithCommas = (price) => price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export const determineUserRole = () => {
+  const TOKEN = localStorage.getItem('accessToken');
+  const decodedToken = decodeJWT(TOKEN);
+
+  return decodedToken ? decodedToken.role : null;
+};

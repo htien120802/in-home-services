@@ -32,12 +32,6 @@ import {
   CREATE_CUSTOMER,
   CREATE_CUSTOMER_SUCCESS,
   CREATE_CUSTOMER_FAILED,
-  CREATE_CATEGORY,
-  CREATE_CATEGORY_SUCCESS,
-  CREATE_CATEGORY_FAILED,
-  UPDATE_CATEGORY,
-  UPDATE_CATEGORY_SUCCESS,
-  UPDATE_CATEGORY_FAILED,
   GET_SALES_STATISTICS,
   GET_SALES_STATISTICS_SUCCESS,
   GET_SALES_STATISTICS_FAILED,
@@ -71,11 +65,15 @@ import {
   DELETE_ADDRESS,
   DELETE_ADDRESS_SUCCESS,
   DELETE_ADDRESS_FAILED,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED,
 } from './actionTypes';
 
 // Get all services
-export const actionGetAllServices = () => ({
+export const actionGetAllServices = (payload) => ({
   type: GET_ALL_SERVICES,
+  payload,
 });
 
 export const actionGetAllServicesSuccess = (payload) => ({
@@ -233,36 +231,6 @@ export const actionCreateCustomerSuccess = (payload) => ({
 
 export const actionCreateCustomerFailed = () => ({
   type: CREATE_CUSTOMER_FAILED,
-});
-
-// Create a category
-export const actionCreateCategory = (payload) => ({
-  type: CREATE_CATEGORY,
-  payload,
-});
-
-export const actionCreateCategorySuccess = (payload) => ({
-  type: CREATE_CATEGORY_SUCCESS,
-  payload,
-});
-
-export const actionCreateCategoryFailed = () => ({
-  type: CREATE_CATEGORY_FAILED,
-});
-
-// Update a category
-export const actionUpdateCategory = (payload) => ({
-  type: UPDATE_CATEGORY,
-  payload,
-});
-
-export const actionUpdateCategorySuccess = (payload) => ({
-  type: UPDATE_CATEGORY_SUCCESS,
-  payload,
-});
-
-export const actionUpdateCategoryFailed = () => ({
-  type: UPDATE_CATEGORY_FAILED,
 });
 
 // Get sales statistics
@@ -423,4 +391,19 @@ export const actionDeleteAddressSuccess = (payload) => ({
 
 export const actionDeleteAddressFailed = () => ({
   type: DELETE_ADDRESS_FAILED,
+});
+
+// APPROVE_OR_UNAPPROVE_REGISTER_SERVICE
+export const actionApproveOrUnapproveRegisterService = (serviceData) => ({
+  type: APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
+  payload: serviceData,
+});
+
+export const actionApproveOrUnapproveRegisterServiceSuccess = (payload) => ({
+  type: APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS,
+  payload,
+});
+
+export const actionApproveOrUnapproveRegisterServiceFailed = () => ({
+  type: APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED,
 });

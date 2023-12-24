@@ -31,14 +31,9 @@ const routes = [
     name: 'Pages', // name that appear in Sidebar
     submenu : [
       {
-        path: '/app/service/public',
+        path: '/app/service',
         icon: <CodeBracketSquareIcon className={submenuIconClasses}/>,
         name: 'Serivce',
-      },
-      {
-        path: '/app/service/provider',
-        icon: <CodeBracketSquareIcon className={submenuIconClasses}/>,
-        name: 'Provider Serivce',
       },
       {
         path: '/app/category',

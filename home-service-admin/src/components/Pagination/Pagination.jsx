@@ -26,7 +26,7 @@ function Pagination({
         <li key={i}>
           <button
             type="button"
-            className={`page-link btn ${currentPage === i ? 'btn-primary' : ''}`}
+            className={`page-link mt-2 mr-2 btn ${currentPage === i ? 'btn-primary' : ''}`}
             onClick={() => handlePageChange(i)}
           >
             {i}

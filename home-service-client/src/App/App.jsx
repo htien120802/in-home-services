@@ -17,6 +17,7 @@ import ContactPage from 'pages/Contact/ContactPage';
 
 import LoginPage from 'pages/Login/LoginPage';
 import RegisterPage from 'pages/Register/RegisterPage';
+import ForgetPasswordPage from 'pages/ForgetPassword/ForgetPasswordPage';
 
 import checkAuth from './auth';
 
@@ -77,8 +78,8 @@ function App() {
         </Route>
 
         <Route path={LOCATION.LOGIN} element={<LoginPage />} />
-
         <Route path={LOCATION.REGISTER} element={<RegisterPage />} />
+        <Route path={LOCATION.FORGETPASSWORD} element={<ForgetPasswordPage />} />
 
         <Route path="*" element={<Navigate to={token ? LOCATION.HOME : LOCATION.LOGIN} replace />} />
       </Routes>

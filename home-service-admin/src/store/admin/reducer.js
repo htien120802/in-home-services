@@ -32,12 +32,6 @@ import {
   CREATE_CUSTOMER,
   CREATE_CUSTOMER_SUCCESS,
   CREATE_CUSTOMER_FAILED,
-  CREATE_CATEGORY,
-  CREATE_CATEGORY_SUCCESS,
-  CREATE_CATEGORY_FAILED,
-  UPDATE_CATEGORY,
-  UPDATE_CATEGORY_SUCCESS,
-  UPDATE_CATEGORY_FAILED,
   GET_SALES_STATISTICS,
   GET_SALES_STATISTICS_SUCCESS,
   GET_SALES_STATISTICS_FAILED,
@@ -71,6 +65,9 @@ import {
   DELETE_ADDRESS,
   DELETE_ADDRESS_SUCCESS,
   DELETE_ADDRESS_FAILED,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS,
+  APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED,
 } from './actionTypes';
 
 const initialState = {
@@ -120,10 +117,17 @@ const admin = (state = initialState, action) => {
       };
 
     case UPDATE_SERVICE_SUCCESS:
+      const updatedServices = state.services.map((service) => {
+        if (service.id === action.payload.id) {
+          return action.payload;
+        }
+        return service;
+      });
+    
       return {
         ...state,
         loading: false,
-        services: action.payload,
+        services: updatedServices,
       };
 
     case UPDATE_SERVICE_FAILED:
@@ -143,7 +147,11 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        services: [...state.services, action.payload],
+
+        services: {
+          ...state.services,
+          content:  [...state.services.content, action.payload]
+        }
       };
 
     case CREATE_SERVICE_FAILED:
@@ -314,48 +322,6 @@ const admin = (state = initialState, action) => {
         // Handle failure, if needed
       };
 
-    // Create a category
-    case CREATE_CATEGORY:
-      return {
-        ...state,
-        loading: true,
-      };
-
-    case CREATE_CATEGORY_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        categories: [...state.categories, action.payload],
-      };
-
-    case CREATE_CATEGORY_FAILED:
-      return {
-        ...state,
-        loading: false,
-        // Handle failure, if needed
-      };
-
-    // Update a category
-    case UPDATE_CATEGORY:
-      return {
-        ...state,
-        loading: true,
-      };
-
-    case UPDATE_CATEGORY_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        categories: action.payload,
-      };
-
-    case UPDATE_CATEGORY_FAILED:
-      return {
-        ...state,
-        loading: false,
-        // Handle failure, if needed
-      };
-
     // Get sales statistics
     case GET_SALES_STATISTICS:
       return {
@@ -451,8 +417,11 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        // Filter out the deleted review from the list
-        reviews: state.reviews.filter(review => review.id !== action.payload),
+
+        reviews: {
+          ...state.reviews,
+          content: state.reviews.content.filter(review => review.id !== action.payload),
+        }
       };
 
     case DELETE_REVIEW_FAILED:
@@ -536,8 +505,11 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        // Filter out the deleted booking from the list
-        bookings: state.bookings.filter(booking => booking.id !== action.payload),
+
+        bookings: {
+          ...state.bookings,
+          content: state.bookings.content.filter(booking => booking.id !== action.payload),
+        }
       };
 
     case DELETE_BOOKING_FAILED:
@@ -558,8 +530,10 @@ const admin = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        // Filter out the deleted service from the list
-        services: state.services.filter(service => service.id !== action.payload),
+        services: {
+          ...state.services,
+          content: state.services.content.filter(service => service.id !== action.payload),
+        }
       };
 
     case DELETE_SERVICE_FAILED:
@@ -589,6 +563,28 @@ const admin = (state = initialState, action) => {
         ...state,
         loading: false,
         // Handle failure, if needed
+      };
+
+    case APPROVE_OR_UNAPPROVE_REGISTER_SERVICE:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        services: {
+          ...state.services,
+          content: state.services.content.filter(service => service.id !== action.payload),
+        }
+      };
+
+    case APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED:
+      return {
+        ...state,
+        loading: false,
       };
 
     default:

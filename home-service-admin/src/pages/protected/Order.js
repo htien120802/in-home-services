@@ -22,7 +22,7 @@ function InternalPage(){
     };
 
     const handleDeleteBooking = (couponId) => {
-        dispatch(actionDeleteBooking({id: couponId}))
+        dispatch(actionDeleteBooking({bookingId: couponId}))
     };
 
     useEffect(() => {
@@ -62,7 +62,7 @@ function InternalPage(){
                             <td>
                                 {booking.bookingItems.map((bookingItem) => (
                                 <div key={bookingItem.id}>
-                                    <p>{bookingItem.work.description} - Quantity: {bookingItem.quantity}</p>
+                                    <p>{bookingItem.work.description} - Quantity: {bookingItem.quantity} {bookingItem.work.unit}</p>
                                 </div>
                                 ))}
                             </td>

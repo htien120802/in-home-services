@@ -22,7 +22,7 @@ export default {
   async registerToProvideService(serviceData) {
     const response = await axiosClient.post(providerEndpoint, serviceData, {
       headers: {
-        'Content-Type': 'multipart/form-data', // Set the correct Content-Type for file upload
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
