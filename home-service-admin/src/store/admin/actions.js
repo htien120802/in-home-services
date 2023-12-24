@@ -68,6 +68,9 @@ import {
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS,
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED,
+  GET_COUNT,
+  GET_COUNT_SUCCESS,
+  GET_COUNT_FAILED,
 } from './actionTypes';
 
 // Get all services
@@ -235,34 +238,6 @@ export const actionCreateCustomerFailed = () => ({
   type: CREATE_CUSTOMER_FAILED,
 });
 
-// Get sales statistics
-export const actionGetSalesStatistics = () => ({
-  type: GET_SALES_STATISTICS,
-});
-
-export const actionGetSalesStatisticsSuccess = (payload) => ({
-  type: GET_SALES_STATISTICS_SUCCESS,
-  payload,
-});
-
-export const actionGetSalesStatisticsFailed = () => ({
-  type: GET_SALES_STATISTICS_FAILED,
-});
-
-// Get quantity statistics
-export const actionGetQuantityStatistics = () => ({
-  type: GET_QUANTITY_STATISTICS,
-});
-
-export const actionGetQuantityStatisticsSuccess = (payload) => ({
-  type: GET_QUANTITY_STATISTICS_SUCCESS,
-  payload,
-});
-
-export const actionGetQuantityStatisticsFailed = () => ({
-  type: GET_QUANTITY_STATISTICS_FAILED,
-});
-
 // Get all reviews
 export const actionGetAllReviews = (payload) => ({
   type: GET_ALL_REVIEWS,
@@ -410,4 +385,49 @@ export const actionApproveOrUnapproveRegisterServiceSuccess = (payload) => ({
 
 export const actionApproveOrUnapproveRegisterServiceFailed = () => ({
   type: APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED,
+});
+
+// Get count
+export const actionGetCount = (payload) => ({
+  type: GET_COUNT,
+  payload,
+});
+
+export const actionGetCountSuccess = (payload) => ({
+  type: GET_COUNT_SUCCESS,
+  payload,
+});
+
+export const actionGetCountFailed = () => ({
+  type: GET_COUNT_FAILED,
+});
+
+// Get sales statistics
+export const actionGetSalesStatistics = (payload) => ({
+  type: GET_SALES_STATISTICS,
+  payload,
+});
+
+export const actionGetSalesStatisticsSuccess = (payload) => ({
+  type: GET_SALES_STATISTICS_SUCCESS,
+  payload,
+});
+
+export const actionGetSalesStatisticsFailed = () => ({
+  type: GET_SALES_STATISTICS_FAILED,
+});
+
+// Get quantity statistics
+export const actionGetQuantityStatistics = (payload) => ({
+  type: GET_QUANTITY_STATISTICS,
+  payload,
+});
+
+export const actionGetQuantityStatisticsSuccess = (payload) => ({
+  type: GET_QUANTITY_STATISTICS_SUCCESS,
+  payload,
+});
+
+export const actionGetQuantityStatisticsFailed = () => ({
+  type: GET_QUANTITY_STATISTICS_FAILED,
 });
