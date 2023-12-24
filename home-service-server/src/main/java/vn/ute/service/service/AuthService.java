@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +31,11 @@ import vn.ute.service.repository.*;
 import vn.ute.service.utils.ResetPasswordTokenUtil;
 import vn.ute.service.utils.UUIDUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class AuthService {
@@ -226,7 +230,9 @@ public class AuthService {
         message.setSubject("Reset Password");
         message.setText("Reset password link: " + host + "/forget-password?token=" + ResetPasswordTokenUtil.splitToken(resetToken)[0]);
 
-        javaMailSender.send(message);
+        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+        emailExecutor.execute(() -> sendEmail(message));
+        emailExecutor.shutdown();
 
         return ResponseEntity.status(200).body(new ResponseDto<>("success","Link reset password has been sent to your email",null));
     }
@@ -251,5 +257,8 @@ public class AuthService {
         }
 
         return ResponseEntity.status(400).body(new ResponseDto<>("fail","Reset token is invalid!", null));
+    }
+    public void sendEmail(SimpleMailMessage message){
+        javaMailSender.send(message);
     }
 }
