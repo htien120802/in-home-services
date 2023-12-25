@@ -50,7 +50,7 @@ function* updateBookingStatus({ payload }) {
 
     const response = yield call(bookingAPI.updateBookingStatus, bookingId);
 
-    yield put(actionUpdateBookingStatusSuccess(bookingId));
+    yield put(actionUpdateBookingStatusSuccess({ bookingId, status: response.data }));
 
     if (response.status === 'success') {
       toast.success(response.message);

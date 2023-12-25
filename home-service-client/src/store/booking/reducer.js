@@ -61,13 +61,19 @@ const bookingReducer = (state = initialState, action) => {
       };
 
     case UPDATE_BOOKING_STATUS_SUCCESS:
+    {
+      const updatedBookings = state.bookings.content.map((booking) => (booking.id === action.payload.bookingId.bookingId
+        ? { ...booking, status: action.payload.status }
+        : booking));
+
       return {
         ...state,
         loading: false,
         bookings: {
-          content: state.bookings.content.filter((booking) => booking.id !== action.payload),
+          content: updatedBookings,
         },
       };
+    }
 
     case CREATE_BOOKING_SUCCESS:
       return {

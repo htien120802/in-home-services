@@ -9,6 +9,7 @@ import Pagination from 'pages/Customer/CustomerProfile/Order/Pagination/Paginati
 function ProviderBooking() {
   const dispatch = useDispatch();
   const bookings = useSelector((state) => state.Booking.bookings);
+  const loading = useSelector((state) => state.Booking.loading);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -79,8 +80,16 @@ function ProviderBooking() {
                           type="button"
                           className="btn btn-danger btn-sm ml-2"
                           onClick={() => updateBookingStatus(booking.id)}
+                          disabled={loading}
                         >
-                          Update Status
+                          {loading ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                              <span className="sr-only">Loading...</span>
+                            </>
+                          ) : (
+                            'Update Status'
+                          )}
                         </button>
                         )}
                       </div>
