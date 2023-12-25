@@ -61,6 +61,12 @@ function BookingPage() {
       return;
     }
 
+    if (selectedWorks.length <= 0) {
+      event.preventDefault();
+      toast.error('You need to select at least a workspace');
+      return;
+    }
+
     const addressChanged = JSON.stringify(formData.address)
     !== JSON.stringify(customerProfile?.addresses[0]) || JSON.stringify(formData.address)
     !== JSON.stringify(providerProfile?.addresses[0]);
