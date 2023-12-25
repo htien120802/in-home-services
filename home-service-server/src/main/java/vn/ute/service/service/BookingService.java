@@ -250,7 +250,7 @@ public class BookingService {
                 CoordinatesDto coordinates2 = mapper.map(new ArrayList<>(booking.getCustomer().getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
                 CoordinatesDto coordinates1 = mapper.map(new ArrayList<>(booking.getProvider().getAddresses()).get(0).getCoordinates(), CoordinatesDto.class);
                 Double time = bingMapsService.calcMovingTime(coordinates1,coordinates2);
-                booking.setArriveTime(new Time((long) (System.currentTimeMillis() + time + 7 *60 * 60)));
+                booking.setArriveTime(new Time((long) (System.currentTimeMillis() + time)));
             }
             else if (booking.getStatus().equals(BookingStatus.COMING)){
                 booking.setStatus(BookingStatus.DOING);
@@ -260,14 +260,14 @@ public class BookingService {
                 booking.setStatus(BookingStatus.DONE);
                 if (booking.getPayment().getMethod().equals(PaymentMethod.CASH)){
                     booking.getPayment().setPaymentStatus(PaymentStatus.PAID);
-                    booking.getPayment().setPaymentDate(new Timestamp(System.currentTimeMillis() + 7 *60 * 60));
+                    booking.getPayment().setPaymentDate(new Timestamp(System.currentTimeMillis()));
                 }
 
             } else {
                 return ResponseEntity.status(400).body(new ResponseDto<>("fail","Fail to update booking status!",null));
             }
             bookingRepository.save(booking);
-            return ResponseEntity.status(200).body(new ResponseDto<>("success","Update booking status successfully!",null));
+            return ResponseEntity.status(200).body(new ResponseDto<>("success","Update booking status successfully!",booking.getStatus()));
         } else {
             return ResponseEntity.status(400).body(new ResponseDto<>("fail","You're not allowed to update booking status!",null));
         }
