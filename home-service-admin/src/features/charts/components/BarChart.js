@@ -15,7 +15,7 @@ import { actionGetQuantityStatistics } from 'store/actions';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function BarChart({dateValue}){
+function BarChart({dateValue, isYearOnly}){
   const dispatch = useDispatch();
   const quantityStatistics = useSelector((state) => state.Admin.quantityStatistics)
 
@@ -24,13 +24,16 @@ function BarChart({dateValue}){
 
     if (startDate) {
       const year = startDate.getFullYear();
-      console.log(startDate.getFullYear())
 
       const month = startDate.getMonth() + 1;
-      dispatch(actionGetQuantityStatistics({ month, year }));
+      if (isYearOnly) {
+        dispatch(actionGetQuantityStatistics({ year }));
+      } else {
+        dispatch(actionGetQuantityStatistics({ month, year }));
+      }
     }
   
-}, [dispatch, dateValue]);
+}, [dispatch, dateValue, isYearOnly]);
 
     const options = {
         responsive: true,
@@ -41,15 +44,21 @@ function BarChart({dateValue}){
         },
       };
       
-      const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const labels = isYearOnly ? [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ] : quantityStatistics.map((item) => item[0]); 
       
       const data = {
         labels,
         datasets: [
           {
             label: 'Store 1',
-            data: labels.map((month, monthIndex) => {
+            data: isYearOnly? labels.map((month, monthIndex) => {
               const salesDataForMonth = quantityStatistics.find((item) => item[0] === monthIndex + 1);
+              return salesDataForMonth ? salesDataForMonth[1] : 0;
+            }) : labels.map((month, monthIndex) => {
+              const salesDataForMonth = quantityStatistics.find((item) => item[0] === month);
               return salesDataForMonth ? salesDataForMonth[1] : 0;
             }),
             backgroundColor: 'rgba(255, 99, 132, 1)',

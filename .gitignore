@@ -52,6 +52,7 @@
 /home-service-client/.DS_Store
 /home-service-client/.env.local
 /home-service-client/.env
+/home-service-admin/.env
 /home-service-client/.env.development.local
 /home-service-client/.env.test.local
 /home-service-client/.env.production.local

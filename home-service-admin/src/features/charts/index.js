@@ -16,11 +16,16 @@ function Charts(){
         startDate: new Date(), 
         endDate: new Date() 
     }); 
+    const [isYearOnly, setIsYearOnly] = useState(false);
     
     const handleDatePickerValueChange = (newValue) => {
         console.log("newValue:", newValue); 
         setDateValue(newValue); 
     } 
+
+    const handleCheckboxChange = () => {
+        setIsYearOnly(!isYearOnly);
+    };    
 
     return(
         <>
@@ -29,12 +34,23 @@ function Charts(){
                 asSingle={true} 
                 value={dateValue} 
                 onChange={handleDatePickerValueChange} 
-                displayFormat={"YYYY"} 
+                displayFormat={isYearOnly ? 'YYYY' : 'MM/YYYY'}
             /> 
+
+<div className="mt-4">
+        <label>
+          <input
+            type="checkbox"
+            checked={isYearOnly}
+            onChange={handleCheckboxChange}
+          />
+          {' '}Show Year Only
+        </label>
+      </div>
         {/** ---------------------- Different charts ------------------------- */}
             <div className="grid lg:grid-cols-2 mt-0 grid-cols-1 gap-6">
-                <StackBarChart dateValue={dateValue}/>
-                <BarChart dateValue={dateValue}/>
+                <StackBarChart dateValue={dateValue} isYearOnly={isYearOnly}/>
+                <BarChart dateValue={dateValue} isYearOnly={isYearOnly}/>
             </div>
 
         
