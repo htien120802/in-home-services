@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { formatPriceWithCommas } from 'utils';
 
 import './index.module.css';
+import { toast } from 'react-toastify';
 
 function ServiceDetails() {
   const { id } = useParams();
@@ -39,6 +40,13 @@ function ServiceDetails() {
 
   const handleUserRating = (rating) => {
     setUserRating(rating);
+  };
+
+  const handleCheck = (event) => {
+    if (selectedWorks.length <= 0) {
+      event.preventDefault();
+      toast.error('You need to select at least a workspace');
+    }
   };
 
   const handleQuantityChange = (event, workDescription) => {
@@ -422,7 +430,12 @@ function ServiceDetails() {
                           </li>
                         ))}
                       </ul>
-                      <Link to={`/booking/${id}`}>Book Now</Link>
+                      <Link
+                        to={`/booking/${id}`}
+                        onClick={handleCheck}
+                      >
+                        Book Now
+                      </Link>
                     </div>
                   </div>
                 </div>

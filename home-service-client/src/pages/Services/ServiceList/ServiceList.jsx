@@ -49,16 +49,27 @@ function ServiceList({ queryParams }) {
       <div key={uuidv4()} className="row">
         {serviceGroup.map((service) => (
           <Link to={`/services/${service.id}`} key={service.id} className="col-md-4 d-flex">
-            <div className="full decorate_blog flex-column">
+            <div className="full decorate_blog flex-column pb-2">
               <img
                 src={service.thumbnail}
                 alt="#"
                 className="img-fluid"
-                style={{ objectFit: 'cover', height: '75%' }}
+                style={{ objectFit: 'cover', height: '225px' }}
               />
-              <Link className="decorate_blog_bt mt-auto" style={{ lineHeight: '35px' }} to={`/services/${service.id}`}>
+              <Link className="decorate_blog_bt mt-3 mb-3" style={{ lineHeight: '15px' }} to={`/services/${service.id}`}>
                 {service.name}
               </Link>
+
+              <div className="pb-2">
+                <span>Rating: </span>
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <i
+                    key={value}
+                    className={`fa${value <= service.avgRating ? 's' : 'r'} fa-star`}
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
             </div>
           </Link>
         ))}
