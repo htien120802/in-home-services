@@ -25,24 +25,20 @@ function Charts(){
     return(
         <>
         <Datepicker 
-                containerClassName="w-72" 
+                useRange={false} 
+                asSingle={true} 
                 value={dateValue} 
-                theme={"light"}
-                inputClassName="input input-bordered w-72" 
-                popoverDirection={"down"}
-                toggleClassName="invisible"
                 onChange={handleDatePickerValueChange} 
-                showShortcuts={true} 
-                primaryColor={"white"} 
+                displayFormat={"YYYY"} 
             /> 
         {/** ---------------------- Different charts ------------------------- */}
             <div className="grid lg:grid-cols-2 mt-0 grid-cols-1 gap-6">
-                <StackBarChart />
-                <BarChart />
+                <StackBarChart dateValue={dateValue}/>
+                <BarChart dateValue={dateValue}/>
             </div>
 
         
-            <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
+            {/* <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
                 <DoughnutChart />
                 <PieChart />
             </div>
@@ -50,7 +46,7 @@ function Charts(){
             <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
                 <ScatterChart />
                 <LineChart />
-            </div>
+            </div> */}
         </>
     )
 }

@@ -93,10 +93,11 @@ function* getCount() {
 
 function* getSalesStatistics({ payload }) {
   try {
-    const response = yield call(adminAPI.getSalesStatistics, payload);
+    const response = yield call(adminAPI.getSalesStatisticsByMonthYear, payload);
 
     yield put(actionGetSalesStatisticsSuccess(response.data));
   } catch (error) {
+    console.log(error)
     yield put(actionGetSalesStatisticsFailed());
     toast.error(error.response.data.message);
   }
@@ -104,7 +105,7 @@ function* getSalesStatistics({ payload }) {
 
 function* getQuantityStatistics({ payload }) {
   try {
-    const response = yield call(adminAPI.getQuantityStatistics, payload);
+    const response = yield call(adminAPI.getQuantityStatisticsByMonthYear, payload);
 
     yield put(actionGetQuantityStatisticsSuccess(response.data));
   } catch (error) {
