@@ -10,10 +10,11 @@ import UserChannels from './components/UserChannels'
 import LineChart from './components/LineChart'
 import BarChart from './components/BarChart'
 import DashboardTopBar from './components/DashboardTopBar'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {showNotification} from '../common/headerSlice'
 import DoughnutChart from './components/DoughnutChart'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { actionGetCount, actionGetQuantityStatistics } from 'store/actions'
 
 const statsData = [
     {title : "New Users", value : "34.7k", icon : <UserGroupIcon className='w-8 h-8'/>, description : "↗︎ 2300 (22%)"},
@@ -27,18 +28,46 @@ const statsData = [
 function Dashboard(){
 
     const dispatch = useDispatch()
- 
+    const countData = useSelector((state) => state.Admin.count)
+
+    const statsData = countData.map((entry) => {
+        let icon;
+        switch (entry.name) {
+          case 'customer':
+            icon = <UserGroupIcon className='w-8 h-8' />;
+            break;
+          case 'provider':
+            icon = <CreditCardIcon className='w-8 h-8' />;
+            break;
+          case 'service':
+            icon = <CircleStackIcon className='w-8 h-8' />;
+            break;
+          case 'booking':
+            icon = <UsersIcon className='w-8 h-8' />;
+            break;
+          default:
+            icon = null;
+        }
+      
+        return {
+          title: entry.name.charAt(0).toUpperCase() + entry.name.slice(1),
+          value: entry.quantity.toString(),
+          icon,
+          description: `↗︎`,
+        };
+      });
 
     const updateDashboardPeriod = (newRange) => {
         // Dashboard range changed, write code to refresh your values
         dispatch(showNotification({message : `Period updated to ${newRange.startDate} to ${newRange.endDate}`, status : 1}))
     }
 
+    useEffect(()=> {
+        dispatch(actionGetCount())
+    },[dispatch])
+
     return(
         <>
-        {/** ---------------------- Select Period Content ------------------------- */}
-            <DashboardTopBar updateDashboardPeriod={updateDashboardPeriod}/>
-        
         {/** ---------------------- Different stats content 1 ------------------------- */}
             <div className="grid lg:grid-cols-4 mt-2 md:grid-cols-2 grid-cols-1 gap-6">
                 {
@@ -53,24 +82,24 @@ function Dashboard(){
 
 
         {/** ---------------------- Different charts ------------------------- */}
-            <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
+            {/* <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
                 <LineChart />
                 <BarChart />
-            </div>
+            </div> */}
             
         {/** ---------------------- Different stats content 2 ------------------------- */}
         
-            <div className="grid lg:grid-cols-2 mt-10 grid-cols-1 gap-6">
+            {/* <div className="grid lg:grid-cols-2 mt-10 grid-cols-1 gap-6">
                 <AmountStats />
                 <PageStats />
-            </div>
+            </div> */}
 
         {/** ---------------------- User source channels table  ------------------------- */}
         
-            <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
+            {/* <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
                 <UserChannels />
                 <DoughnutChart />
-            </div>
+            </div> */}
         </>
     )
 }

@@ -26,6 +26,7 @@ import { GET_ALL_SERVICES,
   DELETE_SERVICE,
   DELETE_ADDRESS,
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
+  GET_COUNT,
 } from './actionTypes';
 
 import {
@@ -75,7 +76,42 @@ import {
   actionDeleteAddressFailed,
   actionApproveOrUnapproveRegisterServiceSuccess,
   actionApproveOrUnapproveRegisterServiceFailed,
+  actionGetCountSuccess,
+  actionGetCountFailed,
 } from './actions';
+
+function* getCount() {
+  try {
+    const response = yield call(adminAPI.getCount);
+
+    yield put(actionGetCountSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetCountFailed());
+    toast.error(error.response.data.message);
+  }
+}
+
+function* getSalesStatistics({ payload }) {
+  try {
+    const response = yield call(adminAPI.getSalesStatistics, payload);
+
+    yield put(actionGetSalesStatisticsSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetSalesStatisticsFailed());
+    toast.error(error.response.data.message);
+  }
+}
+
+function* getQuantityStatistics({ payload }) {
+  try {
+    const response = yield call(adminAPI.getQuantityStatistics, payload);
+
+    yield put(actionGetQuantityStatisticsSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetQuantityStatisticsFailed());
+    toast.error(error.response.data.message);
+  }
+}
 
 function* getAllServices({ payload }) {
   try {
@@ -246,28 +282,6 @@ function* createCustomer({ payload }) {
   }
 }
 
-function* getSalesStatistics() {
-  try {
-    const response = yield call(adminAPI.getSalesStatistics);
-
-    yield put(actionGetSalesStatisticsSuccess(response.data));
-  } catch (error) {
-    yield put(actionGetSalesStatisticsFailed());
-    toast.error(error.response.data.message);
-  }
-}
-
-function* getQuantityStatistics() {
-  try {
-    const response = yield call(adminAPI.getQuantityStatistics);
-
-    yield put(actionGetQuantityStatisticsSuccess(response.data));
-  } catch (error) {
-    yield put(actionGetQuantityStatisticsFailed());
-    toast.error(error.response.data.message);
-  }
-}
-
 function* getAllReviews({payload}) {
   try {
     const response = yield call(adminAPI.getAllReviews, payload);
@@ -413,6 +427,7 @@ function* approveOrUnapproveRegisterService({ payload }) {
 
 export default function* loginSaga() {
   yield takeLeading(GET_ALL_SERVICES, getAllServices);
+  yield takeLeading(GET_COUNT, getCount);
   yield takeLeading(UPDATE_SERVICE, updateService);
   yield takeLeading(CREATE_SERVICE, createService);
   yield takeLeading(UPDATE_PROVIDER_PROFILE, updateProviderProfile);

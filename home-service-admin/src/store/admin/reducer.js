@@ -68,6 +68,9 @@ import {
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_SUCCESS,
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE_FAILED,
+  GET_COUNT,
+  GET_COUNT_SUCCESS,
+  GET_COUNT_FAILED,
 } from './actionTypes';
 
 const initialState = {
@@ -82,6 +85,7 @@ const initialState = {
   reviews: [],
   quantityStatistics: [],
   entityCounts: [],
+  count:[],
   booking: null,
   bookings: [],
   addresses: [],
@@ -331,48 +335,6 @@ const admin = (state = initialState, action) => {
         // Handle failure, if needed
       };
 
-    // Get sales statistics
-    case GET_SALES_STATISTICS:
-      return {
-        ...state,
-        loading: true,
-      };
-
-    case GET_SALES_STATISTICS_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        salesStatistics: action.payload,
-      };
-
-    case GET_SALES_STATISTICS_FAILED:
-      return {
-        ...state,
-        loading: false,
-        // Handle failure, if needed
-      };
-
-    // Get quantity statistics
-    case GET_QUANTITY_STATISTICS:
-      return {
-        ...state,
-        loading: true,
-      };
-
-    case GET_QUANTITY_STATISTICS_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        quantityStatistics: action.payload,
-      };
-
-    case GET_QUANTITY_STATISTICS_FAILED:
-      return {
-        ...state,
-        loading: false,
-        // Handle failure, if needed
-      };
-
     // Get all reviews
     case GET_ALL_REVIEWS:
       return {
@@ -595,6 +557,67 @@ const admin = (state = initialState, action) => {
         ...state,
         loading: false,
       };
+
+    // Get count
+case GET_COUNT:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_COUNT_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    count: action.payload,
+  };
+
+case GET_COUNT_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
+
+// Get sales statistics
+case GET_SALES_STATISTICS:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_SALES_STATISTICS_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    salesStatistics: action.payload,
+  };
+
+case GET_SALES_STATISTICS_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
+
+// Get quantity statistics
+case GET_QUANTITY_STATISTICS:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_QUANTITY_STATISTICS_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    quantityStatistics: action.payload,
+  };
+
+case GET_QUANTITY_STATISTICS_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
+
 
     default:
       return state;

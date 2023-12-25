@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { useFormik } from 'formik';
@@ -9,7 +9,7 @@ import styles from './index.module.css';
 import { actionResetPassword, actionResetPasswordToken } from 'store/actions';
 
 function ForgetPasswordPage() {
-  const { token } = useParams();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const [resetPasswordMode, setResetPasswordMode] = useState(false);
@@ -47,10 +47,13 @@ function ForgetPasswordPage() {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token') || '';
+
     if (token) {
       setResetPasswordMode(true);
     }
-  }, [token]);
+  }, [location.pathname]);
 
   return (
     <div className={styles.Container}>
