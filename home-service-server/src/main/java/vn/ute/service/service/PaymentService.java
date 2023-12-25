@@ -62,7 +62,7 @@ public class PaymentService {
         vnp_Params.put("vnp_OrderType", orderType);
 
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl+"?paymentId="+payment.getId());
+        vnp_Params.put("vnp_ReturnUrl", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/v1/payment-callback" +"?paymentId="+payment.getId());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
