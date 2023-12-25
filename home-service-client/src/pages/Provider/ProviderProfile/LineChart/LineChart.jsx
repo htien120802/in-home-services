@@ -30,11 +30,11 @@ function BarChart({ data, title }) {
 
   return (
     <div>
-      <XYPlot width={300} height={300} xType="ordinal" style={{ overflow: 'visible' }}>
+      <XYPlot width={300} height={300} xType="linear" style={{ overflow: 'visible' }}>
         <VerticalGridLines />
         <HorizontalGridLines />
-        <XAxis title="X-axis" tickValues={xLabels.map((item) => item.x)} tickFormat={(v) => xLabels[v]?.label} />
-        <YAxis title="Y-axis" />
+        <XAxis title="" tickValues={xLabels.map((item) => item.x)} tickFormat={(v) => xLabels[v]?.label} />
+        <YAxis title="" />
         <ChartLabel
           text={title}
           includeMargin={false}
