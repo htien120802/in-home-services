@@ -91,7 +91,7 @@ function* resetPassword({ payload }) {
 
     yield put(actionResetPasswordSuccess());
 
-    toast.success(response.data);
+    toast.success(response.message);
   } catch (error) {
     toast.error(error.response.data.message);
 
