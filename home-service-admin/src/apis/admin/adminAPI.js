@@ -13,12 +13,11 @@ export default {
   },
 
   // GET /admin/statistics/booking/sales
-  async getSalesStatisticsByMonthYear(month, year) {
+  async getSalesStatisticsByMonthYear({year}) {
     const path = `${adminEndpoint}/statistics/booking/sales`;
 
     const response = await axiosClient.get(path, {
       params: {
-        month,
         year,
       },
     });
@@ -27,12 +26,11 @@ export default {
   },
 
   // GET /admin/statistics/booking/quantity
-  async getQuantityStatisticsByMonthYear(month, year) {
+  async getQuantityStatisticsByMonthYear({year}) {
     const path = `${adminEndpoint}/statistics/booking/quantity`;
 
     const response = await axiosClient.get(path, {
       params: {
-        month,
         year,
       },
     });
