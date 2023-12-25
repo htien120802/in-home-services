@@ -7,9 +7,9 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAILED,
 
-  REFRESH_TOKEN,
-  REFRESH_TOKEN_SUCCESS,
-  REFRESH_TOKEN_FAILED,
+  RESET_PASSWORD,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_FAILED,
 
   RESET_PASSWORD_TOKEN,
   RESET_PASSWORD_TOKEN_SUCCESS,
@@ -65,19 +65,19 @@ const login = (state = initialState, action) => {
       };
 
       // REFRESH TOKEN
-    case REFRESH_TOKEN:
+    case RESET_PASSWORD:
       return {
         ...state,
         loading: true,
       };
 
-    case REFRESH_TOKEN_SUCCESS:
+    case RESET_PASSWORD_SUCCESS:
       return {
         ...state,
         loading: false,
       };
 
-    case REFRESH_TOKEN_FAILED:
+    case RESET_PASSWORD_FAILED:
       return {
         ...state,
         loading: false,

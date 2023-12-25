@@ -7,9 +7,9 @@ import {
   LOGOUT_SUCCESS,
   LOGOUT_FAILED,
 
-  REFRESH_TOKEN,
-  REFRESH_TOKEN_SUCCESS,
-  REFRESH_TOKEN_FAILED,
+  RESET_PASSWORD,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_FAILED,
 
   RESET_PASSWORD_TOKEN,
   RESET_PASSWORD_TOKEN_SUCCESS,
@@ -47,17 +47,17 @@ export const actionLogoutFailed = () => ({
 
 // REFRESH TOKEN
 export const actionResetPassword = (payload) => ({
-  type: REFRESH_TOKEN,
+  type: RESET_PASSWORD,
   payload,
 });
 
 export const actionResetPasswordSuccess = (payload) => ({
-  type: REFRESH_TOKEN_SUCCESS,
+  type: RESET_PASSWORD_SUCCESS,
   payload,
 });
 
 export const actionResetPasswordFailed = () => ({
-  type: REFRESH_TOKEN_FAILED,
+  type: RESET_PASSWORD_FAILED,
 });
 
 // RESET PASSWORD TOKEN

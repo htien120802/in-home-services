@@ -7,7 +7,7 @@ import { decodeJWT } from 'utils';
 
 const checkAuth = () => {
   const TOKEN = localStorage.getItem('accessToken');
-  const PUBLIC_ROUTES = ['login', 'forgot-password', 'register', 'about', 'contact', 'services'];
+  const PUBLIC_ROUTES = ['login', 'forgot-password', 'register', 'about', 'contact', 'services', 'forget-password'];
 
   const currentPath = window.location.pathname.substring(1);
 
