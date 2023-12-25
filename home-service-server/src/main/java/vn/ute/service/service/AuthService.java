@@ -228,7 +228,7 @@ public class AuthService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Reset Password");
-        message.setText("Reset password link: " + host + "/forget-password?token=" + ResetPasswordTokenUtil.splitToken(resetToken)[0]);
+        message.setText("Reset password link: " + host + "/forget-password?token=" + ResetPasswordTokenUtil.splitToken(resetToken)[0] + "&email=" + email);
 
         ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
         emailExecutor.execute(() -> sendEmail(message));
