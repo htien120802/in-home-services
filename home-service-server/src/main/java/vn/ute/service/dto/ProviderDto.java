@@ -19,4 +19,5 @@ public class ProviderDto {
     private String phone;
     private Set<AddressDto> addresses;
     private String avatar;
+    private double avgRating;
 }
