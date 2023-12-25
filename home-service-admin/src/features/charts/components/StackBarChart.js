@@ -15,7 +15,7 @@ import { actionGetSalesStatistics } from 'store/actions';
   
   ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
   
-  function StackBarChart({dateValue}){
+  function StackBarChart({dateValue, isYearOnly}){
     const dispatch = useDispatch();
     const salesStatistics = useSelector((state) => state.Admin.salesStatistics)
     
@@ -24,13 +24,16 @@ import { actionGetSalesStatistics } from 'store/actions';
 
       if (startDate) {
         const year = startDate.getFullYear();
-        console.log(startDate.getFullYear())
 
         const month = startDate.getMonth() + 1;
-        dispatch(actionGetSalesStatistics({ month, year }));
+        if (isYearOnly) {
+          dispatch(actionGetSalesStatistics({ year }));
+        } else {
+          dispatch(actionGetSalesStatistics({ month, year }));
+        }
       }
     
-  }, [dispatch, dateValue]);
+  }, [dispatch, dateValue, isYearOnly]);
   
       const options = {
             responsive: true,
@@ -44,15 +47,21 @@ import { actionGetSalesStatistics } from 'store/actions';
             },
         };
         
-        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const labels = isYearOnly ? [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ] : salesStatistics.map((item) => item[0]); 
         
         const data = {
           labels,
           datasets: [
             {
               label: 'Store 1',
-              data: labels.map((month, monthIndex) => {
+              data: isYearOnly? labels.map((month, monthIndex) => {
                 const salesDataForMonth = salesStatistics.find((item) => item[0] === monthIndex + 1);
+                return salesDataForMonth ? salesDataForMonth[1] : 0;
+              }) : labels.map((month, monthIndex) => {
+                const salesDataForMonth = salesStatistics.find((item) => item[0] === month);
                 return salesDataForMonth ? salesDataForMonth[1] : 0;
               }),
               backgroundColor: 'rgba(255, 99, 132, 1)',
