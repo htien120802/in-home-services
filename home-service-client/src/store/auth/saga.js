@@ -6,7 +6,7 @@ import { removeSpacesWithTrim } from 'utils';
 import axiosClient from 'utils/axios';
 
 import {
-  LOGIN, LOGOUT, REFRESH_TOKEN,
+  LOGIN, LOGOUT, RESET_PASSWORD,
   RESET_PASSWORD_TOKEN,
 } from './actionTypes';
 import {
@@ -116,6 +116,6 @@ function* resetPasswordToken({ payload }) {
 export default function* loginSaga() {
   yield takeLeading(LOGIN, login);
   yield takeLeading(LOGOUT, logout);
-  yield takeLeading(REFRESH_TOKEN, resetPassword);
+  yield takeLeading(RESET_PASSWORD, resetPassword);
   yield takeLeading(RESET_PASSWORD_TOKEN, resetPasswordToken);
 }

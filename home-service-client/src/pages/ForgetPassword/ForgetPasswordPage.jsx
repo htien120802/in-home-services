@@ -2,30 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
+import { actionResetPassword, actionResetPasswordToken } from 'store/actions';
+
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import styles from './index.module.css';
-import { actionResetPassword, actionResetPasswordToken } from 'store/actions';
 
 function ForgetPasswordPage() {
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const params = new URLSearchParams(location.search);
+  const initialEmail = params.get('email') || '';
 
   const [resetPasswordMode, setResetPasswordMode] = useState(false);
 
   const validation = useFormik({
     initialValues: {
       username: '',
-      email: '',
+      email: initialEmail,
       resetToken: '',
       password: '',
       passwordConfirm: '',
     },
     validationSchema: Yup.object({
       username: Yup.string()
-        .trim()
-        .required('Username is required.'),
+        .trim(),
       email: Yup.string()
         .trim()
         .email('Invalid email format'),
@@ -38,7 +41,12 @@ function ForgetPasswordPage() {
         .oneOf([Yup.ref('password'), null], 'Passwords must match'),
     }),
     onSubmit: (values) => {
-      dispatch(actionResetPassword(values));
+      dispatch(actionResetPassword({
+        email: values.email,
+        password: values.password,
+        passwordConfirm: values.passwordConfirm,
+        resetToken: values.resetToken,
+      }));
     },
   });
 
@@ -47,12 +55,14 @@ function ForgetPasswordPage() {
   };
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
     const token = params.get('token') || '';
 
     if (token) {
       setResetPasswordMode(true);
+      validation.setFieldValue('resetToken', token);
     }
+
+    validation.setFieldValue('email', initialEmail);
   }, [location.pathname]);
 
   return (
@@ -75,45 +85,27 @@ function ForgetPasswordPage() {
         </div>
 
         <form className={styles.Form} onSubmit={validation.handleSubmit}>
-          {resetPasswordMode && (
-            <div>
-              <label htmlFor="email" className={styles.Label}>EMAIL</label>
+          {!resetPasswordMode && (
+            <>
+              <label htmlFor="username" className={styles.Label}>USERNAME</label>
 
               <div className={styles.EmailContainer}>
                 <input
-                  type="email"
-                  placeholder="Email address"
-                  name="email"
+                  type="username"
+                  placeholder="Username"
+                  name="username"
                   onChange={validation.handleChange}
                   onBlur={validation.handleBlur}
-                  value={validation.values.email || ''}
+                  value={validation.values.username || ''}
                   className={styles.Input}
                 />
 
-                {validation.touched.email && validation.errors.email
-                  ? <div className={styles.Errors}>{validation.errors.email}</div>
+                {validation.touched.username && validation.errors.username
+                  ? <div className={styles.Errors}>{validation.errors.username}</div>
                   : null}
               </div>
-            </div>
+            </>
           )}
-
-          <label htmlFor="username" className={styles.Label}>USERNAME</label>
-
-          <div className={styles.EmailContainer}>
-            <input
-              type="username"
-              placeholder="Username"
-              name="username"
-              onChange={validation.handleChange}
-              onBlur={validation.handleBlur}
-              value={validation.values.username || ''}
-              className={styles.Input}
-            />
-
-            {validation.touched.username && validation.errors.username
-              ? <div className={styles.Errors}>{validation.errors.username}</div>
-              : null}
-          </div>
 
           {!resetPasswordMode && (
             <button type="button" className={styles.Button} onClick={switchMode}>
