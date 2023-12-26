@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.ute.service.dto.BookingDto;
-import vn.ute.service.dto.BookingItemDto;
-import vn.ute.service.dto.CoordinatesDto;
-import vn.ute.service.dto.PaymentDto;
+import vn.ute.service.dto.*;
 import vn.ute.service.dto.request.CreateBookingRequest;
 import vn.ute.service.dto.response.ResponseDto;
 import vn.ute.service.entity.*;
@@ -33,6 +30,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -410,5 +408,54 @@ public class BookingService {
         object.put("data", price);
 
         return ResponseEntity.status(200).body(object.toString(3));
+    }
+
+    public ResponseEntity<?> leaveReviewBooking(UUID bookingId, BookingReviewDto bookingReview, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        CustomerEntity customer = customerRepository.findByAccount_Username(username).orElse(null);
+        if (customer == null){
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Customer not found!",null));
+        }
+
+        BookingEntity booking = bookingRepository.findByIdAndCustomer(bookingId,customer).orElse(null);
+        if (booking == null){
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail","Booking not found!",null));
+        }
+
+        if (!booking.getStatus().equals(BookingStatus.DONE)){
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","This booking isn't at DONE status!",null));
+        }
+
+        if (booking.getReview() != null){
+            return ResponseEntity.status(400).body(new ResponseDto<>("fail","You has written review for this booking!",null));
+        }
+
+        booking.setReview(bookingReview.getReview());
+        booking.setRating(bookingReview.getRating());
+        booking.setReviewTime(new Timestamp(System.currentTimeMillis()));
+        booking =  bookingRepository.save(booking);
+
+        ProviderEntity provider = booking.getProvider();
+        List<BookingEntity> bookingEntities = bookingRepository.findAllByProviderAndReviewIsNotNull(provider);
+        double avgRating =  bookingEntities.stream().mapToDouble(BookingEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avgRating);
+        providerRepository.save(provider);
+
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Post your review successfully!",mapper.map(booking,BookingReviewDto.class)));
+    }
+
+    public ResponseEntity<?> getAllBookingReviews(int pageNumber, int size, HttpServletRequest request) {
+        String username = jwtService.getUsernameFromRequest(request);
+        ProviderEntity provider = providerRepository.findByAccount_Username(username).orElse(null);
+        if (provider == null){
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Provider not found!",null));
+        }
+
+        Sort sort = Sort.by(Sort.Direction.DESC,"reviewTime");
+        Pageable pageable = PageRequest.of(pageNumber,size,sort);
+        List<BookingEntity> bookingEntities = bookingRepository.findAllByProviderAndReviewIsNotNull(provider,pageable);
+        List<BookingReviewDto> bookingReviewDtos = bookingEntities.stream().map(booking -> mapper.map(booking,BookingReviewDto.class)).toList();
+
+        return ResponseEntity.status(200).body(new ResponseDto<>("success","Get all booking reviews successfully!", bookingReviewDtos));
     }
 }

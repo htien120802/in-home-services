@@ -11,6 +11,7 @@ import vn.ute.service.enumerate.ServiceStatus;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -80,11 +81,18 @@ public class BookingEntity {
     private BookingStatus status;
 
     private String reasonCancel;
+
+    private String review;
+
+    private int rating;
+
+    private Timestamp reviewTime;
     @PrePersist
     private void prePersist(){
         if (this.status == null){
             this.status = BookingStatus.BOOKED;
         }
+        this.rating = 0;
         calcTotalPrice();
     }
     @PreUpdate

@@ -74,11 +74,11 @@ public class ReviewService {
         reviewEntity.setCustomer(customer);
         reviewEntity = reviewRepository.save(reviewEntity);
 
-        ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
-        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
-        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
-        provider.setAvgRating(avg);
-        providerRepository.save(provider);
+//        ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
+//        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
+//        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+//        provider.setAvgRating(avg);
+//        providerRepository.save(provider);
 
         return ResponseEntity.status(201).body(new ResponseDto<>("success","Post your review successfully!",mapper.map(reviewEntity, ReviewDto.class)));
     }

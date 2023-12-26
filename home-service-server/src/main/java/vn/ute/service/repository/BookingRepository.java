@@ -102,4 +102,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, UUID> {
     order by function('MONTH',b.date) asc 
     """)
     List<Object[]> salesStatisticsForProvider(@Param("year") int year, @Param("provider") ProviderEntity provider);
+
+    List<BookingEntity> findAllByProviderAndReviewIsNotNull(ProviderEntity provider);
+    List<BookingEntity> findAllByProviderAndReviewIsNotNull(ProviderEntity provider, Pageable pageable);
 }

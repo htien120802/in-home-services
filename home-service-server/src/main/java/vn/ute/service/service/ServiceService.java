@@ -35,7 +35,7 @@ public class ServiceService {
 
     private final CategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
-    private final ReviewRepository reviewRepository;
+    private final BookingRepository bookingRepository;
 
     private final ProviderRepository providerRepository;
 
@@ -49,12 +49,12 @@ public class ServiceService {
 
     private final ModelMapper mapper;
 
-    public ServiceService(ServiceRepository serviceRepository, ServiceCriteriaRepository serviceCriteriaRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ReviewRepository reviewRepository, ProviderRepository providerRepository, WorkRepository workRepository, BingMapsService bingMapsService, ImageService imageService, JwtService jwtService, ModelMapper mapper) {
+    public ServiceService(ServiceRepository serviceRepository, ServiceCriteriaRepository serviceCriteriaRepository, CategoryRepository categoryRepository, CustomerRepository customerRepository, ReviewRepository reviewRepository, BookingRepository bookingRepository, ProviderRepository providerRepository, WorkRepository workRepository, BingMapsService bingMapsService, ImageService imageService, JwtService jwtService, ModelMapper mapper) {
         this.serviceRepository = serviceRepository;
         this.serviceCriteriaRepository = serviceCriteriaRepository;
         this.categoryRepository = categoryRepository;
         this.customerRepository = customerRepository;
-        this.reviewRepository = reviewRepository;
+        this.bookingRepository = bookingRepository;
         this.providerRepository = providerRepository;
         this.workRepository = workRepository;
         this.bingMapsService = bingMapsService;
@@ -158,9 +158,9 @@ public class ServiceService {
 //        service.setStatus(ServiceStatus.DELETE);
 //        serviceRepository.save(service);
 
-        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
-        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
-        provider.setAvgRating(avg);
+        List<BookingEntity> bookingEntities = bookingRepository.findAllByProviderAndReviewIsNotNull(provider);
+        double avgRating =  bookingEntities.stream().mapToDouble(BookingEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avgRating);
         providerRepository.save(provider);
 
         return ResponseEntity.status(200).body(new ResponseDto<>("success","Delete service successfully!",null));

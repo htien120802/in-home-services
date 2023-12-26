@@ -277,9 +277,9 @@ public class AdminService {
         serviceRepository.delete(service);
 
         ProviderEntity provider = providerRepository.findById(service.getProvider().getId()).get();
-        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
-        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
-        provider.setAvgRating(avg);
+        List<BookingEntity> bookingEntities = bookingRepository.findAllByProviderAndReviewIsNotNull(provider);
+        double avgRating =  bookingEntities.stream().mapToDouble(BookingEntity::getRating).average().orElse(0.0);
+        provider.setAvgRating(avgRating);
         providerRepository.save(provider);
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete service successfully!",null));
@@ -365,19 +365,19 @@ public class AdminService {
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId).orElse(null);
         if (reviewEntity == null)
             return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(new ResponseDto<>("fail","Review not found",null));
-        ServiceEntity service = reviewEntity.getService();
-        service.getReviews().remove(reviewEntity);
+//        ServiceEntity service = reviewEntity.getService();
+//        service.getReviews().remove(reviewEntity);
         reviewRepository.delete(reviewEntity);
 
 
-        service.calcAvgRating();
-        serviceRepository.save(service);
-
-        ProviderEntity provider = service.getProvider();
-        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
-        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
-        provider.setAvgRating(avg);
-        providerRepository.save(provider);
+//        service.calcAvgRating();
+//        serviceRepository.save(service);
+//
+//        ProviderEntity provider = service.getProvider();
+//        List<ReviewEntity> reviewEntities = reviewRepository.findAllByService_Provider(provider);
+//        double avg = reviewEntities.stream().mapToDouble(ReviewEntity::getRating).average().orElse(0.0);
+//        provider.setAvgRating(avg);
+//        providerRepository.save(provider);
 
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success","Delete review successfully!",null));

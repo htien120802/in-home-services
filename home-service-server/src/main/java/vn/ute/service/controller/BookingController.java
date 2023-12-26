@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.ute.service.dto.BookingReviewDto;
 import vn.ute.service.dto.request.CreateBookingRequest;
 import vn.ute.service.enumerate.BookingStatus;
 import vn.ute.service.service.BookingService;
@@ -88,5 +89,17 @@ public class BookingController {
         return bookingService.getBookingOfProvider(bookingId, request);
     }
 
+    @Operation(summary = "Leave review for booking")
+    @PostMapping("/customer/booking/{bookingId}/review")
+    public ResponseEntity<?> leaveReviewBooking(@PathVariable UUID bookingId, @RequestBody BookingReviewDto bookingReview, HttpServletRequest request){
+        return bookingService.leaveReviewBooking(bookingId,bookingReview,request);
+    }
 
+    @Operation(summary = "Get all booking reviews")
+    @GetMapping("/provider/booking/review")
+    public ResponseEntity<?> getAllBookingReviews(@RequestParam(defaultValue = "0") int pageNumber,
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  HttpServletRequest request){
+        return bookingService.getAllBookingReviews(pageNumber, size, request);
+    }
 }

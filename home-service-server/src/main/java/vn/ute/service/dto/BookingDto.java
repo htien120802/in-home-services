@@ -7,6 +7,7 @@ import vn.ute.service.enumerate.BookingStatus;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Set;
 import java.util.UUID;
 @Setter
@@ -28,4 +29,7 @@ public class BookingDto {
     private Time arriveTime;
     private BookingStatus status;
     private PaymentDto payment;
+    private String rating;
+    private String review;
+    private Timestamp reviewTime;
 }
