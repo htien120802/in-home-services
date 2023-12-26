@@ -105,4 +105,41 @@ public interface BookingRepository extends JpaRepository<BookingEntity, UUID> {
 
     List<BookingEntity> findAllByProviderAndReviewIsNotNull(ProviderEntity provider);
     List<BookingEntity> findAllByProviderAndReviewIsNotNull(ProviderEntity provider, Pageable pageable);
+
+
+    @Query("""
+    select b.provider.id, b.provider.firstName, b.provider.lastName, count(b.id)
+    from BookingEntity b 
+    where b.status = 'DONE' and function('MONTH',b.date) = :month and function('YEAR',b.date) = :year
+    group by b.provider
+    order by count(b.id) desc 
+    """)
+    List<Object[]> topProviderAboutQuantity(@Param("month") int month, @Param("year") int year);
+
+    @Query("""
+    select b.provider.id, b.provider.firstName, b.provider.lastName, count(b.id)
+    from BookingEntity b 
+    where b.status = 'DONE' and function('YEAR',b.date) = :year
+    group by b.provider
+    order by count(b.id) desc 
+    """)
+    List<Object[]> topProviderAboutQuantity(@Param("year") int year);
+
+    @Query("""
+    select b.provider.id, b.provider.firstName, b.provider.lastName, sum(b.totalPrice)
+    from BookingEntity b 
+    where b.status = 'DONE' and function('MONTH',b.date) = :month and function('YEAR',b.date) = :year
+    group by b.provider
+    order by sum(b.totalPrice) desc 
+    """)
+    List<Object[]> topProviderAboutSales(@Param("month") int month, @Param("year") int year);
+
+    @Query("""
+    select b.provider.id, b.provider.firstName, b.provider.lastName, sum(b.totalPrice)
+    from BookingEntity b 
+    where b.status = 'DONE' and function('YEAR',b.date) = :year
+    group by b.provider
+    order by sum(b.totalPrice) desc 
+    """)
+    List<Object[]> topProviderAboutSales(@Param("year") int year);
 }

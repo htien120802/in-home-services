@@ -425,4 +425,56 @@ public class AdminService {
         }
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
     }
+
+    public ResponseEntity<?> quantityStatisticsOfProvider(UUID providerId, String month, int year) {
+
+        ProviderEntity provider = providerRepository.findById(providerId).orElse(null);
+
+        if (provider == null)
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Provider not found", null));
+
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.quantityStatisticsForProvider(Integer.parseInt(month), year, provider);
+        } else {
+            result = bookingRepository.quantityStatisticsForProvider(year, provider);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
+    }
+
+    public ResponseEntity<?> salesStatisticsOfProvider(UUID providerId, String month, int year) {
+        ProviderEntity provider = providerRepository.findById(providerId).orElse(null);
+
+        if (provider == null)
+            return ResponseEntity.status(404).body(new ResponseDto<>("fail", "Provider not found", null));
+
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.salesStatisticsForProvider(Integer.parseInt(month), year, provider);
+        } else {
+            result = bookingRepository.salesStatisticsForProvider(year, provider);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
+    }
+
+    public ResponseEntity<?> topQuantity(String month, int year) {
+
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.topProviderAboutQuantity(Integer.parseInt(month),year);
+        } else {
+            result = bookingRepository.topProviderAboutQuantity(year);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
+    }
+
+    public ResponseEntity<?> topSales(String month, int year) {
+        List<Object[]> result;
+        if (month != null){
+            result = bookingRepository.topProviderAboutSales(Integer.parseInt(month),year);
+        } else {
+            result = bookingRepository.topProviderAboutSales(year);
+        }
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(new ResponseDto<>("success",null,result));
+    }
 }

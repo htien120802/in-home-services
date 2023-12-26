@@ -34,11 +34,20 @@ public class AdminController {
         return adminService.countEntity();
     }
 
-    @Operation(summary = "Quantity statistics of bookings by month, year")
-    @GetMapping("/statistics/booking/quantity")
-    public ResponseEntity<?> quantityStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
-                                                         @RequestParam int year){
-        return adminService.quantityStatisticsOfBookingByMonth(month,year);
+    @Operation(summary = "Quantity statistics of bookings by month, year of provider")
+    @GetMapping("/statistics/{providerId}/booking/quantity")
+    public ResponseEntity<?> quantityStatisticsOfProvider(@PathVariable UUID providerId,
+                                                          @RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                          @RequestParam int year){
+        return adminService.quantityStatisticsOfProvider(providerId,month,year);
+    }
+
+    @Operation(summary = "Sales statistics of bookings by month, year of provider")
+    @GetMapping("/statistics/{providerId}/booking/sales")
+    public ResponseEntity<?> salesStatisticsOfProvider(@PathVariable UUID providerId,
+                                                      @RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                      @RequestParam int year){
+        return adminService.salesStatisticsOfProvider(providerId,month,year);
     }
 
     @Operation(summary = "Sales statistics of bookings by month, year")
@@ -46,6 +55,28 @@ public class AdminController {
     public ResponseEntity<?> salesStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
                                                          @RequestParam int year){
         return adminService.salesStatisticsOfBookingByMonth(month,year);
+    }
+
+
+    @Operation(summary = "Quantity statistics of bookings by month, year")
+    @GetMapping("/statistics/booking/quantity")
+    public ResponseEntity<?> quantityStatisticsOfBooking(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                         @RequestParam int year){
+        return adminService.quantityStatisticsOfBookingByMonth(month,year);
+    }
+
+    @Operation(summary = "Get top quantity provider")
+    @GetMapping("/statistics/topquantity")
+    public ResponseEntity<?> topQuantity(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                                         @RequestParam int year){
+        return adminService.topQuantity(month,year);
+    }
+
+    @Operation(summary = "Get top sales provider")
+    @GetMapping("/statistics/topsales")
+    public ResponseEntity<?> topSales(@RequestParam(required = false) @Min(1) @Max(12) String month,
+                                         @RequestParam int year){
+        return adminService.topSales(month,year);
     }
 
     @Operation(summary = "Get all customers")
