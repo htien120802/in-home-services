@@ -42,12 +42,12 @@ function LoginPage() {
     validationSchema: Yup.object({
       username: Yup.string()
         .trim()
-        .required('Username không được bỏ trống.'),
+        .required('Username is required.'),
       password: Yup.string()
         .trim()
-        .required('Mật khẩu không được bỏ trống.')
-        .min(TEXT_LENGTH_LIMIT.PASSWORD, 'Mật khẩu không được ít hơn 6 kí tự')
-        .max(TEXT_LENGTH_LIMIT.SHORT, `Mật khẩu không được vượt quá ${TEXT_LENGTH_LIMIT.SHORT} kí tự`),
+        .required('Password is required.')
+        .min(TEXT_LENGTH_LIMIT.PASSWORD, 'Password must be at least 6 characters long')
+        .max(TEXT_LENGTH_LIMIT.SHORT, `Password must not exceed ${TEXT_LENGTH_LIMIT.SHORT} characters`),
     }),
 
     onSubmit: (values) => {
