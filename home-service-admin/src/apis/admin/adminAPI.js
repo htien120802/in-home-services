@@ -3,6 +3,62 @@ import axiosClient from 'utils/axios';
 const adminEndpoint = '/admin';
 
 export default {
+  // GET /admin/statistics/{providerId}/booking/sales
+  async getSalesStatisticsByMonthYearAndProvider({ providerId, year, month }) {
+    const path = `${adminEndpoint}/statistics/${providerId}/booking/sales`;
+
+    const response = await axiosClient.get(path, {
+      params: {
+        year,
+        month,
+      },
+    });
+
+    return response.data;
+  },
+
+  // GET /admin/statistics/{providerId}/booking/quantity
+  async getQuantityStatisticsByMonthYearAndProvider({ providerId, year, month }) {
+    const path = `${adminEndpoint}/statistics/${providerId}/booking/quantity`;
+
+    const response = await axiosClient.get(path, {
+      params: {
+        year,
+        month,
+      },
+    });
+
+    return response.data;
+  },
+
+  // GET /admin/statistics/topsales
+  async getTopSalesProvider({year, month}) {
+    const path = `${adminEndpoint}/statistics/topsales`;
+
+    const response = await axiosClient.get(path, {
+      params: {
+        year,
+        month,
+      },
+    });
+
+    return response.data;
+  },
+
+  // GET /admin/statistics/topquantity
+  async getTopQuantityProvider({year, month}) {
+    const path = `${adminEndpoint}/statistics/topquantity`;
+
+    const response = await axiosClient.get(path, {
+      params: {
+        year,
+        month,
+      },
+    });
+
+    return response.data;
+  },
+
   // GET /admin/count
   async getCount() {
     const path = `${adminEndpoint}/count`;
@@ -213,17 +269,6 @@ export default {
     const path = `${adminEndpoint}/review/${reviewId}`;
 
     const response = await axiosClient.delete(path, {
-      withCredentials: true,
-    });
-
-    return response.data;
-  },
-
-  // GET /admin/count
-  async getCount() {
-    const path = `${adminEndpoint}/count`;
-
-    const response = await axiosClient.get(path, {
       withCredentials: true,
     });
 

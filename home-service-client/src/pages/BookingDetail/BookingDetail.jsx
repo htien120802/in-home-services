@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  actionCustomerCancelBooking, actionGetCustomerBooking, actionGetCustomerProfile, actionGetProviderBooking, actionGetProviderProfile, actionProviderCancelBooking,
+  actionCustomerCancelBooking, actionGetCustomerBooking, actionGetCustomerProfile, actionGetProviderBooking, actionGetProviderProfile, actionPostCustomerBookingReview, actionProviderCancelBooking,
 } from 'store/actions';
 
 import BannerSlider from 'components/BannerSlider/BannerSlider';
@@ -11,6 +11,7 @@ import ServerErrorPage from 'pages/Error500/Error500Page';
 
 import { determineUserRole, formatPriceWithCommas } from 'utils';
 import ReasonModal from 'pages/Customer/CustomerProfile/Order/OrderDetail/ReasonModal/ReasonModal';
+import LetAReviewModal from './LetAReviewModal/LetAReviewModal';
 
 function BookingDetailPage() {
   const { id } = useParams();
@@ -20,8 +21,12 @@ function BookingDetailPage() {
   const bookingDetail = useSelector((state) => state.Booking.bookingDetail);
 
   const [error, setError] = useState(false);
+  const [role, setRole] = useState(null);
   const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
+  const [review, setReview] = useState('');
+  const [rating, setRating] = useState(5);
 
   const handleCloseReasonModal = () => {
     setIsReasonModalOpen(false);
@@ -29,6 +34,22 @@ function BookingDetailPage() {
 
   const handleReasonChange = (event) => {
     setCancellationReason(event.target.value);
+  };
+
+  const handleOpenReviewModal = () => {
+    setIsReviewModalOpen(true);
+  };
+
+  const handleCloseReviewModal = () => {
+    setIsReviewModalOpen(false);
+  };
+
+  const handleReviewChange = (event) => {
+    setReview(event.target.value);
+  };
+
+  const handleRatingChange = (event) => {
+    setRating(Number(event.target.value));
   };
 
   const handleCancel = () => {
@@ -43,6 +64,11 @@ function BookingDetailPage() {
     setIsReasonModalOpen(false);
   };
 
+  const handleSubmitReview = () => {
+    dispatch(actionPostCustomerBookingReview({ bookingId: bookingDetail.id, review, rating }));
+    setIsReviewModalOpen(false);
+  };
+
   const callbackLoginSuccess = useCallback(() => {
     navigate('/login');
   }, [navigate]);
@@ -55,9 +81,11 @@ function BookingDetailPage() {
     const userRole = determineUserRole();
 
     if (userRole === 'ROLE_CUSTOMER') {
+      setRole(userRole);
       dispatch(actionGetCustomerProfile({ callback: callbackLoginSuccess }));
       dispatch(actionGetCustomerBooking({ bookingId: id, callback: callbackGetBookingDetailFailed }));
     } else if (userRole === 'ROLE_PROVIDER') {
+      setRole(userRole);
       dispatch(actionGetProviderProfile());
       dispatch(actionGetProviderBooking({ bookingId: id, callback: callbackGetBookingDetailFailed }));
     }
@@ -133,7 +161,7 @@ function BookingDetailPage() {
                       </div>
 
                       <div className="mb-3">
-                        <h4 className="mt-0">Pyament Info</h4>
+                        <h4 className="mt-0">Payment Info</h4>
 
                         <p>
                           <span>Payment Method:</span>
@@ -172,6 +200,42 @@ function BookingDetailPage() {
                           Cancel Order
                         </button>
                         ) }
+                      </div>
+
+                      <div className="mb-3">
+                        <h4 className="mt-0">Review</h4>
+
+                        {bookingDetail.review ? (
+                          <>
+                            <p>
+                              <span>Rating:</span>
+                              {' '}
+                              {bookingDetail.rating}
+                            </p>
+                            <p>
+                              <span>Review:</span>
+                              {' '}
+                              {bookingDetail.review}
+                            </p>
+                            <p>
+                              <span>Time:</span>
+                              {' '}
+                              {bookingDetail.reviewTime}
+                            </p>
+                          </>
+                        ) : (
+                          <div>
+                            {bookingDetail.status === 'DONE' && role === 'ROLE_CUSTOMER' && (
+                            <button
+                              type="button"
+                              className="btn btn-primary ms-2"
+                              onClick={handleOpenReviewModal}
+                            >
+                              Leave a Review
+                            </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </>
                   ) : (
@@ -252,6 +316,15 @@ function BookingDetailPage() {
           handleCancel={handleCancel}
           handleReasonChange={handleReasonChange}
           cancellationReason={cancellationReason}
+        />
+        <LetAReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={handleCloseReviewModal}
+          handleReviewChange={handleReviewChange}
+          handleRatingChange={handleRatingChange}
+          review={review}
+          rating={rating}
+          handleSubmit={handleSubmitReview}
         />
       </section>
     </>

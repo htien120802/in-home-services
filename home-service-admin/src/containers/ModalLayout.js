@@ -12,6 +12,7 @@ import UpdateProviderModalBody from 'features/common/components/UpdateProviderMo
 import AddCustomerModalBody from 'features/common/components/AddCustomerModalBody'
 import AddProviderModalBody from 'features/common/components/AddProviderModalBody'
 import UpdateCategoryModalBody from 'features/common/components/UpdateCategoryModalBody'
+import ProviderStatisticsModalBody from 'features/common/components/ProviderStatisticsModalBody'
 
 function ModalLayout(){
 
@@ -49,6 +50,7 @@ function ModalLayout(){
                             [MODAL_BODY_TYPES.ADD_PROVIDER]: <AddProviderModalBody extraObject={extraObject} closeModal={close} />,
                             [MODAL_BODY_TYPES.ADD_CUSTOMER]: <AddCustomerModalBody extraObject={extraObject} closeModal={close} />,
                             [MODAL_BODY_TYPES.UPDATE_CATEGORY]: <UpdateCategoryModalBody extraObject={extraObject} closeModal={close} />,
+                            [MODAL_BODY_TYPES.PROVIDER_STATISTICS]: <ProviderStatisticsModalBody extraObject={extraObject} closeModal={close} />,
                              [MODAL_BODY_TYPES.DEFAULT] : <div></div>
                     }[bodyType]
                 }

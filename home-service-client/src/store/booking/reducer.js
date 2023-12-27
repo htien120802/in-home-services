@@ -32,6 +32,12 @@ import {
   GET_PROVIDER_BOOKING,
   GET_PROVIDER_BOOKING_SUCCESS,
   GET_PROVIDER_BOOKING_FAILED,
+  POST_CUSTOMER_BOOKING_REVIEW,
+  POST_CUSTOMER_BOOKING_REVIEW_SUCCESS,
+  POST_CUSTOMER_BOOKING_REVIEW_FAILED,
+  GET_PROVIDER_BOOKING_REVIEW,
+  GET_PROVIDER_BOOKING_REVIEW_SUCCESS,
+  GET_PROVIDER_BOOKING_REVIEW_FAILED,
 } from './actionTypes';
 
 const initialState = {
@@ -41,6 +47,7 @@ const initialState = {
   works: [],
   totalPrice: 0,
   finalPrice: 0,
+  bookingReviews: [],
 };
 
 const bookingReducer = (state = initialState, action) => {
@@ -187,6 +194,44 @@ const bookingReducer = (state = initialState, action) => {
       };
 
     case GET_CUSTOMER_BOOKING_FAILED:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case POST_CUSTOMER_BOOKING_REVIEW:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case POST_CUSTOMER_BOOKING_REVIEW_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case POST_CUSTOMER_BOOKING_REVIEW_FAILED:
+      return {
+        ...state,
+        loading: false,
+      };
+
+      // GET_PROVIDER_BOOKING_REVIEW
+    case GET_PROVIDER_BOOKING_REVIEW:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case GET_PROVIDER_BOOKING_REVIEW_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        bookingReviews: action.payload,
+      };
+
+    case GET_PROVIDER_BOOKING_REVIEW_FAILED:
       return {
         ...state,
         loading: false,

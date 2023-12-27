@@ -173,6 +173,10 @@ function ProviderProfilePage() {
                         </div>
 
                         <div className="col-12">
+                          <Link to="/provider/reviews" className="btn btn-primary btn-block btn-lg my-2">My Review</Link>
+                        </div>
+
+                        <div className="col-12">
                           <a href="javascript:;" onClick={() => setChangePasswordModalOpen(true)} className="btn btn-warning btn-block btn-lg my-2">Change Password</a>
                         </div>
 

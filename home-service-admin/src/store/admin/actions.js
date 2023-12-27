@@ -71,6 +71,18 @@ import {
   GET_COUNT,
   GET_COUNT_SUCCESS,
   GET_COUNT_FAILED,
+  GET_SALES_STATISTICS_BY_PROVIDER,
+  GET_SALES_STATISTICS_BY_PROVIDER_SUCCESS,
+  GET_SALES_STATISTICS_BY_PROVIDER_FAILED,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER_SUCCESS,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER_FAILED,
+  GET_TOP_SALES_PROVIDER,
+  GET_TOP_SALES_PROVIDER_SUCCESS,
+  GET_TOP_SALES_PROVIDER_FAILED,
+  GET_TOP_QUANTITY_PROVIDER,
+  GET_TOP_QUANTITY_PROVIDER_SUCCESS,
+  GET_TOP_QUANTITY_PROVIDER_FAILED
 } from './actionTypes';
 
 // Get all services
@@ -430,4 +442,63 @@ export const actionGetQuantityStatisticsSuccess = (payload) => ({
 
 export const actionGetQuantityStatisticsFailed = () => ({
   type: GET_QUANTITY_STATISTICS_FAILED,
+});
+
+export const actionGetSalesStatisticsByProvider = (payload) => ({
+  type: GET_SALES_STATISTICS_BY_PROVIDER,
+  payload,
+});
+
+export const actionGetSalesStatisticsByProviderSuccess = (payload) => ({
+  type: GET_SALES_STATISTICS_BY_PROVIDER_SUCCESS,
+  payload,
+});
+
+export const actionGetSalesStatisticsByProviderFailed = () => ({
+  type: GET_SALES_STATISTICS_BY_PROVIDER_FAILED,
+});
+
+// Get quantity statistics by provider
+export const actionGetQuantityStatisticsByProvider = (payload) => ({
+  type: GET_QUANTITY_STATISTICS_BY_PROVIDER,
+  payload,
+});
+
+export const actionGetQuantityStatisticsByProviderSuccess = (payload) => ({
+  type: GET_QUANTITY_STATISTICS_BY_PROVIDER_SUCCESS,
+  payload,
+});
+
+export const actionGetQuantityStatisticsByProviderFailed = () => ({
+  type: GET_QUANTITY_STATISTICS_BY_PROVIDER_FAILED,
+});
+
+// Get top sales provider
+export const actionGetTopSalesProvider = (payload) => ({
+  type: GET_TOP_SALES_PROVIDER,
+  payload,
+});
+
+export const actionGetTopSalesProviderSuccess = (payload) => ({
+  type: GET_TOP_SALES_PROVIDER_SUCCESS,
+  payload,
+});
+
+export const actionGetTopSalesProviderFailed = () => ({
+  type: GET_TOP_SALES_PROVIDER_FAILED,
+});
+
+// Get top quantity provider
+export const actionGetTopQuantityProvider = (payload) => ({
+  type: GET_TOP_QUANTITY_PROVIDER,
+  payload,
+});
+
+export const actionGetTopQuantityProviderSuccess = (payload) => ({
+  type: GET_TOP_QUANTITY_PROVIDER_SUCCESS,
+  payload,
+});
+
+export const actionGetTopQuantityProviderFailed = () => ({
+  type: GET_TOP_QUANTITY_PROVIDER_FAILED,
 });

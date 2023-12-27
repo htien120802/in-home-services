@@ -23,6 +23,7 @@ import ProfilePage from 'pages/Profile/ProfilePage';
 import BookingPage from 'pages/Booking/BookingPage';
 import ProviderService from 'pages/Provider/ProviderService/ProviderService';
 import ProviderBooking from 'pages/Provider/ProviderBooking/ProviderBooking';
+import ProviderReviewPage from 'pages/Provider/ProviderProfile/ProviderReview/ProviderReviewPage';
 import ProviderProfilePage from 'pages/Provider/ProviderProfile/ProviderProfilePage';
 import CheckoutPage from 'pages/Checkout/CheckoutPage';
 import BookingDetailPage from 'pages/BookingDetail/BookingDetail';
@@ -53,6 +54,7 @@ function App() {
 
           <Route exact path={LOCATION.PROVIDERSERVICE} element={<ProviderService />} />
           <Route exact path={LOCATION.PROVIDERBOOKING} element={<ProviderBooking />} />
+          <Route exact path={LOCATION.PROVIDERREVIEW} element={<ProviderReviewPage />} />
           <Route exact path={LOCATION.PROVIDERPROFILE} element={<ProviderProfilePage />} />
         </Route>
 

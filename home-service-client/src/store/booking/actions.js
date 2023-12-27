@@ -32,6 +32,12 @@ import {
   GET_PROVIDER_BOOKING,
   GET_PROVIDER_BOOKING_SUCCESS,
   GET_PROVIDER_BOOKING_FAILED,
+  POST_CUSTOMER_BOOKING_REVIEW,
+  POST_CUSTOMER_BOOKING_REVIEW_SUCCESS,
+  POST_CUSTOMER_BOOKING_REVIEW_FAILED,
+  GET_PROVIDER_BOOKING_REVIEW,
+  GET_PROVIDER_BOOKING_REVIEW_SUCCESS,
+  GET_PROVIDER_BOOKING_REVIEW_FAILED,
 } from './actionTypes';
 
 // UPDATE_BOOKING_STATUS
@@ -192,4 +198,32 @@ export const actionGetCustomerBookingSuccess = (payload) => ({
 
 export const actionGetCustomerBookingFailed = () => ({
   type: GET_CUSTOMER_BOOKING_FAILED,
+});
+
+export const actionPostCustomerBookingReview = (payload) => ({
+  type: POST_CUSTOMER_BOOKING_REVIEW,
+  payload,
+});
+
+export const actionPostCustomerBookingReviewSuccess = (payload) => ({
+  type: POST_CUSTOMER_BOOKING_REVIEW_SUCCESS,
+  payload,
+});
+
+export const actionPostCustomerBookingReviewFailed = () => ({
+  type: POST_CUSTOMER_BOOKING_REVIEW_FAILED,
+});
+
+export const actionGetProviderBookingReview = (payload) => ({
+  type: GET_PROVIDER_BOOKING_REVIEW,
+  payload,
+});
+
+export const actionGetProviderBookingReviewSuccess = (payload) => ({
+  type: GET_PROVIDER_BOOKING_REVIEW_SUCCESS,
+  payload,
+});
+
+export const actionGetProviderBookingReviewFailed = () => ({
+  type: GET_PROVIDER_BOOKING_REVIEW_FAILED,
 });

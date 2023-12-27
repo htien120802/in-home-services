@@ -71,6 +71,18 @@ import {
   GET_COUNT,
   GET_COUNT_SUCCESS,
   GET_COUNT_FAILED,
+  GET_SALES_STATISTICS_BY_PROVIDER,
+  GET_SALES_STATISTICS_BY_PROVIDER_SUCCESS,
+  GET_SALES_STATISTICS_BY_PROVIDER_FAILED,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER_SUCCESS,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER_FAILED,
+  GET_TOP_SALES_PROVIDER,
+  GET_TOP_SALES_PROVIDER_SUCCESS,
+  GET_TOP_SALES_PROVIDER_FAILED,
+  GET_TOP_QUANTITY_PROVIDER,
+  GET_TOP_QUANTITY_PROVIDER_SUCCESS,
+  GET_TOP_QUANTITY_PROVIDER_FAILED,
 } from './actionTypes';
 
 const initialState = {
@@ -89,6 +101,10 @@ const initialState = {
   booking: null,
   bookings: [],
   addresses: [],
+  salesStatisticsByProvider: [],
+  quantityStatisticsByProvider: [],
+  topSalesProvider: [],
+  topQuantityProvider: [],
 };
 
 const admin = (state = initialState, action) => {
@@ -618,6 +634,85 @@ case GET_QUANTITY_STATISTICS_FAILED:
     loading: false,
   };
 
+  // Reducer handling sales statistics by provider
+case GET_SALES_STATISTICS_BY_PROVIDER:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_SALES_STATISTICS_BY_PROVIDER_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    salesStatisticsByProvider: action.payload,
+  };
+
+case GET_SALES_STATISTICS_BY_PROVIDER_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
+
+// Reducer handling quantity statistics by provider
+case GET_QUANTITY_STATISTICS_BY_PROVIDER:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_QUANTITY_STATISTICS_BY_PROVIDER_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    quantityStatisticsByProvider: action.payload,
+  };
+
+case GET_QUANTITY_STATISTICS_BY_PROVIDER_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
+
+// Reducer handling top sales provider
+case GET_TOP_SALES_PROVIDER:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_TOP_SALES_PROVIDER_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    topSalesProvider: action.payload,
+  };
+
+case GET_TOP_SALES_PROVIDER_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
+
+// Reducer handling top quantity provider
+case GET_TOP_QUANTITY_PROVIDER:
+  return {
+    ...state,
+    loading: true,
+  };
+
+case GET_TOP_QUANTITY_PROVIDER_SUCCESS:
+  return {
+    ...state,
+    loading: false,
+    topQuantityProvider: action.payload,
+  };
+
+case GET_TOP_QUANTITY_PROVIDER_FAILED:
+  return {
+    ...state,
+    loading: false,
+  };
 
     default:
       return state;

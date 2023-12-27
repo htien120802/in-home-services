@@ -13,6 +13,7 @@ module.exports = Object.freeze({
         ADD_CUSTOMER : "ADD_CUSTOMER",
         UPDATE_CATEGORY : "UPDATE_CATEGORY",
         UPDATE_REVIEW : "UPDATE_REVIEW",
+        PROVIDER_STATISTICS : "PROVIDER_STATISTICS",
         DEFAULT : "",
     },
 
