@@ -213,6 +213,10 @@ function ServiceDetails() {
                                     {' '}
                                     {work.pricePerUnit}
                                     đ
+                                    {' '}
+                                    per
+                                    {' '}
+                                    {work.unit}
                                   </label>
 
                                   <div className="align-items-center">

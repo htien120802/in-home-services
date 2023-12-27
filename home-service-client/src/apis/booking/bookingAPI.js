@@ -22,6 +22,25 @@ export default {
     return response.data;
   },
 
+  // POST /customer/booking/{bookingId}/review
+  async postCustomerReview(payload) {
+    const path = `${customerEndpoint}/${payload.bookingId}/review`;
+    const response = await axiosClient.post(path, {
+      review: payload.review,
+      rating: payload.rating,
+    });
+    return response.data;
+  },
+
+  // GET /provider/booking/review
+  async getProviderBookingReviews(payload) {
+    const path = `${providerEndpoint}/review`;
+    const response = await axiosClient.get(path, {
+      params: payload,
+    });
+    return response.data;
+  },
+
   // PUT /customer/booking/{bookingId}/cancel
   async customerCancelBooking(payload) {
     const path = `${customerEndpoint}/${payload.bookingId}/cancel`;

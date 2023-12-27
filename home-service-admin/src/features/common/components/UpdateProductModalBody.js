@@ -37,10 +37,10 @@ function UpdateServiceModalBody({ closeModal, extraObject }) {
     closeModal();
   };
 
-  const handleApproveOrUnapproveService = () => {
+  const handleApproveOrUnapproveService = (approve) => {
     dispatch(actionApproveOrUnapproveRegisterService({
       serviceId: extraObject.id,
-      approve: !extraObject.approve,
+      approve: approve,
     }))
   }
 
@@ -203,13 +203,13 @@ function UpdateServiceModalBody({ closeModal, extraObject }) {
           Update Service
         </button>
 
-        {(serviceDetails.status === 'UNAPPROVED' || serviceDetails.status === 'APPROVING') && (
-          <button className="btn btn-success w-36 ml-4" onClick={handleApproveOrUnapproveService}>
+        {(serviceDetails.status === 'APPROVING') && (
+          <button className="btn btn-success w-36 ml-4" onClick={() => handleApproveOrUnapproveService(true)}>
             Approve
           </button>
         )}
-        {serviceDetails.status === 'APPROVED' && (
-          <button className="btn btn-warning w-36 ml-4" onClick={handleApproveOrUnapproveService}>
+        {serviceDetails.status === 'APPROVING' && (
+          <button className="btn btn-warning w-36 ml-4" onClick={() => handleApproveOrUnapproveService(false)}>
             Unapprove
           </button>
         )}

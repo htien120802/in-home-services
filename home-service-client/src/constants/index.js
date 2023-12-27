@@ -16,6 +16,7 @@ export const LOCATION = {
   PROVIDERSERVICE: '/provider/services',
   PROVIDERBOOKING: '/provider/bookings',
   PROVIDERPROFILE: '/provider/profile',
+  PROVIDERREVIEW: '/provider/reviews',
 
   ADMINBOOKINGMANAGER: '/admin/booking-manager',
   ADMINPROVIDERMANAGER: '/admin/provider',

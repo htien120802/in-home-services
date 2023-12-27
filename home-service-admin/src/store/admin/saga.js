@@ -27,6 +27,10 @@ import { GET_ALL_SERVICES,
   DELETE_ADDRESS,
   APPROVE_OR_UNAPPROVE_REGISTER_SERVICE,
   GET_COUNT,
+  GET_SALES_STATISTICS_BY_PROVIDER,
+  GET_QUANTITY_STATISTICS_BY_PROVIDER,
+  GET_TOP_SALES_PROVIDER,
+  GET_TOP_QUANTITY_PROVIDER,
 } from './actionTypes';
 
 import {
@@ -78,6 +82,14 @@ import {
   actionApproveOrUnapproveRegisterServiceFailed,
   actionGetCountSuccess,
   actionGetCountFailed,
+  actionGetSalesStatisticsByProviderSuccess,
+  actionGetSalesStatisticsByProviderFailed,
+  actionGetQuantityStatisticsByProviderSuccess,
+  actionGetQuantityStatisticsByProviderFailed,
+  actionGetTopSalesProviderSuccess,
+  actionGetTopSalesProviderFailed,
+  actionGetTopQuantityProviderSuccess,
+  actionGetTopQuantityProviderFailed,
 } from './actions';
 
 function* getCount() {
@@ -110,6 +122,50 @@ function* getQuantityStatistics({ payload }) {
     yield put(actionGetQuantityStatisticsSuccess(response.data));
   } catch (error) {
     yield put(actionGetQuantityStatisticsFailed());
+    toast.error(error.response.data.message);
+  }
+}
+
+function* getSalesStatisticsByProvider({ payload }) {
+  try {
+    const response = yield call(adminAPI.getSalesStatisticsByMonthYearAndProvider, payload);
+
+    yield put(actionGetSalesStatisticsByProviderSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetSalesStatisticsByProviderFailed());
+    toast.error(error.response.data.message);
+  }
+}
+
+function* getQuantityStatisticsByProvider({ payload }) {
+  try {
+    const response = yield call(adminAPI.getQuantityStatisticsByMonthYearAndProvider, payload);
+
+    yield put(actionGetQuantityStatisticsByProviderSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetQuantityStatisticsByProviderFailed());
+    toast.error(error.response.data.message);
+  }
+}
+
+function* getTopSalesProvider({payload}) {
+  try {
+    const response = yield call(adminAPI.getTopSalesProvider, payload);
+
+    yield put(actionGetTopSalesProviderSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetTopSalesProviderFailed());
+    toast.error(error.response.data.message);
+  }
+}
+
+function* getTopQuantityProvider({payload}) {
+  try {
+    const response = yield call(adminAPI.getTopQuantityProvider, payload);
+
+    yield put(actionGetTopQuantityProviderSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetTopQuantityProviderFailed());
     toast.error(error.response.data.message);
   }
 }
@@ -441,6 +497,10 @@ export default function* loginSaga() {
   yield takeLeading(CREATE_CUSTOMER, createCustomer);
   yield takeLeading(GET_SALES_STATISTICS, getSalesStatistics);
   yield takeLeading(GET_QUANTITY_STATISTICS, getQuantityStatistics);
+  yield takeLeading(GET_SALES_STATISTICS_BY_PROVIDER, getSalesStatisticsByProvider);
+  yield takeLeading(GET_QUANTITY_STATISTICS_BY_PROVIDER, getQuantityStatisticsByProvider);
+  yield takeLeading(GET_TOP_SALES_PROVIDER, getTopSalesProvider);
+  yield takeLeading(GET_TOP_QUANTITY_PROVIDER, getTopQuantityProvider);
   yield takeLeading(GET_ALL_REVIEWS, getAllReviews);
   yield takeLeading(GET_REVIEW, getReview);
   yield takeLeading(DELETE_REVIEW, deleteReview);

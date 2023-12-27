@@ -17,6 +17,8 @@ import {
   SET_SELECTED_WORKS,
   GET_CUSTOMER_BOOKING,
   GET_PROVIDER_BOOKING,
+  POST_CUSTOMER_BOOKING_REVIEW,
+  GET_PROVIDER_BOOKING_REVIEW,
 } from './actionTypes';
 
 import {
@@ -42,6 +44,10 @@ import {
   actionGetProviderBookingFailed,
   actionGetCustomerBookingSuccess,
   actionGetCustomerBookingFailed,
+  actionPostCustomerBookingReviewSuccess,
+  actionPostCustomerBookingReviewFailed,
+  actionGetProviderBookingReviewSuccess,
+  actionGetProviderBookingReviewFailed,
 } from './actions';
 
 function* updateBookingStatus({ payload }) {
@@ -207,6 +213,34 @@ function* getCustomerBooking({ payload }) {
   }
 }
 
+function* postCustomerBookingReview({ payload }) {
+  try {
+    const response = yield call(bookingAPI.postCustomerReview, payload);
+
+    yield put(actionPostCustomerBookingReviewSuccess(response.data));
+
+    if (response.status === 'success') {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  } catch (error) {
+    toast.error(error.response.data.message);
+
+    yield put(actionPostCustomerBookingReviewFailed());
+  }
+}
+
+function* getProviderBookingReview({ payload }) {
+  try {
+    const response = yield call(bookingAPI.getProviderBookingReviews, payload);
+
+    yield put(actionGetProviderBookingReviewSuccess(response.data));
+  } catch (error) {
+    yield put(actionGetProviderBookingReviewFailed());
+  }
+}
+
 export default function* bookingSaga() {
   yield takeLeading(UPDATE_BOOKING_STATUS, updateBookingStatus);
   yield takeLeading(PROVIDER_CANCEL_BOOKING, providerCancelBooking);
@@ -219,4 +253,6 @@ export default function* bookingSaga() {
   yield takeLatest(SET_SELECTED_WORKS, setSelectedWorks);
   yield takeLeading(GET_PROVIDER_BOOKING, getProviderBooking);
   yield takeLeading(GET_CUSTOMER_BOOKING, getCustomerBooking);
+  yield takeLeading(POST_CUSTOMER_BOOKING_REVIEW, postCustomerBookingReview);
+  yield takeLeading(GET_PROVIDER_BOOKING_REVIEW, getProviderBookingReview);
 }
